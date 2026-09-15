@@ -57,10 +57,9 @@ const features = [
 ];
 
 const plans = [
-  { name: "Free", price: "₹10", suffix: "/ monthly", items: ["50 Orders/month", "1 Merchant Account", "1 Webhook", "Basic Support"] },
-  { name: "Starter", price: "₹499", suffix: "/ monthly", popular: true, items: ["5,000 Orders/month", "3 Merchant Accounts", "Unlimited Webhooks", "Unlimited Payment Links", "Email Support"] },
-  { name: "Business", price: "₹1", suffix: "/ monthly", items: ["Unlimited Orders", "Unlimited Merchants", "Unlimited Webhooks", "Unlimited Payment Links", "Priority Support", "Advanced Analytics"] },
-  { name: "Enterprise", price: "Custom", suffix: "pricing", items: ["Custom Pricing", "Unlimited Everything", "Dedicated Account Manager", "Custom Integration", "SLA Guarantee", "24/7 Support"] },
+  { name: "Free", price: "₹0", suffix: "forever", items: ["3 QR codes in total", "Basic analytics", "Email support"] },
+  { name: "Pro", price: "₹299", suffix: "/ 30 days", popular: true, items: ["3,000 QR codes in 30 days", "Instant activation on payment", "Priority support"] },
+  { name: "Custom", price: "Talk to us", suffix: "for higher volume", items: ["Custom QR limits", "Dedicated settlements", "Account manager"] },
 ];
 
 function BrandMark() {
