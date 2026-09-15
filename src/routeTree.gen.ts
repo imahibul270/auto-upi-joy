@@ -24,6 +24,8 @@ import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedTransactionsRouteImport } from './routes/_authenticated/transactions'
 import { Route as PaySlugRouteImport } from './routes/pay.$slug'
 import { Route as ApiPublicPaymentsPollRouteImport } from './routes/api/public/payments/poll'
+import { Route as ApiPublicV1CreateOrderRouteImport } from './routes/api/public/v1/create-order'
+import { Route as ApiPublicV1OrderStatusRouteImport } from './routes/api/public/v1/order-status'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -102,6 +104,16 @@ const ApiPublicPaymentsPollRoute = ApiPublicPaymentsPollRouteImport.update({
   path: '/api/public/payments/poll',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicV1CreateOrderRoute = ApiPublicV1CreateOrderRouteImport.update({
+  id: '/api/public/v1/create-order',
+  path: '/api/public/v1/create-order',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1OrderStatusRoute = ApiPublicV1OrderStatusRouteImport.update({
+  id: '/api/public/v1/order-status',
+  path: '/api/public/v1/order-status',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -118,6 +130,8 @@ export interface FileRoutesByFullPath {
   '/transactions': typeof AuthenticatedTransactionsRoute
   '/pay/$slug': typeof PaySlugRoute
   '/api/public/payments/poll': typeof ApiPublicPaymentsPollRoute
+  '/api/public/v1/create-order': typeof ApiPublicV1CreateOrderRoute
+  '/api/public/v1/order-status': typeof ApiPublicV1OrderStatusRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -134,6 +148,8 @@ export interface FileRoutesByTo {
   '/transactions': typeof AuthenticatedTransactionsRoute
   '/pay/$slug': typeof PaySlugRoute
   '/api/public/payments/poll': typeof ApiPublicPaymentsPollRoute
+  '/api/public/v1/create-order': typeof ApiPublicV1CreateOrderRoute
+  '/api/public/v1/order-status': typeof ApiPublicV1OrderStatusRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -152,6 +168,8 @@ export interface FileRoutesById {
   '/_authenticated/transactions': typeof AuthenticatedTransactionsRoute
   '/pay/$slug': typeof PaySlugRoute
   '/api/public/payments/poll': typeof ApiPublicPaymentsPollRoute
+  '/api/public/v1/create-order': typeof ApiPublicV1CreateOrderRoute
+  '/api/public/v1/order-status': typeof ApiPublicV1OrderStatusRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -170,6 +188,8 @@ export interface FileRouteTypes {
     | '/transactions'
     | '/pay/$slug'
     | '/api/public/payments/poll'
+    | '/api/public/v1/create-order'
+    | '/api/public/v1/order-status'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -186,6 +206,8 @@ export interface FileRouteTypes {
     | '/transactions'
     | '/pay/$slug'
     | '/api/public/payments/poll'
+    | '/api/public/v1/create-order'
+    | '/api/public/v1/order-status'
   id:
     | '__root__'
     | '/'
@@ -203,6 +225,8 @@ export interface FileRouteTypes {
     | '/_authenticated/transactions'
     | '/pay/$slug'
     | '/api/public/payments/poll'
+    | '/api/public/v1/create-order'
+    | '/api/public/v1/order-status'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -214,6 +238,8 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   PaySlugRoute: typeof PaySlugRoute
   ApiPublicPaymentsPollRoute: typeof ApiPublicPaymentsPollRoute
+  ApiPublicV1CreateOrderRoute: typeof ApiPublicV1CreateOrderRoute
+  ApiPublicV1OrderStatusRoute: typeof ApiPublicV1OrderStatusRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -323,6 +349,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsPollRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/v1/create-order': {
+      id: '/api/public/v1/create-order'
+      path: '/api/public/v1/create-order'
+      fullPath: '/api/public/v1/create-order'
+      preLoaderRoute: typeof ApiPublicV1CreateOrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/order-status': {
+      id: '/api/public/v1/order-status'
+      path: '/api/public/v1/order-status'
+      fullPath: '/api/public/v1/order-status'
+      preLoaderRoute: typeof ApiPublicV1OrderStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -358,6 +398,8 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   PaySlugRoute: PaySlugRoute,
   ApiPublicPaymentsPollRoute: ApiPublicPaymentsPollRoute,
+  ApiPublicV1CreateOrderRoute: ApiPublicV1CreateOrderRoute,
+  ApiPublicV1OrderStatusRoute: ApiPublicV1OrderStatusRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

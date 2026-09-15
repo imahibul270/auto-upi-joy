@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Copy, KeyRound, Plus, RefreshCw, ShieldCheck, Trash2 } from "lucide-react";
+import { Copy, KeyRound, Plus, RefreshCw, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ConsoleLayout } from "@/components/console/ConsoleLayout";
 import { useConsoleName } from "@/components/console/useConsoleName";
 import { Swal } from "@/lib/swal";
-import { formatDate, issueApiKey, revokeApiKey, useApiKeys } from "@/lib/gateway";
+import { formatDate, issueApiKey, useApiKeys } from "@/lib/gateway";
 
 export const Route = createFileRoute("/_authenticated/api-keys")({
   head: () => ({ meta: [
