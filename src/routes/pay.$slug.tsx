@@ -32,17 +32,31 @@ function PayPage() {
 
   useEffect(() => {
     let active = true;
+    let pending = true;
     void supabase.rpc("register_payment_link_click", { _slug: slug });
+
+    const kickDetection = () => {
+      if (!pending) return;
+      void fetch("/api/public/payments/poll", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ slug }),
+      }).catch(() => {});
+    };
 
     const load = async () => {
       const { data } = await supabase.rpc("get_public_payment_link", { _slug: slug });
       if (!active) return;
-      setLink((data as unknown as PublicLink) ?? null);
+      const next = (data as unknown as PublicLink) ?? null;
+      pending = next?.status === "active";
+      setLink(next);
       setLoading(false);
     };
     void load();
-    const timer = setInterval(() => void load(), 3000);
-    return () => { active = false; clearInterval(timer); };
+    kickDetection();
+    const timer = setInterval(() => void load(), 2000);
+    const poller = setInterval(kickDetection, 3000);
+    return () => { active = false; clearInterval(timer); clearInterval(poller); };
   }, [slug]);
 
   useEffect(() => {

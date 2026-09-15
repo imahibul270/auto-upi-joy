@@ -1,4 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { pollMyPayments } from "@/lib/gmail.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 export type Provider = "phonepe" | "paytm";
@@ -104,14 +106,17 @@ export type PaymentLinkRow = {
   clicks: number;
   paid_count: number;
   paid_at: string | null;
+  detected_at: string | null;
+  expires_at: string;
   payer_name: string | null;
+  payer_email: string | null;
   created_at: string;
 };
 
 export async function fetchPaymentLinks(): Promise<PaymentLinkRow[]> {
   const { data, error } = await supabase
     .from("payment_links")
-    .select("id,order_id,slug,customer_name,amount,payable_amount,link_type,status,clicks,paid_count,paid_at,payer_name,created_at")
+    .select("id,order_id,slug,customer_name,amount,payable_amount,link_type,status,clicks,paid_count,paid_at,detected_at,expires_at,payer_name,payer_email,created_at")
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as PaymentLinkRow[];
@@ -122,8 +127,33 @@ export function usePaymentLinks() {
   return useQuery({
     queryKey: ["payment-links"],
     queryFn: fetchPaymentLinks,
-    refetchInterval: 5000,
+    refetchInterval: 3000,
     refetchOnWindowFocus: true,
+  });
+}
+
+/** Only links that can still be paid. */
+export function useActiveLinks() {
+  const query = usePaymentLinks();
+  return { ...query, rows: (query.data ?? []).filter((row) => row.status === "active") };
+}
+
+/** Settled links — these are the transactions. */
+export function useTransactions() {
+  const query = usePaymentLinks();
+  return { ...query, rows: (query.data ?? []).filter((row) => row.status !== "active") };
+}
+
+/** How long detection took, in seconds. */
+export function detectionSeconds(row: PaymentLinkRow): number | null {
+  if (!row.paid_at || !row.detected_at) return null;
+  const seconds = Math.round((Date.parse(row.detected_at) - Date.parse(row.paid_at)) / 1000);
+  return seconds >= 0 ? seconds : null;
+}
+
+export function formatTime(value: string) {
+  return new Date(value).toLocaleString("en-IN", {
+    day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit",
   });
 }
 
@@ -152,4 +182,28 @@ export function formatInr(value: number) {
 
 export function formatDate(value: string) {
   return new Date(value).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+}
+
+/**
+ * Runs the mailbox scan for the signed-in merchant every few seconds so
+ * payments show up on the dashboard and transactions list in real time.
+ */
+export function usePaymentDetection(enabled = true) {
+  const queryClient = useQueryClient();
+  const poll = useServerFn(pollMyPayments);
+
+  return useQuery({
+    queryKey: ["payment-detection"],
+    enabled,
+    refetchInterval: 5000,
+    refetchOnWindowFocus: true,
+    retry: false,
+    queryFn: async () => {
+      const result = await poll({ data: undefined as never });
+      if (result.matched > 0 || result.expired > 0) {
+        await queryClient.invalidateQueries({ queryKey: ["payment-links"] });
+      }
+      return result;
+    },
+  });
 }

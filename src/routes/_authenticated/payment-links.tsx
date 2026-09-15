@@ -13,7 +13,8 @@ import {
   formatDate,
   formatInr,
   paymentLinkUrl,
-  usePaymentLinks,
+  useActiveLinks,
+  usePaymentDetection,
   useMerchantAccounts,
 } from "@/lib/gateway";
 
@@ -37,7 +38,8 @@ function PaymentLinksPage() {
   const { user } = Route.useRouteContext();
   const name = useConsoleName(user);
   const queryClient = useQueryClient();
-  const { data: links = [] } = usePaymentLinks();
+  usePaymentDetection();
+  const { rows: links } = useActiveLinks();
   const { data: accounts = [] } = useMerchantAccounts();
   const [amount, setAmount] = useState("");
   const [customer, setCustomer] = useState("");
@@ -115,12 +117,12 @@ function PaymentLinksPage() {
       </section>
 
       <section className="console-card reveal-delay-2" data-reveal>
-        <div className="console-card-head"><h3>Your links</h3><small>Live status</small></div>
+        <div className="console-card-head"><h3>Active links</h3><small>Paid and expired links move to Transactions</small></div>
         {links.length === 0 ? (
           <div className="console-empty console-empty-row">
             <Link2 />
-            <p>No payment links yet</p>
-            <small>Generate your first link above and share it with a customer.</small>
+            <p>No active links</p>
+            <small>Generate a link above; settled links are listed under Transactions.</small>
           </div>
         ) : (
           <div className="console-table-wrap">
