@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   BarChart3,
@@ -144,8 +144,8 @@ function Index() {
             <a href="#developers" onClick={() => setMenuOpen(false)}>Developers</a>
             <a href="#pricing" onClick={() => setMenuOpen(false)}>Pricing</a>
             <a href="#developers" onClick={() => setMenuOpen(false)}>API Docs</a>
-            <a href="#pricing" onClick={() => setMenuOpen(false)}>Sign in</a>
-            <a className="button button-primary nav-cta" href="#pricing">Create account <ArrowRight /></a>
+            <Link to="/auth" onClick={() => setMenuOpen(false)}>Sign in</Link>
+            <Link className="button button-primary nav-cta" to="/register">Create account <ArrowRight /></Link>
           </nav>
           <button className="menu-button" type="button" aria-label={menuOpen ? "Close menu" : "Open menu"} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button>
         </header>
@@ -158,7 +158,7 @@ function Index() {
             <h1>Payments that move at the speed of <mark>your business.</mark></h1>
             <p>Create secure UPI checkout links, connect merchant accounts, verify transactions and automate payment updates—all from one focused platform.</p>
             <div className="hero-actions">
-              <a className="button button-primary" href="#pricing">Start accepting payments <ArrowRight /></a>
+              <Link className="button button-primary" to="/register">Start accepting payments <ArrowRight /></Link>
               <a className="button button-outline" href="#how-it-works"><CirclePlay /> View payment demo</a>
             </div>
             <div className="trust-row"><span><ShieldCheck /> Secure checkout</span><span><Webhook /> Real-time webhooks</span><span><Code2 /> Developer-ready API</span></div>
@@ -211,7 +211,7 @@ function Index() {
         <div className="pricing-grid">{plans.map(plan => <article className={plan.popular ? "price-card popular" : "price-card"} key={plan.name}>{plan.popular && <div className="popular-label">MOST POPULAR</div>}<h3>{plan.name}</h3><div className="price"><strong>{plan.price}</strong><span>{plan.suffix}</span></div><ul>{plan.items.map(item => <li key={item}><Check /> {item}</li>)}</ul><a className={plan.popular ? "button button-primary" : "button button-dark"} href="mailto:support@autoupi.in">{plan.name === 'Enterprise' ? 'Contact sales' : `Choose ${plan.name}`} <ArrowRight /></a></article>)}</div>
       </section>
 
-      <section className="cta-section"><div><span>READY FOR PRODUCTION</span><h2>Turn every payment into a clear,<br /> trackable workflow.</h2><p>Set up your merchant workspace and create your first payment link.</p><a className="button button-primary" href="#pricing">Create free account <ArrowRight /></a></div></section>
+       <section className="cta-section"><div><span>READY FOR PRODUCTION</span><h2>Turn every payment into a clear,<br /> trackable workflow.</h2><p>Set up your merchant workspace and create your first payment link.</p><Link className="button button-primary" to="/register">Create free account <ArrowRight /></Link></div></section>
       <footer><div><Logo /><p>Payment infrastructure built for ambitious Indian businesses.</p></div><div><a href="#product">Product</a><a href="#developers">Developers</a><a href="#pricing">Pricing</a></div><span>© 2026 Auto Upi. All rights reserved.</span></footer>
     </main>
   );
