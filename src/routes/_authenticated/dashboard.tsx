@@ -65,7 +65,7 @@ function DashboardPage() {
   ];
 
   return (
-    <ConsoleLayout title="Dashboard" userName={name}>
+    <ConsoleLayout title="Dashboard" user={user} userName={name}>
       <section className="console-welcome" data-reveal>
         <div>
           <h2>Welcome Back, {name}!</h2>

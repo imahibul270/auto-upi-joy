@@ -18,7 +18,7 @@ function ConnectAccountsPage() {
   const name = useConsoleName(user);
 
   return (
-    <ConsoleLayout title="Connect Accounts" userName={name}>
+    <ConsoleLayout title="Connect Accounts" user={user} userName={name}>
       <section className="console-page-head" data-reveal>
         <h2>Connect Accounts</h2>
         <p>Add the UPI IDs and bank accounts where your money should settle.</p>

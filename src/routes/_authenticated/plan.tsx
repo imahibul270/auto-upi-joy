@@ -24,7 +24,7 @@ function PlanPage() {
   const name = useConsoleName(user);
 
   return (
-    <ConsoleLayout title="Plan" userName={name}>
+    <ConsoleLayout title="Plan" user={user} userName={name}>
       <section className="console-page-head" data-reveal>
         <h2>Your Plan</h2>
         <p>You are on the Free plan. Upgrade anytime as your payment volume grows.</p>
