@@ -86,7 +86,6 @@ export function ConsoleLayout({
           <div className="console-top-right">
             <span className="console-live"><i />Live</span>
             <button type="button" className="console-icon-btn" aria-label="Notifications"><Bell /></button>
-            <Button variant="outline" size="sm" onClick={signOut}><LogOut /> Sign out</Button>
           </div>
         </header>
         <main className="console-body">{children}</main>
