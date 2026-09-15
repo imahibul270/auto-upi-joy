@@ -18,7 +18,7 @@ function TransactionsPage() {
   const name = useConsoleName(user);
 
   return (
-    <ConsoleLayout title="Transactions" userName={name}>
+    <ConsoleLayout title="Transactions" user={user} userName={name}>
       <section className="console-page-head" data-reveal>
         <h2>Transactions</h2>
         <p>All payments captured on your account will be listed here.</p>

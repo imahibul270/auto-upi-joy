@@ -18,7 +18,7 @@ function ApiKeysPage() {
   const name = useConsoleName(user);
 
   return (
-    <ConsoleLayout title="API Keys" userName={name}>
+    <ConsoleLayout title="API Keys" user={user} userName={name}>
       <section className="console-page-head" data-reveal>
         <h2>API Keys</h2>
         <p>Keys let your website or app create payments through Auto Upi.</p>

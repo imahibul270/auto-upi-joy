@@ -281,6 +281,7 @@ section[id]{scroll-margin-top:var(--header-height)}
 .console-menu-item.is-active{background:linear-gradient(95deg,var(--primary),oklch(.82 .18 135));color:var(--primary-foreground);font-weight:700}
 .console-user{display:flex;align-items:center;gap:.7rem;margin-top:1rem;padding:.8rem;border-radius:.7rem;background:color-mix(in oklab,var(--hero-foreground) 7%,transparent)}
 .console-avatar{display:grid;place-items:center;width:2.2rem;height:2.2rem;border-radius:.55rem;background:var(--primary);color:var(--primary-foreground);font-weight:800}
+.console-avatar img,.console-logo-preview img{width:100%;height:100%;object-fit:cover;border-radius:inherit}
 .console-user strong{display:block;font-size:.82rem}
 .console-user small{font-size:.58rem;color:color-mix(in oklab,var(--hero-foreground) 55%,transparent)}
 .console-scrim{position:fixed;inset:0;z-index:35;border:0;background:oklch(0 0 0/.45)}
@@ -340,6 +341,7 @@ section[id]{scroll-margin-top:var(--header-height)}
 .console-side-scroll{flex:1;min-height:0;overflow-y:auto}
 .console-menu-item{text-decoration:none}
 .console-user-fixed{position:sticky;bottom:0;margin-top:.75rem}
+.console-profile-trigger{min-width:0;flex:1;height:auto;justify-content:flex-start;padding:0;color:inherit;text-align:left}.console-profile-trigger:hover{background:transparent;color:inherit}.console-user-copy{min-width:0}.console-user-copy strong,.console-user-copy small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.console-profile-dialog{max-height:min(90vh,760px);overflow-y:auto}.console-settings-section{display:grid;gap:.8rem;padding-top:1rem;border-top:1px solid var(--border)}.console-settings-heading{display:flex;align-items:center;gap:.7rem}.console-settings-heading>svg{width:1.1rem;color:oklch(.46 .14 164)}.console-settings-heading strong,.console-settings-heading small{display:block}.console-settings-heading small{margin-top:.18rem;font-size:.7rem;color:var(--muted-foreground)}.console-logo-editor{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap}.console-logo-preview{display:grid;place-items:center;width:3.2rem;height:3.2rem;overflow:hidden;border-radius:.65rem;background:var(--primary);color:var(--primary-foreground);font-weight:800}.console-settings-section label{display:grid;gap:.4rem;font-size:.78rem;font-weight:600}.console-settings-message{font-size:.72rem;color:var(--muted-foreground)}.console-password-visibility{justify-self:start;padding-inline:0}.console-password-visibility:hover{background:transparent}
 .console-signout{margin-left:auto;display:grid;place-items:center;width:2rem;height:2rem;border-radius:.5rem;border:0;background:color-mix(in oklab,var(--hero-foreground) 10%,transparent);color:var(--hero-foreground);cursor:pointer;transition:background .2s ease}
 .console-signout:hover{background:color-mix(in oklab,var(--hero-foreground) 20%,transparent)}
 .console-signout svg{width:.95rem}

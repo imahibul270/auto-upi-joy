@@ -18,7 +18,7 @@ function SupportPage() {
   const name = useConsoleName(user);
 
   return (
-    <ConsoleLayout title="Support" userName={name}>
+    <ConsoleLayout title="Support" user={user} userName={name}>
       <section className="console-page-head" data-reveal>
         <h2>Support</h2>
         <p>Need help? Our team usually replies within a few hours.</p>

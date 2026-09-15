@@ -18,7 +18,7 @@ function PaymentLinksPage() {
   const name = useConsoleName(user);
 
   return (
-    <ConsoleLayout title="Payment Links" userName={name}>
+    <ConsoleLayout title="Payment Links" user={user} userName={name}>
       <section className="console-page-head" data-reveal>
         <h2>Payment Links</h2>
         <p>Create shareable links and collect payments without any integration.</p>
