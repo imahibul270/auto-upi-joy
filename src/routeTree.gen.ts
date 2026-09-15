@@ -23,6 +23,8 @@ import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/p
 import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
 import { Route as AuthenticatedTransactionsRouteImport } from './routes/_authenticated/transactions'
 import { Route as PaySlugRouteImport } from './routes/pay.$slug'
+import { Route as ApiPublicGmailCallbackRouteImport } from './routes/api/public/gmail/callback'
+import { Route as ApiPublicPaymentsPollRouteImport } from './routes/api/public/payments/poll'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -96,6 +98,16 @@ const PaySlugRoute = PaySlugRouteImport.update({
   path: '/pay/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicGmailCallbackRoute = ApiPublicGmailCallbackRouteImport.update({
+  id: '/api/public/gmail/callback',
+  path: '/api/public/gmail/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicPaymentsPollRoute = ApiPublicPaymentsPollRouteImport.update({
+  id: '/api/public/payments/poll',
+  path: '/api/public/payments/poll',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -111,6 +123,8 @@ export interface FileRoutesByFullPath {
   '/support': typeof AuthenticatedSupportRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
   '/pay/$slug': typeof PaySlugRoute
+  '/api/public/gmail/callback': typeof ApiPublicGmailCallbackRoute
+  '/api/public/payments/poll': typeof ApiPublicPaymentsPollRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -126,6 +140,8 @@ export interface FileRoutesByTo {
   '/support': typeof AuthenticatedSupportRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
   '/pay/$slug': typeof PaySlugRoute
+  '/api/public/gmail/callback': typeof ApiPublicGmailCallbackRoute
+  '/api/public/payments/poll': typeof ApiPublicPaymentsPollRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -143,6 +159,8 @@ export interface FileRoutesById {
   '/_authenticated/support': typeof AuthenticatedSupportRoute
   '/_authenticated/transactions': typeof AuthenticatedTransactionsRoute
   '/pay/$slug': typeof PaySlugRoute
+  '/api/public/gmail/callback': typeof ApiPublicGmailCallbackRoute
+  '/api/public/payments/poll': typeof ApiPublicPaymentsPollRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -160,6 +178,8 @@ export interface FileRouteTypes {
     | '/support'
     | '/transactions'
     | '/pay/$slug'
+    | '/api/public/gmail/callback'
+    | '/api/public/payments/poll'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -175,6 +195,8 @@ export interface FileRouteTypes {
     | '/support'
     | '/transactions'
     | '/pay/$slug'
+    | '/api/public/gmail/callback'
+    | '/api/public/payments/poll'
   id:
     | '__root__'
     | '/'
@@ -191,6 +213,8 @@ export interface FileRouteTypes {
     | '/_authenticated/support'
     | '/_authenticated/transactions'
     | '/pay/$slug'
+    | '/api/public/gmail/callback'
+    | '/api/public/payments/poll'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -201,6 +225,8 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   PaySlugRoute: typeof PaySlugRoute
+  ApiPublicGmailCallbackRoute: typeof ApiPublicGmailCallbackRoute
+  ApiPublicPaymentsPollRoute: typeof ApiPublicPaymentsPollRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -303,6 +329,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PaySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/gmail/callback': {
+      id: '/api/public/gmail/callback'
+      path: '/api/public/gmail/callback'
+      fullPath: '/api/public/gmail/callback'
+      preLoaderRoute: typeof ApiPublicGmailCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/payments/poll': {
+      id: '/api/public/payments/poll'
+      path: '/api/public/payments/poll'
+      fullPath: '/api/public/payments/poll'
+      preLoaderRoute: typeof ApiPublicPaymentsPollRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -337,6 +377,8 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   PaySlugRoute: PaySlugRoute,
+  ApiPublicGmailCallbackRoute: ApiPublicGmailCallbackRoute,
+  ApiPublicPaymentsPollRoute: ApiPublicPaymentsPollRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
