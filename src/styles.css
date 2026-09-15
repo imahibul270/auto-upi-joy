@@ -235,7 +235,7 @@
 .bars i:nth-child(2){height:43%}.bars i:nth-child(3){height:62%}.bars i:nth-child(4){height:55%}.bars i:nth-child(5){height:74%}.bars i:nth-child(6){height:88%}
 .dash-grid .pay-card { display:flex; flex-direction:column; align-items:center; }
 .qr-code { color:var(--foreground); width:92px; height:92px; margin:auto; }
-.pay-card span { font-size:.5rem; font-weight:700; background:var(--soft-green); padding:.45rem .6rem; border-radius:.45rem; width:100%; text-align:center; }
+.dash-grid .pay-card span { font-size:.5rem; font-weight:700; background:var(--soft-green); padding:.45rem .6rem; border-radius:.45rem; width:100%; text-align:center; }
 .payment-toast { position:absolute; z-index:2; display:flex; gap:.65rem; align-items:center; padding:.7rem .9rem; border-radius:.65rem; background:var(--background); color:var(--foreground); box-shadow:var(--shadow-brand); animation:toast-in 5s ease infinite; }
 .payment-toast > span { display:grid; place-items:center; width:1.8rem;height:1.8rem;border-radius:.5rem;background:var(--mint);color:oklch(0.55 0.15 157); }
 .payment-toast svg { width:1rem; }
