@@ -2,6 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import bhimUpiLogo from "@/assets/bhim-upi-logo.png.asset.json";
+import upiAppsRow from "@/assets/upi-apps-row.png.asset.json";
 
 export const Route = createFileRoute("/pay/$slug")({
   head: () => ({ meta: [
@@ -29,6 +32,14 @@ function PayPage() {
   const [link, setLink] = useState<PublicLink | null>(null);
   const [qr, setQr] = useState("");
   const [loading, setLoading] = useState(true);
+  const [secondsLeft, setSecondsLeft] = useState(5 * 60);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setSecondsLeft((seconds) => Math.max(seconds - 1, 0));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -68,29 +79,44 @@ function PayPage() {
   return (
     <div className="pay-screen">
       <div className="pay-card">
-        <span className="pay-brand">Auto Upi</span>
+        <header className="pay-head">
+          <img className="pay-bhim-logo" src={bhimUpiLogo.url} alt="BHIM UPI" />
+          {!loading && link && (
+            <>
+              <h1 className="pay-payee">{link.payee_name || link.upi_id}</h1>
+              <p className="pay-transfer-label">Transfer to</p>
+            </>
+          )}
+        </header>
         {loading ? (
-          <p className="pay-note">Loading payment…</p>
+          <div className="pay-state"><p className="pay-note">Loading payment…</p></div>
         ) : !link ? (
-          <p className="pay-note">This payment link does not exist.</p>
+          <div className="pay-state"><p className="pay-note">This payment link does not exist.</p></div>
         ) : link.status === "paid" ? (
-          <>
+          <div className="pay-state">
             <h1 className="pay-amount">₹{link.payable_amount.toFixed(2)}</h1>
             <p className="pay-success">Payment received</p>
             <p className="pay-note">Order {link.order_id}</p>
-          </>
+          </div>
         ) : link.status === "expired" ? (
-          <>
+          <div className="pay-state">
             <h1 className="pay-amount">₹{link.payable_amount.toFixed(2)}</h1>
             <p className="pay-note">This payment link has expired.</p>
-          </>
+          </div>
         ) : (
           <>
-            <p className="pay-payee">{link.payee_name || link.upi_id}</p>
-            <h1 className="pay-amount">₹{link.payable_amount.toFixed(2)}</h1>
-            {qr ? <img className="pay-qr" src={qr} alt="UPI QR code" width={220} height={220} /> : <div className="pay-qr pay-qr-skeleton" />}
-            <p className="pay-note">Pay the exact amount so it is detected automatically.</p>
-            <p className="pay-order">Order {link.order_id}</p>
+            <section className="pay-total">
+              <span>Total Amount</span>
+              <strong>₹{link.payable_amount.toFixed(2)}</strong>
+            </section>
+            <section className="pay-code-area">
+              {qr ? <img className="pay-qr" src={qr} alt="UPI QR code" width={250} height={250} /> : <div className="pay-qr pay-qr-skeleton" />}
+              <img className="pay-apps" src={upiAppsRow.url} alt="Supported UPI payment apps" />
+            </section>
+            <footer className="pay-footer">
+              <p>Expire in <strong>{Math.floor(secondsLeft / 60).toString().padStart(2, "0")}:{(secondsLeft % 60).toString().padStart(2, "0")}</strong></p>
+              <Button type="button" className="pay-cancel">Cancel</Button>
+            </footer>
           </>
         )}
       </div>
