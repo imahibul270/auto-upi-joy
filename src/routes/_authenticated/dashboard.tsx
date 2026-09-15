@@ -85,7 +85,7 @@ function DashboardPage() {
   const recent = [...links]
     .filter((row) => row.status !== "active")
     .sort((a, b) => Date.parse(b.paid_at ?? b.created_at) - Date.parse(a.paid_at ?? a.created_at))
-    .slice(0, 6);
+    .slice(0, 4);
 
   const stats = [
     { label: "Total Revenue", value: formatInr(revenue), icon: BadgeIndianRupee, tone: "lime",
