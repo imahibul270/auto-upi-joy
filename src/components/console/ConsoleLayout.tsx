@@ -49,12 +49,11 @@ export function ConsoleLayout({
         <div className="console-side-scroll">
           <p className="console-side-label">MAIN MENU</p>
           <nav className="console-menu">
-            {CONSOLE_MENU.map((item, index) => (
+            {CONSOLE_MENU.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
-                className={`console-menu-item${pathname === item.href ? " is-active" : ""} reveal-delay-${(index % 4) + 1}`}
-                data-reveal
+                className={`console-menu-item${pathname === item.href ? " is-active" : ""}`}
               >
                 <item.icon />
                 <span>{item.label}</span>

@@ -121,31 +121,52 @@ function RootComponent() {
   const pathname = useLocation({ select: (location) => location.pathname });
 
   useEffect(() => {
-    let observer: IntersectionObserver | undefined;
-    const timer = window.setTimeout(() => {
-      const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        elements.forEach((element) => element.classList.add("is-revealed"));
-        return;
-      }
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-      observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            entry.target.classList.add("is-revealed");
-            observer?.unobserve(entry.target);
-          });
-        },
-        { threshold: 0.12, rootMargin: "0px 0px -7% 0px" },
-      );
+    const revealAll = () => {
+      document
+        .querySelectorAll<HTMLElement>("[data-reveal]")
+        .forEach((element) => element.classList.add("is-revealed"));
+    };
 
-      elements.forEach((element) => observer?.observe(element));
-    }, 120);
+    if (reduced) {
+      revealAll();
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-revealed");
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.05, rootMargin: "0px 0px -4% 0px" },
+    );
+
+    const scan = () => {
+      document.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-revealed)").forEach((element) => {
+        observer.observe(element);
+      });
+    };
+
+    scan();
+    const mutation = new MutationObserver(scan);
+    mutation.observe(document.body, { childList: true, subtree: true });
+    // Safety net: never leave above-the-fold content hidden.
+    const fallback = window.setTimeout(() => {
+      document.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-revealed)").forEach((element) => {
+        if (element.getBoundingClientRect().top < window.innerHeight) {
+          element.classList.add("is-revealed");
+        }
+      });
+    }, 900);
 
     return () => {
-      window.clearTimeout(timer);
-      observer?.disconnect();
+      window.clearTimeout(fallback);
+      mutation.disconnect();
+      observer.disconnect();
     };
   }, [pathname]);
 
