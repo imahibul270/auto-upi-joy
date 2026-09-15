@@ -22,9 +22,13 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   id          UUID PRIMARY KEY,
   full_name   TEXT NOT NULL DEFAULT '',
   mobile      TEXT NOT NULL DEFAULT '',
+  business_logo TEXT,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS business_logo TEXT;
 
 COMMENT ON TABLE public.profiles IS 'One row per registered user. id matches auth.users.id';
 

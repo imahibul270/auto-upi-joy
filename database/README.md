@@ -18,7 +18,7 @@ Open **SQL Editor → New query**, paste the whole content of `setup.sql`, press
 
 It creates:
 
-- `public.profiles` table (id, full_name, mobile, created_at, updated_at)
+- `public.profiles` table (id, full_name, mobile, business logo, created_at, updated_at)
 - Grants for `authenticated` and `service_role`
 - Row Level Security so a user can only read/write their own profile
 - `updated_at` auto-update trigger

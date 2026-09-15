@@ -1,15 +1,17 @@
 import { useRouterState } from "@tanstack/react-router";
 import {
-  Bell, CreditCard, KeyRound, LayoutGrid, LifeBuoy, Link2, LogOut, Menu, Receipt, Sparkles, X,
+  ArrowLeftRight, Bell, CreditCard, KeyRound, LayoutGrid, LifeBuoy, Link2, Menu, Sparkles, X,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import type { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
+import { ProfileSettings } from "@/components/console/ProfileSettings";
 import { supabase } from "@/integrations/supabase/client";
 
 export const CONSOLE_MENU = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutGrid },
-  { label: "Transactions", href: "/transactions", icon: Receipt },
+  { label: "Transactions", href: "/transactions", icon: ArrowLeftRight },
   { label: "Payment Links", href: "/payment-links", icon: Link2 },
   { label: "Connect Accounts", href: "/connect-accounts", icon: CreditCard },
   { label: "Plan", href: "/plan", icon: Sparkles },
@@ -19,18 +21,18 @@ export const CONSOLE_MENU = [
 
 export function ConsoleLayout({
   title,
+  user,
   userName,
   children,
 }: {
   title: string;
+  user: User;
   userName: string;
   children: ReactNode;
 }) {
   const queryClient = useQueryClient();
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const initial = (userName || "M").trim().charAt(0).toUpperCase();
-
   async function signOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
@@ -61,16 +63,7 @@ export function ConsoleLayout({
             ))}
           </nav>
         </div>
-        <div className="console-user console-user-fixed">
-          <span className="console-avatar">{initial}</span>
-          <div>
-            <strong>{userName}</strong>
-            <small>Free Plan</small>
-          </div>
-          <button type="button" className="console-signout" aria-label="Sign out" onClick={signOut}>
-            <LogOut />
-          </button>
-        </div>
+        <ProfileSettings user={user} userName={userName} onSignOut={signOut} />
       </aside>
 
       {menuOpen ? (
