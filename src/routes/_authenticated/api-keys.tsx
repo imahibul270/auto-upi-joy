@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Copy, KeyRound, Plus, RefreshCw, ShieldCheck, Trash2 } from "lucide-react";
+import { Copy, KeyRound, Plus, RefreshCw, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ConsoleLayout } from "@/components/console/ConsoleLayout";
 import { useConsoleName } from "@/components/console/useConsoleName";
 import { Swal } from "@/lib/swal";
-import { formatDate, issueApiKey, revokeApiKey, useApiKeys } from "@/lib/gateway";
+import { formatDate, issueApiKey, useApiKeys } from "@/lib/gateway";
 
 export const Route = createFileRoute("/_authenticated/api-keys")({
   head: () => ({ meta: [
@@ -34,7 +34,8 @@ function ApiKeysPage() {
   const { data: keys = [] } = useApiKeys();
   const [creating, setCreating] = useState(false);
   const [freshKey, setFreshKey] = useState<string | null>(null);
-  const hasActiveKey = keys.some((key) => key.active);
+  const activeKey = keys.find((key) => key.active) ?? null;
+  const hasActiveKey = Boolean(activeKey);
 
   async function create() {
     setCreating(true);
@@ -53,22 +54,6 @@ function ApiKeysPage() {
     } finally {
       setCreating(false);
     }
-  }
-
-  function revoke(id: string) {
-    void Swal.fire({
-      icon: "warning",
-      title: "Revoke this key?",
-      text: "Any app using it will stop working immediately.",
-      showCancelButton: true,
-      confirmButtonText: "Yes, revoke",
-      cancelButtonText: "Cancel",
-    }).then(async (result) => {
-      if (!result.isConfirmed) return;
-      await revokeApiKey(id);
-      await queryClient.invalidateQueries({ queryKey: ["api-keys"] });
-      void Swal.fire({ icon: "success", title: "Key revoked", draggable: true });
-    });
   }
 
   return (
@@ -97,35 +82,31 @@ function ApiKeysPage() {
       </section>
 
       <section className="console-card reveal-delay-2" data-reveal>
-        <div className="console-card-head"><h3>Your keys</h3><small>{keys.length} total</small></div>
-        {keys.length === 0 ? (
+        <div className="console-card-head"><h3>Active key</h3></div>
+        {!activeKey ? (
           <div className="console-empty console-empty-row">
             <KeyRound />
-            <p>No API keys yet</p>
-            <small>Create a key above to start integrating Auto Upi.</small>
+            <p>No API key yet</p>
+            <small>Generate a key above to start integrating Auto Upi.</small>
           </div>
         ) : (
           <div className="console-table-wrap">
             <table className="console-table">
               <thead>
-                <tr><th>NAME</th><th>KEY</th><th>WEBHOOK SECRET</th><th>STATUS</th><th>CREATED</th><th /></tr>
+                <tr><th>KEY</th><th>WEBHOOK SECRET</th><th>STATUS</th><th>CREATED</th></tr>
               </thead>
               <tbody>
-                {keys.map((row) => (
-                  <tr key={row.id}>
-                    <td><strong>{row.label}</strong></td>
-                    <td><code>{row.key_prefix}••••••••</code></td>
-                    <td>
-                      <span className="console-secret">
-                        <code>{`${row.webhook_secret.slice(0, 12)}••••`}</code>
-                        <button type="button" aria-label="Copy webhook secret" onClick={() => void copy(row.webhook_secret, "Webhook secret copied")}><Copy /></button>
-                      </span>
-                    </td>
-                    <td><span className={`console-pill${row.active ? " is-active" : " is-muted"}`}>{row.active ? "Active" : "Revoked"}</span></td>
-                    <td>{formatDate(row.created_at)}</td>
-                    <td>{row.active ? <button type="button" className="console-row-action" onClick={() => revoke(row.id)} aria-label="Revoke key"><Trash2 /></button> : null}</td>
-                  </tr>
-                ))}
+                <tr>
+                  <td><code>{activeKey.key_prefix}••••••••</code></td>
+                  <td>
+                    <span className="console-secret">
+                      <code>{`${activeKey.webhook_secret.slice(0, 12)}••••`}</code>
+                      <button type="button" aria-label="Copy webhook secret" onClick={() => void copy(activeKey.webhook_secret, "Webhook secret copied")}><Copy /></button>
+                    </span>
+                  </td>
+                  <td><span className="console-pill is-active">Active</span></td>
+                  <td>{formatDate(activeKey.created_at)}</td>
+                </tr>
               </tbody>
             </table>
           </div>
