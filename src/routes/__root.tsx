@@ -154,8 +154,14 @@ function RootComponent() {
     scan();
     const mutation = new MutationObserver(scan);
     mutation.observe(document.body, { childList: true, subtree: true });
-    // Safety net: never leave content hidden if observation misses an element.
-    const fallback = window.setTimeout(revealAll, 1200);
+    // Safety net: never leave above-the-fold content hidden.
+    const fallback = window.setTimeout(() => {
+      document.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-revealed)").forEach((element) => {
+        if (element.getBoundingClientRect().top < window.innerHeight) {
+          element.classList.add("is-revealed");
+        }
+      });
+    }, 900);
 
     return () => {
       window.clearTimeout(fallback);
