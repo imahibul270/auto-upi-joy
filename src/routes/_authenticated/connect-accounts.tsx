@@ -9,18 +9,12 @@ import { useConsoleName } from "@/components/console/useConsoleName";
 import { Swal } from "@/lib/swal";
 import {
   PROVIDERS,
+  connectMerchantAccount,
+  disconnectMerchantAccount,
   saveMerchantAccount,
   useMerchantAccounts,
   type Provider,
 } from "@/lib/gateway";
-import {
-  disconnectGmail,
-  getGmailStatus,
-  saveGmailCredentials,
-  startGmailConnect,
-} from "@/lib/gmail.functions";
-import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_authenticated/connect-accounts")({
   head: () => ({ meta: [
@@ -57,13 +51,20 @@ function ConnectAccountsPage() {
   const [payeeName, setPayeeName] = useState("");
   const [saving, setSaving] = useState(false);
 
+  const [email, setEmail] = useState("");
+  const [appPassword, setAppPassword] = useState("");
+  const [connecting, setConnecting] = useState(false);
+
   const current = accounts.find((item) => item.provider === provider);
   const providerLabel = PROVIDERS.find((item) => item.value === provider)?.label ?? "";
+  const connected = Boolean(current?.connected);
 
   useEffect(() => {
     setUpiId(current?.upi_id ?? "");
     setPayeeName(current?.payee_name ?? "");
-  }, [provider, current?.upi_id, current?.payee_name]);
+    setEmail(current?.email ?? "");
+    setAppPassword("");
+  }, [provider, current?.upi_id, current?.payee_name, current?.email]);
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["merchant-accounts"] });
 
@@ -79,6 +80,46 @@ function ConnectAccountsPage() {
     } finally {
       setSaving(false);
     }
+  }
+
+  async function connect(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setConnecting(true);
+    try {
+      await connectMerchantAccount({ provider, email, appPassword });
+      setAppPassword("");
+      await refresh();
+      void Swal.fire({
+        icon: "success",
+        title: "Mailbox connected",
+        text: "Payments will now be detected automatically from your alert emails.",
+        draggable: true,
+      });
+    } catch (error) {
+      void Swal.fire({ icon: "error", title: "Could not connect", text: friendly(error) });
+    } finally {
+      setConnecting(false);
+    }
+  }
+
+  function removeConnection() {
+    void Swal.fire({
+      icon: "warning",
+      title: "Disconnect mailbox?",
+      text: "Automatic payment detection will stop for this app.",
+      showCancelButton: true,
+      confirmButtonText: "Yes, disconnect",
+      cancelButtonText: "Cancel",
+    }).then(async (result) => {
+      if (!result.isConfirmed) return;
+      try {
+        await disconnectMerchantAccount(provider);
+        await refresh();
+        void Swal.fire({ icon: "success", title: "Disconnected", draggable: true });
+      } catch (error) {
+        void Swal.fire({ icon: "error", title: "Could not disconnect", text: friendly(error) });
+      }
+    });
   }
 
   return (
@@ -123,7 +164,60 @@ function ConnectAccountsPage() {
           </form>
         </div>
 
-        <GmailCard />
+        <div className="console-card reveal-delay-2" data-reveal>
+          <form className="console-form" onSubmit={connect}>
+            <div className="console-settings-heading">
+              <Mail />
+              <div>
+                <strong>Payment alert mailbox</strong>
+                <small>The inbox that receives your {providerLabel} payment alerts</small>
+              </div>
+            </div>
+
+            <span className={`console-conn-badge${connected ? " is-on" : ""}`}>
+              <i />{connected ? `Connected — ${current?.email}` : "Not connected"}
+            </span>
+
+            <label className="console-field">
+              Email address
+              <Input
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="you@gmail.com"
+                autoComplete="off"
+                required
+              />
+            </label>
+
+            <label className="console-field">
+              App password
+              <Input
+                type="password"
+                value={appPassword}
+                onChange={(event) => setAppPassword(event.target.value)}
+                placeholder={connected ? "Saved — enter again to replace" : "abcd efgh ijkl mnop"}
+                autoComplete="off"
+                required
+              />
+              <small>16-character app password from your mail account (not your login password).</small>
+            </label>
+
+            <div className="console-form-actions">
+              <Button type="submit" disabled={connecting}>
+                <Plug />{connecting ? "Connecting…" : connected ? "Reconnect mailbox" : "Connect mailbox"}
+              </Button>
+              {connected ? (
+                <Button type="button" variant="outline" onClick={removeConnection}><Link2Off />Disconnect</Button>
+              ) : null}
+            </div>
+
+            <p className="console-note">
+              <RefreshCw />Payments are checked every few seconds; a payment is normally captured within 5–15 seconds of the alert email.
+            </p>
+            <p className="console-note"><ShieldCheck />Your app password stays on the server and is never sent back to the browser.</p>
+          </form>
+        </div>
       </section>
 
       <section className="console-card reveal-delay-3" data-reveal>
@@ -135,7 +229,7 @@ function ConnectAccountsPage() {
               <div key={item.value} className="console-conn-row">
                 <span className="console-conn-name"><CheckCircle2 />{item.label}</span>
                 <span className="console-conn-upi">{account?.upi_id || "No UPI ID saved"}</span>
-                <span className="console-conn-mail">{account?.upi_id ? "UPI saved" : "—"}</span>
+                <span className="console-conn-mail">{account?.email || "—"}</span>
                 <span className={`console-conn-badge${account?.connected ? " is-on" : ""}`}>
                   <i />{account?.connected ? "Connected" : "Disconnected"}
                 </span>
@@ -145,138 +239,5 @@ function ConnectAccountsPage() {
         </div>
       </section>
     </ConsoleLayout>
-  );
-}
-
-function GmailCard() {
-  const fetchStatus = useServerFn(getGmailStatus);
-  const saveCreds = useServerFn(saveGmailCredentials);
-  const beginConnect = useServerFn(startGmailConnect);
-  const disconnect = useServerFn(disconnectGmail);
-
-  const [clientId, setClientId] = useState("");
-  const [clientSecret, setClientSecret] = useState("");
-  const [busy, setBusy] = useState(false);
-
-  const status = useQuery({
-    queryKey: ["gmail-status"],
-    queryFn: () => fetchStatus({ data: undefined as never }),
-    refetchInterval: 8000,
-    refetchOnWindowFocus: true,
-  });
-
-  const connected = status.data?.connected ?? false;
-  const redirectUri = typeof window === "undefined" ? "" : `${window.location.origin}/api/public/gmail/callback`;
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("gmail") === "connected") {
-      void Swal.fire({ icon: "success", title: "Mailbox connected", text: "Payments will now be detected automatically.", draggable: true });
-      window.history.replaceState({}, "", window.location.pathname);
-      void status.refetch();
-    } else if (params.get("error")) {
-      void Swal.fire({ icon: "error", title: "Could not connect", text: params.get("error") ?? "" });
-      window.history.replaceState({}, "", window.location.pathname);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  async function save(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setBusy(true);
-    try {
-      await saveCreds({ data: { clientId, clientSecret } });
-      setClientSecret("");
-      await status.refetch();
-      void Swal.fire({ icon: "success", title: "Saved", text: "Now click Connect mailbox.", draggable: true });
-    } catch (error) {
-      void Swal.fire({ icon: "error", title: "Could not save", text: error instanceof Error ? error.message : String(error) });
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function connectNow() {
-    setBusy(true);
-    try {
-      const { url } = await beginConnect({ data: { origin: window.location.origin } });
-      window.location.href = url;
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      void Swal.fire({
-        icon: "error",
-        title: "Could not start",
-        text: message.includes("SAVE_CREDENTIALS_FIRST") ? "Save your Google client ID and secret first." : message,
-      });
-      setBusy(false);
-    }
-  }
-
-  function removeConnection() {
-    void Swal.fire({
-      icon: "warning",
-      title: "Disconnect mailbox?",
-      text: "Automatic payment detection will stop.",
-      showCancelButton: true,
-      confirmButtonText: "Yes, disconnect",
-      cancelButtonText: "Cancel",
-    }).then(async (result) => {
-      if (!result.isConfirmed) return;
-      await disconnect({ data: undefined as never });
-      await status.refetch();
-      void Swal.fire({ icon: "success", title: "Disconnected", draggable: true });
-    });
-  }
-
-  return (
-    <div className="console-card reveal-delay-2" data-reveal>
-      <form className="console-form" onSubmit={save}>
-        <div className="console-settings-heading">
-          <Mail />
-          <div>
-            <strong>Payment alert mailbox</strong>
-            <small>Connect the Gmail inbox that receives PhonePe / Paytm payment alerts</small>
-          </div>
-        </div>
-
-        <span className={`console-conn-badge${connected ? " is-on" : ""}`}>
-          <i />{connected ? `Connected — ${status.data?.email ?? "Gmail"}` : status.data?.needsReconnect ? "Reconnect needed" : "Not connected"}
-        </span>
-
-        <label className="console-field">
-          Google client ID
-          <Input value={clientId} onChange={(event) => setClientId(event.target.value)} placeholder="xxxx.apps.googleusercontent.com" required />
-        </label>
-
-        <label className="console-field">
-          Google client secret
-          <Input
-            type="password"
-            value={clientSecret}
-            onChange={(event) => setClientSecret(event.target.value)}
-            placeholder={status.data?.hasCredentials ? "Saved — enter again to replace" : "GOCSPX-…"}
-            autoComplete="off"
-            required
-          />
-          <small>Authorised redirect URI: {redirectUri}</small>
-        </label>
-
-        <div className="console-form-actions">
-          <Button type="submit" disabled={busy}>{busy ? "Saving…" : "Save credentials"}</Button>
-          <Button type="button" variant="outline" onClick={() => void connectNow()} disabled={busy || !status.data?.hasCredentials}>
-            <Plug />{connected ? "Reconnect mailbox" : "Connect mailbox"}
-          </Button>
-          {connected ? (
-            <Button type="button" variant="outline" onClick={removeConnection}><Link2Off />Disconnect</Button>
-          ) : null}
-        </div>
-
-        <p className="console-note">
-          <RefreshCw />Payments are checked every few seconds; a payment is normally captured within 5–15 seconds of the alert email.
-        </p>
-        <p className="console-note"><ShieldCheck />Credentials stay on the server and are never sent back to the browser.</p>
-      </form>
-    </div>
   );
 }

@@ -23,7 +23,7 @@ export const Route = createFileRoute("/api/public/payments/poll")({
 
         if (!link?.user_id) return Response.json({ ok: false, error: "not_found" }, { status: 404 });
 
-        const { pollPaymentsForUser } = await import("@/lib/gmail-poll.server");
+        const { pollPaymentsForUser } = await import("@/lib/mail-poll.server");
         const result = await pollPaymentsForUser(link.user_id);
         return Response.json({ ok: result.ok, matched: result.matched, connected: result.connected });
       },
