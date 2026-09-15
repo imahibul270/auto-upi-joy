@@ -369,20 +369,18 @@ section[id]{scroll-margin-top:var(--header-height)}
 .console-support-item small{font-size:.72rem;color:var(--muted-foreground)}
 @media (max-width:900px){.console-plan-grid,.console-support-grid{grid-template-columns:1fr}}
 
-/* SweetAlert2 popups — font stack as the sweetalert2.com demo, colors = gateway theme */
+/* SweetAlert2 popups — white box (classic look), buttons/icons = gateway theme */
 .swal2-container {
   font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
-.swal2-backdrop-show { background: oklch(0.12 0.035 166 / 0.62) !important; }
+.swal2-backdrop-show { background: oklch(0.12 0.035 166 / 0.45) !important; }
 .swal2-popup {
-  background: oklch(0.16 0.04 164);
-  color: oklch(0.97 0.01 150);
-  border: 1px solid oklch(0.35 0.07 155 / 0.55);
+  background: #fff;
+  color: #545454;
   border-radius: 0.9rem;
-  box-shadow: 0 24px 60px oklch(0.1 0.03 166 / 0.45);
 }
-.swal2-title { color: oklch(0.98 0.01 150); }
-.swal2-html-container { color: oklch(0.88 0.02 150 / 0.85); }
+.swal2-title { color: #595959; }
+.swal2-html-container { color: #545454; }
 .swal2-styled {
   border-radius: 0.55rem;
   font-weight: 600;
@@ -401,7 +399,7 @@ section[id]{scroll-margin-top:var(--header-height)}
 .swal2-styled.swal2-confirm:focus,
 .swal2-confirm.swal2-styled:focus {
   background: var(--primary);
-  box-shadow: 0 0 0 3px oklch(0.87 0.21 125 / 0.35);
+  box-shadow: 0 0 0 3px oklch(0.87 0.21 125 / 0.45);
   outline: none;
 }
 .swal2-styled.swal2-cancel,
@@ -409,23 +407,23 @@ section[id]{scroll-margin-top:var(--header-height)}
 .swal2-styled.swal2-deny,
 .swal2-deny.swal2-styled {
   background: transparent;
-  color: oklch(0.9 0.02 150);
-  border: 1px solid oklch(0.45 0.06 155 / 0.6);
+  color: #6b7280;
+  border: 1px solid oklch(0.75 0.05 155 / 0.55);
   box-shadow: none;
 }
 .swal2-styled.swal2-cancel:hover,
 .swal2-cancel.swal2-styled:hover,
 .swal2-styled.swal2-deny:hover,
 .swal2-deny.swal2-styled:hover {
-  background: oklch(0.22 0.05 163);
-  color: oklch(0.97 0.01 150);
+  background: oklch(0.95 0.02 150);
+  color: #374151;
 }
 .swal2-styled.swal2-cancel:focus,
 .swal2-cancel.swal2-styled:focus,
 .swal2-styled.swal2-deny:focus,
 .swal2-deny.swal2-styled:focus {
   outline: none;
-  box-shadow: 0 0 0 3px oklch(0.87 0.21 125 / 0.25);
+  box-shadow: 0 0 0 3px oklch(0.87 0.21 125 / 0.35);
 }
 /* success icon = brand green; error/warning/info keep their standard semantic hues */
 .swal2-icon.swal2-success {
@@ -436,7 +434,7 @@ section[id]{scroll-margin-top:var(--header-height)}
 .swal2-success-line-tip, .swal2-success-line-long { background-color: oklch(0.75 0.19 148); }
 .swal2-icon.swal2-success [class^="swal2-success-circular-line"],
 .swal2-icon.swal2-success [class$="swal2-success-circular-line"] {
-  background-color: oklch(0.16 0.04 164);
+  background-color: #fff;
 }
 .swal2-progress-steps .swal2-progress-step {
   background: var(--primary);
