@@ -1,4 +1,5 @@
 import { useRouterState } from "@tanstack/react-router";
+import { BrandLogo } from "@/components/BrandLogo";
 import {
   ArrowLeftRight, Bell, BookOpen, CreditCard, KeyRound, LayoutGrid, LifeBuoy, Link2, Menu, Sparkles, X,
 } from "lucide-react";
@@ -45,7 +46,7 @@ export function ConsoleLayout({
     <div className="console">
       <aside className={`console-side${menuOpen ? " side-open" : ""}`}>
         <div className="console-brand">
-          <span className="console-mark">A</span>
+          <BrandLogo />
           <strong>Auto Upi</strong>
           <em>V2</em>
         </div>

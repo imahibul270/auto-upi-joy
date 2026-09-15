@@ -163,6 +163,10 @@ export type Database = {
           status: Database["public"]["Enums"]["link_status"]
           upi_id: string
           user_id: string
+          webhook_attempts: number
+          webhook_delivered_at: string | null
+          webhook_last_error: string | null
+          webhook_url: string | null
         }
         Insert: {
           amount: number
@@ -186,6 +190,10 @@ export type Database = {
           status?: Database["public"]["Enums"]["link_status"]
           upi_id?: string
           user_id: string
+          webhook_attempts?: number
+          webhook_delivered_at?: string | null
+          webhook_last_error?: string | null
+          webhook_url?: string | null
         }
         Update: {
           amount?: number
@@ -209,6 +217,10 @@ export type Database = {
           status?: Database["public"]["Enums"]["link_status"]
           upi_id?: string
           user_id?: string
+          webhook_attempts?: number
+          webhook_delivered_at?: string | null
+          webhook_last_error?: string | null
+          webhook_url?: string | null
         }
         Relationships: []
       }

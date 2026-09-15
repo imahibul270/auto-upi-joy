@@ -24,7 +24,7 @@ export const Route = createFileRoute("/api/public/v1/create-order")({
         const apiKey = (request.headers.get("x-api-key") ?? "").trim();
         if (!apiKey.startsWith("aupi_live_")) return json({ ok: false, error: "invalid_api_key" }, 401);
 
-        let body: { amount?: number | string; customer_name?: string; link_type?: string } = {};
+        let body: { amount?: number | string; customer_name?: string; link_type?: string; webhook_url?: string } = {};
         try {
           body = (await request.json()) as typeof body;
         } catch {
@@ -57,6 +57,14 @@ export const Route = createFileRoute("/api/public/v1/create-order")({
 
         const origin = new URL(request.url).origin;
         const link = data as { slug: string; order_id: string; amount: number; payable_amount: number };
+
+        const webhookUrl = (body.webhook_url ?? "").toString().trim();
+        if (/^https:\/\//i.test(webhookUrl)) {
+          await (supabaseAdmin.from("payment_links") as any)
+            .update({ webhook_url: webhookUrl.slice(0, 500) })
+            .eq("order_id", link.order_id)
+            .eq("user_id", key.user_id);
+        }
         return json({ ok: true, ...link, payment_url: `${origin}/pay/${link.slug}` });
       },
     },

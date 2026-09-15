@@ -1,12 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { QrCode, ScanLine } from "lucide-react";
+import { QrCode } from "lucide-react";
+import { BrandLogo } from "@/components/BrandLogo";
 import type { ReactNode } from "react";
 
 export function AuthShell({ children }: { children: ReactNode }) {
   return (
     <main className="auth-page">
       <Link to="/" className="auth-brand page-enter page-enter-early" aria-label="Auto Upi home">
-        <span className="auth-brand-mark"><ScanLine /></span>
+        <BrandLogo className="brand-logo-lg" />
         <strong>Auto Upi</strong>
       </Link>
       <section className="auth-layout">
