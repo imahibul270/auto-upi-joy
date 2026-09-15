@@ -143,7 +143,7 @@ function Index() {
             <a href="#how-it-works" onClick={() => setMenuOpen(false)}>How it works</a>
             <a href="#developers" onClick={() => setMenuOpen(false)}>Developers</a>
             <a href="#pricing" onClick={() => setMenuOpen(false)}>Pricing</a>
-            <a href="#developers" onClick={() => setMenuOpen(false)}>API Docs</a>
+            <Link to="/docs" onClick={() => setMenuOpen(false)}>API Docs</Link>
             <Link to="/auth" onClick={() => setMenuOpen(false)}>Sign in</Link>
             <Link className="button button-primary nav-cta" to="/register">Create account <ArrowRight /></Link>
           </nav>
@@ -192,7 +192,7 @@ function Index() {
 
       <section className="developer-section" id="developers">
         <div className="section developer-grid">
-          <div data-reveal><div className="section-heading align-left light"><span>BUILT FOR DEVELOPERS</span><h2>A clean API, without the integration maze.</h2><p>Create an order with JSON, redirect the customer to hosted checkout and verify the result through status APIs or webhooks.</p></div><div className="dev-points"><span><strong>API credentials</strong>Dedicated key and secret</span><span><strong>Order status</strong>Server-side verification</span><span><strong>Webhooks</strong>Automatic event delivery</span></div><a className="button button-primary" href="#code-example">Read API documentation <ArrowRight /></a></div>
+          <div data-reveal><div className="section-heading align-left light"><span>BUILT FOR DEVELOPERS</span><h2>A clean API, without the integration maze.</h2><p>Create an order with JSON, redirect the customer to hosted checkout and verify the result through status APIs or webhooks.</p></div><div className="dev-points"><span><strong>API credentials</strong>Dedicated key and secret</span><span><strong>Order status</strong>Server-side verification</span><span><strong>Webhooks</strong>Automatic event delivery</span></div><Link className="button button-primary" to="/docs">Read API documentation <ArrowRight /></Link></div>
           <div className="code-panel reveal-delay-2" data-reveal id="code-example"><div className="code-head"><span><i /><i /><i /></span><small>create-order.php</small><button type="button" onClick={copyCode} aria-label="Copy API example">{copied ? <Check /> : <Copy />}</button></div><pre><code><b>curl</b> -X POST https://autoupi.in/api/create-order \
   -H <em>"X-API-Key: pi_live_your_key"</em> \
   -H <em>"X-API-Secret: sk_live_your_secret"</em> \
@@ -212,7 +212,7 @@ function Index() {
       </section>
 
        <section className="cta-section" data-reveal><div><span>READY FOR PRODUCTION</span><h2>Turn every payment into a clear,<br /> trackable workflow.</h2><p>Set up your merchant workspace and create your first payment link.</p><Link className="button button-primary" to="/register">Create free account <ArrowRight /></Link></div></section>
-      <footer data-reveal><div><Logo /><p>Payment infrastructure built for ambitious Indian businesses.</p></div><div><a href="#product">Product</a><a href="#developers">Developers</a><a href="#pricing">Pricing</a></div><span>© 2026 Auto Upi. All rights reserved.</span></footer>
+      <footer data-reveal><div><Logo /><p>Payment infrastructure built for ambitious Indian businesses.</p></div><div><a href="#product">Product</a><a href="#developers">Developers</a><Link to="/docs">API Docs</Link><a href="#pricing">Pricing</a></div><span>© 2026 Auto Upi. All rights reserved.</span></footer>
     </main>
   );
 }
