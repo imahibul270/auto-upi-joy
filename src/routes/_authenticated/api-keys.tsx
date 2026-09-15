@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Copy, KeyRound, Plus, ShieldCheck, Trash2 } from "lucide-react";
+import { Copy, KeyRound, Plus, RefreshCw, ShieldCheck, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ConsoleLayout } from "@/components/console/ConsoleLayout";
 import { useConsoleName } from "@/components/console/useConsoleName";
 import { Swal } from "@/lib/swal";
@@ -33,20 +32,19 @@ function ApiKeysPage() {
   const name = useConsoleName(user);
   const queryClient = useQueryClient();
   const { data: keys = [] } = useApiKeys();
-  const [label, setLabel] = useState("");
   const [creating, setCreating] = useState(false);
   const [freshKey, setFreshKey] = useState<string | null>(null);
+  const hasActiveKey = keys.some((key) => key.active);
 
   async function create() {
     setCreating(true);
     try {
-      const issued = await issueApiKey(label || "Default key");
+      const issued = await issueApiKey("Default key");
       setFreshKey(issued.api_key);
-      setLabel("");
       await queryClient.invalidateQueries({ queryKey: ["api-keys"] });
       void Swal.fire({
         icon: "success",
-        title: "API key created",
+        title: hasActiveKey ? "API key regenerated" : "API key generated",
         text: "Copy it now — it is shown only once.",
         draggable: true,
       });
@@ -81,10 +79,12 @@ function ApiKeysPage() {
       </section>
 
       <section className="console-card reveal-delay-1" data-reveal>
-        <div className="console-card-head"><h3>Create a key</h3><small>Only the newest key stays active</small></div>
+        <div className="console-card-head"><h3>API key</h3><small>Only the newest key stays active</small></div>
         <div className="console-key-create">
-          <Input value={label} onChange={(event) => setLabel(event.target.value)} placeholder="Key name (for example: Website)" />
-          <Button type="button" onClick={() => void create()} disabled={creating}><Plus />{creating ? "Creating…" : "Create key"}</Button>
+          <Button type="button" onClick={() => void create()} disabled={creating}>
+            {hasActiveKey ? <RefreshCw /> : <Plus />}
+            {creating ? (hasActiveKey ? "Regenerating…" : "Generating…") : (hasActiveKey ? "Regenerate key" : "Generate key")}
+          </Button>
         </div>
 
         {freshKey ? (

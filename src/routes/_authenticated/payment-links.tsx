@@ -98,7 +98,6 @@ function PaymentLinksPage() {
     <ConsoleLayout title="Payment Links" user={user} userName={name}>
       <section className="console-page-head" data-reveal>
         <h2>Payment Links</h2>
-        <p>Create shareable links and collect payments without any integration.</p>
       </section>
 
       <section className="console-card reveal-delay-1" data-reveal>

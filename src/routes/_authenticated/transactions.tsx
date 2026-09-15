@@ -31,7 +31,6 @@ function TransactionsPage() {
     <ConsoleLayout title="Transactions" user={user} userName={name}>
       <section className="console-page-head" data-reveal>
         <h2>Transactions</h2>
-        <p>Links move here the moment they are paid or expired. Updates in real time.</p>
       </section>
 
 

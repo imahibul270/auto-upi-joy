@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
-import { CheckCircle2, ChevronDown, Link2Off, Mail, Plug, RefreshCw, ShieldCheck, Wallet } from "lucide-react";
+import { CheckCircle2, ChevronDown, Link2Off, Mail, Plug, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ConsoleLayout } from "@/components/console/ConsoleLayout";
@@ -175,7 +175,7 @@ function ConnectAccountsPage() {
             </div>
 
             <span className={`console-conn-badge${connected ? " is-on" : ""}`}>
-              <i />{connected ? `Connected — ${current?.email}` : "Not connected"}
+              <i />{connected ? "Connected" : "Disconnected"}
             </span>
 
             <label className="console-field">
@@ -212,10 +212,6 @@ function ConnectAccountsPage() {
               ) : null}
             </div>
 
-            <p className="console-note">
-              <RefreshCw />Payments are checked every few seconds; a payment is normally captured within 5–15 seconds of the alert email.
-            </p>
-            <p className="console-note"><ShieldCheck />Your app password stays on the server and is never sent back to the browser.</p>
           </form>
         </div>
       </section>
@@ -229,7 +225,7 @@ function ConnectAccountsPage() {
               <div key={item.value} className="console-conn-row">
                 <span className="console-conn-name"><CheckCircle2 />{item.label}</span>
                 <span className="console-conn-upi">{account?.upi_id || "No UPI ID saved"}</span>
-                <span className="console-conn-mail">{account?.email || "—"}</span>
+                <span className="console-conn-mail">{account?.connected ? "Connected" : "Disconnected"}</span>
                 <span className={`console-conn-badge${account?.connected ? " is-on" : ""}`}>
                   <i />{account?.connected ? "Connected" : "Disconnected"}
                 </span>
