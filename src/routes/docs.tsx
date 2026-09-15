@@ -7,7 +7,7 @@ export const Route = createFileRoute("/docs")({
   component: DocsPage,
   head: () => ({
     meta: [
-      { title: "API Documentation — Auto Upi" },
+      { title: "autoupi | API Documentation" },
       {
         name: "description",
         content:

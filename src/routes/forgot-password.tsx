@@ -8,9 +8,9 @@ import { Swal } from "@/lib/swal";
 
 export const Route = createFileRoute("/forgot-password")({
   head: () => ({ meta: [
-    { title: "Reset password — Auto Upi" },
+    { title: "autoupi | Reset password" },
     { name: "description", content: "Request a secure password reset link for your Auto Upi account." },
-    { property: "og:title", content: "Reset password — Auto Upi" },
+    { property: "og:title", content: "autoupi | Reset password" },
     { property: "og:description", content: "Recover access to your Auto Upi account." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },

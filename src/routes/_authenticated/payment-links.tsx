@@ -20,9 +20,9 @@ import {
 
 export const Route = createFileRoute("/_authenticated/payment-links")({
   head: () => ({ meta: [
-    { title: "Payment Links — Auto Upi" },
+    { title: "autoupi | Payment Links" },
     { name: "description", content: "Create and share Auto Upi payment links to collect money without writing any code." },
-    { property: "og:title", content: "Payment Links — Auto Upi" },
+    { property: "og:title", content: "autoupi | Payment Links" },
     { property: "og:description", content: "Share a link, get paid instantly with Auto Upi." },
   ]}),
   component: PaymentLinksPage,

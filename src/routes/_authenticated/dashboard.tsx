@@ -14,9 +14,9 @@ import {
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [
-    { title: "Dashboard — Auto Upi" },
+    { title: "autoupi | Dashboard" },
     { name: "description", content: "Track revenue, orders, success rate and payment analytics inside your Auto Upi merchant workspace." },
-    { property: "og:title", content: "Dashboard — Auto Upi" },
+    { property: "og:title", content: "autoupi | Dashboard" },
     { property: "og:description", content: "Your secure Auto Upi merchant workspace with live payment analytics." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },

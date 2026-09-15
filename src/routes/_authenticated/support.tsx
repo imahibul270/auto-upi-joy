@@ -5,9 +5,9 @@ import { useConsoleName } from "@/components/console/useConsoleName";
 
 export const Route = createFileRoute("/_authenticated/support")({
   head: () => ({ meta: [
-    { title: "Support — Auto Upi" },
+    { title: "autoupi | Support" },
     { name: "description", content: "Get help with your Auto Upi account, payments and integrations." },
-    { property: "og:title", content: "Support — Auto Upi" },
+    { property: "og:title", content: "autoupi | Support" },
     { property: "og:description", content: "Reach the Auto Upi team for account and payment help." },
   ]}),
   component: SupportPage,

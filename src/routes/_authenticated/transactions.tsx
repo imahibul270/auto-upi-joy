@@ -12,9 +12,9 @@ import {
 
 export const Route = createFileRoute("/_authenticated/transactions")({
   head: () => ({ meta: [
-    { title: "Transactions — Auto Upi" },
+    { title: "autoupi | Transactions" },
     { name: "description", content: "View every UPI payment captured by your Auto Upi account, with payer name and detection time." },
-    { property: "og:title", content: "Transactions — Auto Upi" },
+    { property: "og:title", content: "autoupi | Transactions" },
     { property: "og:description", content: "Every payment your Auto Upi account has processed, in one live list." },
   ]}),
   component: TransactionsPage,
