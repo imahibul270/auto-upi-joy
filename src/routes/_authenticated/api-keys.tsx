@@ -82,35 +82,31 @@ function ApiKeysPage() {
       </section>
 
       <section className="console-card reveal-delay-2" data-reveal>
-        <div className="console-card-head"><h3>Your keys</h3><small>{keys.length} total</small></div>
-        {keys.length === 0 ? (
+        <div className="console-card-head"><h3>Active key</h3></div>
+        {!activeKey ? (
           <div className="console-empty console-empty-row">
             <KeyRound />
-            <p>No API keys yet</p>
-            <small>Create a key above to start integrating Auto Upi.</small>
+            <p>No API key yet</p>
+            <small>Generate a key above to start integrating Auto Upi.</small>
           </div>
         ) : (
           <div className="console-table-wrap">
             <table className="console-table">
               <thead>
-                <tr><th>NAME</th><th>KEY</th><th>WEBHOOK SECRET</th><th>STATUS</th><th>CREATED</th><th /></tr>
+                <tr><th>KEY</th><th>WEBHOOK SECRET</th><th>STATUS</th><th>CREATED</th></tr>
               </thead>
               <tbody>
-                {keys.map((row) => (
-                  <tr key={row.id}>
-                    <td><strong>{row.label}</strong></td>
-                    <td><code>{row.key_prefix}••••••••</code></td>
-                    <td>
-                      <span className="console-secret">
-                        <code>{`${row.webhook_secret.slice(0, 12)}••••`}</code>
-                        <button type="button" aria-label="Copy webhook secret" onClick={() => void copy(row.webhook_secret, "Webhook secret copied")}><Copy /></button>
-                      </span>
-                    </td>
-                    <td><span className={`console-pill${row.active ? " is-active" : " is-muted"}`}>{row.active ? "Active" : "Revoked"}</span></td>
-                    <td>{formatDate(row.created_at)}</td>
-                    <td>{row.active ? <button type="button" className="console-row-action" onClick={() => revoke(row.id)} aria-label="Revoke key"><Trash2 /></button> : null}</td>
-                  </tr>
-                ))}
+                <tr>
+                  <td><code>{activeKey.key_prefix}••••••••</code></td>
+                  <td>
+                    <span className="console-secret">
+                      <code>{`${activeKey.webhook_secret.slice(0, 12)}••••`}</code>
+                      <button type="button" aria-label="Copy webhook secret" onClick={() => void copy(activeKey.webhook_secret, "Webhook secret copied")}><Copy /></button>
+                    </span>
+                  </td>
+                  <td><span className="console-pill is-active">Active</span></td>
+                  <td>{formatDate(activeKey.created_at)}</td>
+                </tr>
               </tbody>
             </table>
           </div>
