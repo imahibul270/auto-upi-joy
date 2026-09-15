@@ -57,6 +57,13 @@
       "when": 1789489460773,
       "tag": "0007_api_key_single_and_public_api",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1789493274293,
+      "tag": "0008_fixed_5min_expiry_and_exact_amounts",
+      "breakpoints": true
     }
   ]
 }
