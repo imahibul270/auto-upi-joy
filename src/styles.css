@@ -555,19 +555,19 @@ section[id]{scroll-margin-top:var(--header-height)}
   background: var(--card); border-radius: 1.35rem;
   border: 1px solid var(--border); box-shadow: var(--shadow-brand); text-align: center;
 }
-.pay-head { min-height: 172px; padding: 2rem 1.5rem 1rem; display: flex; flex-direction: column; align-items: center; }
-.pay-bhim-logo { width: min(235px, 75%); height: 64px; object-fit: contain; margin-bottom: .55rem; }
-.pay-payee { margin: 0; font-size: 1.35rem; line-height: 1.2; font-weight: 800; text-transform: uppercase; color: var(--hero); }
-.pay-transfer-label { margin: .45rem 0 0; color: var(--muted-foreground); font-size: 1rem; }
-.pay-total { min-height: 78px; display: grid; grid-template-columns: 1fr 1fr; border-block: 1px solid var(--border); }
-.pay-total span, .pay-total strong { display: flex; align-items: center; padding: 1rem 1.5rem; color: var(--hero); }
-.pay-total span { font-size: 1rem; font-weight: 700; text-align: left; }
-.pay-total strong { justify-content: center; border-left: 1px solid var(--border); font-size: 1.45rem; }
-.pay-code-area { padding: 1.45rem 1.5rem 1.25rem; display: flex; flex-direction: column; align-items: center; }
-.pay-qr { width: min(250px, 78vw); height: auto; aspect-ratio: 1; border-radius: .3rem; filter: sepia(.35) saturate(1.35) hue-rotate(95deg) brightness(.7); }
+.pay-head { padding: 1.35rem 1.5rem .9rem; display: flex; flex-direction: column; align-items: center; }
+.pay-bhim-logo { width: min(200px, 68%); height: 48px; object-fit: contain; margin-bottom: .45rem; }
+.pay-payee { margin: 0; font-size: 1.2rem; line-height: 1.2; font-weight: 800; text-transform: uppercase; color: var(--hero); }
+.pay-transfer-label { margin: .3rem 0 0; color: var(--muted-foreground); font-size: .92rem; }
+.pay-total { display: grid; grid-template-columns: 1fr 1fr; border-block: 1px solid var(--border); }
+.pay-total span, .pay-total strong { display: flex; align-items: center; padding: .8rem 1.35rem; color: var(--hero); }
+.pay-total span { font-size: .95rem; font-weight: 700; text-align: left; }
+.pay-total strong { justify-content: center; border-left: 1px solid var(--border); font-size: 1.3rem; }
+.pay-code-area { padding: 1.1rem 1.5rem 1rem; display: flex; flex-direction: column; align-items: center; }
+.pay-qr { width: min(210px, 62vw, 34vh); height: auto; aspect-ratio: 1; border-radius: .3rem; }
 .pay-qr-skeleton { background: var(--muted); }
-.pay-apps { width: min(300px, 88%); height: 44px; object-fit: contain; margin-top: .85rem; }
-.pay-footer { min-height: 76px; padding: 1rem 1.55rem; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); }
+.pay-apps { width: min(270px, 84%); height: 34px; object-fit: contain; margin-top: .7rem; }
+.pay-footer { padding: .85rem 1.4rem; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); }
 .pay-footer p { margin: 0; color: var(--muted-foreground); font-size: .93rem; }
 .pay-footer strong { color: var(--hero); font-size: 1rem; }
 .pay-cancel { min-width: 103px; background: color-mix(in oklab, var(--destructive) 12%, var(--card)); color: var(--destructive); box-shadow: none; }
