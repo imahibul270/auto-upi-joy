@@ -151,6 +151,7 @@ export async function pollPaymentsForUser(userId: string): Promise<PollResult> {
         if (!updated) continue;
 
         await admin.from("processed_emails").update({ link_id: link.id, amount }).eq("message_id", messageId);
+        await deliverWebhook(userId, link, payerName);
         matched++;
       }
     } catch (error) {
