@@ -37,7 +37,8 @@ function PaymentLinksPage() {
   const { user } = Route.useRouteContext();
   const name = useConsoleName(user);
   const queryClient = useQueryClient();
-  const { data: links = [] } = usePaymentLinks();
+  usePaymentDetection();
+  const { rows: links } = useActiveLinks();
   const { data: accounts = [] } = useMerchantAccounts();
   const [amount, setAmount] = useState("");
   const [customer, setCustomer] = useState("");

@@ -2,13 +2,20 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Receipt } from "lucide-react";
 import { ConsoleLayout } from "@/components/console/ConsoleLayout";
 import { useConsoleName } from "@/components/console/useConsoleName";
+import {
+  detectionSeconds,
+  formatInr,
+  formatTime,
+  usePaymentDetection,
+  useTransactions,
+} from "@/lib/gateway";
 
 export const Route = createFileRoute("/_authenticated/transactions")({
   head: () => ({ meta: [
     { title: "Transactions — Auto Upi" },
-    { name: "description", content: "View every UPI, card and netbanking transaction captured by your Auto Upi account." },
+    { name: "description", content: "View every UPI payment captured by your Auto Upi account, with payer name and detection time." },
     { property: "og:title", content: "Transactions — Auto Upi" },
-    { property: "og:description", content: "Every payment your Auto Upi account has processed, in one searchable list." },
+    { property: "og:description", content: "Every payment your Auto Upi account has processed, in one live list." },
   ]}),
   component: TransactionsPage,
 });
@@ -16,19 +23,74 @@ export const Route = createFileRoute("/_authenticated/transactions")({
 function TransactionsPage() {
   const { user } = Route.useRouteContext();
   const name = useConsoleName(user);
+  usePaymentDetection();
+  const { rows } = useTransactions();
+
+  const paid = rows.filter((row) => row.status === "paid");
+  const collected = paid.reduce((sum, row) => sum + Number(row.payable_amount), 0);
 
   return (
     <ConsoleLayout title="Transactions" user={user} userName={name}>
       <section className="console-page-head" data-reveal>
         <h2>Transactions</h2>
-        <p>All payments captured on your account will be listed here.</p>
+        <p>Links move here the moment they are paid or expired. Updates in real time.</p>
       </section>
+
+      <section className="console-stats">
+        <article className="console-stat reveal-delay-1" data-reveal>
+          <div className="console-stat-head"><span>Collected</span></div>
+          <strong>{formatInr(collected)}</strong>
+        </article>
+        <article className="console-stat reveal-delay-2" data-reveal>
+          <div className="console-stat-head"><span>Successful</span></div>
+          <strong>{paid.length}</strong>
+        </article>
+        <article className="console-stat reveal-delay-3" data-reveal>
+          <div className="console-stat-head"><span>Failed / Expired</span></div>
+          <strong>{rows.length - paid.length}</strong>
+        </article>
+      </section>
+
       <section className="console-card reveal-delay-1" data-reveal>
-        <div className="console-empty console-empty-row">
-          <Receipt />
-          <p>No transactions yet</p>
-          <small>Once a real payment is generated, it will appear here with status, amount and method.</small>
-        </div>
+        <div className="console-card-head"><h3>All transactions</h3><small>Live</small></div>
+        {rows.length === 0 ? (
+          <div className="console-empty console-empty-row">
+            <Receipt />
+            <p>No transactions yet</p>
+            <small>Once a payment is detected or a link expires, it appears here.</small>
+          </div>
+        ) : (
+          <div className="console-table-wrap">
+            <table className="console-table">
+              <thead>
+                <tr>
+                  <th>ORDER ID</th><th>CUSTOMER</th><th>PAYER</th><th>AMOUNT</th>
+                  <th>STATUS</th><th>DETECTED IN</th><th>TIME</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => {
+                  const seconds = detectionSeconds(row);
+                  return (
+                    <tr key={row.id}>
+                      <td><strong>{row.order_id}</strong></td>
+                      <td className="console-cell-customer">{row.customer_name || "—"}</td>
+                      <td>{row.payer_name || "—"}</td>
+                      <td><strong>{formatInr(row.payable_amount)}</strong></td>
+                      <td>
+                        <span className={`console-pill ${row.status === "paid" ? "is-paid" : "is-muted"}`}>
+                          {row.status === "paid" ? "Success" : "Failed"}
+                        </span>
+                      </td>
+                      <td>{row.status === "paid" ? (seconds === null ? "—" : `${seconds}s`) : "—"}</td>
+                      <td>{formatTime(row.paid_at ?? row.created_at)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
     </ConsoleLayout>
   );
