@@ -114,6 +114,19 @@ function PaymentVisual() {
 function Index() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (headerRef.current) {
+        headerRef.current.classList.toggle("scrolled", window.scrollY > 10);
+      }
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const copyCode = async () => {
     await navigator.clipboard.writeText("curl -X POST https://autoupi.in/api/create-order");
     setCopied(true);
@@ -122,8 +135,8 @@ function Index() {
 
   return (
     <main id="top">
-      <section className="hero-section">
-        <header className="site-header">
+      <div className="header-bar">
+        <header className="site-header" ref={headerRef}>
           <Logo />
           <nav className={menuOpen ? "nav-links nav-open" : "nav-links"} aria-label="Main navigation">
             <a href="#product" onClick={() => setMenuOpen(false)}>Product</a>
@@ -136,6 +149,8 @@ function Index() {
           </nav>
           <button className="menu-button" type="button" aria-label={menuOpen ? "Close menu" : "Open menu"} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button>
         </header>
+      </div>
+      <section className="hero-section">
 
         <div className="hero-content">
           <div className="hero-copy">
