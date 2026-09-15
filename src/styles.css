@@ -551,7 +551,7 @@ section[id]{scroll-margin-top:var(--header-height)}
   background-size: 64px 64px;
 }
 .pay-card {
-  width: min(425px, 100%); overflow: hidden; display: block;
+  width: min(390px, 100%); overflow: hidden; display: block;
   background: var(--card); border-radius: 1.35rem;
   border: 1px solid var(--border); box-shadow: var(--shadow-brand); text-align: center;
 }
