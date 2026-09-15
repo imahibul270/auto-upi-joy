@@ -388,17 +388,17 @@ section[id]{scroll-margin-top:var(--header-height)}
 }
 .swal2-styled.swal2-confirm,
 .swal2-confirm.swal2-styled {
-  background: var(--primary);
-  color: var(--primary-foreground);
+  background: var(--hero);
+  color: var(--hero-foreground);
   box-shadow: none;
 }
 .swal2-styled.swal2-confirm:hover,
 .swal2-confirm.swal2-styled:hover {
-  background: oklch(0.91 0.19 122);
+  background: oklch(0.22 0.05 164);
 }
 .swal2-styled.swal2-confirm:focus,
 .swal2-confirm.swal2-styled:focus {
-  background: var(--primary);
+  background: var(--hero);
   box-shadow: 0 0 0 3px oklch(0.87 0.21 125 / 0.45);
   outline: none;
 }
@@ -447,19 +447,19 @@ section[id]{scroll-margin-top:var(--header-height)}
 }
 
 /* ---- Plan quota ---- */
-.console-quota { display: grid; gap: 14px; }
+.console-quota { display: grid; gap: 10px; padding: .9rem 1.1rem; }
 .console-quota-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.console-quota-head h3 { margin: 6px 0 0; font-size: 1.05rem; }
-.console-quota-head strong { font-size: 1.35rem; }
+.console-quota-head h3 { margin: 4px 0 0; font-size: .92rem; }
+.console-quota-head strong { font-size: 1.1rem; }
 .console-quota-tag {
-  display: inline-block; padding: 3px 10px; border-radius: 999px;
-  font-size: .68rem; letter-spacing: .12em;
+  display: inline-block; padding: 2px 9px; border-radius: 999px;
+  font-size: .62rem; letter-spacing: .12em;
   background: color-mix(in srgb, var(--primary) 18%, transparent);
   color: var(--primary);
 }
-.console-quota-bar { height: 10px; border-radius: 999px; background: color-mix(in srgb, currentColor 10%, transparent); overflow: hidden; }
+.console-quota-bar { height: 7px; border-radius: 999px; background: color-mix(in srgb, currentColor 10%, transparent); overflow: hidden; }
 .console-quota-bar i { display: block; height: 100%; border-radius: 999px; background: var(--primary); transition: width .4s ease; }
-.console-quota-meta { display: flex; justify-content: space-between; gap: 12px; font-size: .85rem; opacity: .75; }
+.console-quota-meta { display: flex; justify-content: space-between; gap: 12px; font-size: .78rem; opacity: .75; }
 .console-quota-warn { margin: 0; font-size: .88rem; color: var(--destructive); }
 .console-plan-cta { margin-top: 14px; width: 100%; }
 .inline-rupee { display: inline-block; width: 1em; height: 1em; vertical-align: -0.08em; }
