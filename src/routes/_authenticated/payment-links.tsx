@@ -137,7 +137,7 @@ function PaymentLinksPage() {
                   <tr key={row.id}>
                     <td><strong>{row.order_id}</strong></td>
                     <td className="console-cell-customer">{row.customer_name || "—"}</td>
-                    <td><strong>{formatInr(row.payable_amount)}</strong></td>
+                    <td><strong>{formatInr(row.amount)}</strong></td>
                     <td>
                       <span className="console-secret">
                         <code>{paymentLinkUrl(row.slug).replace(/^https?:\/\//, "").slice(0, 26)}…</code>
