@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import type { User } from "@supabase/supabase-js";
-import { Eye, EyeOff, ImageUp, LogOut, Settings } from "lucide-react";
+import { Eye, EyeOff, ImageUp, LogOut, Settings, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -126,50 +126,44 @@ export function ProfileSettings({
 
   return (
     <>
-      <div className="console-user console-user-fixed">
-        <Button
+      <div className="console-profile-wrap">
+        <button
           type="button"
-          variant="ghost"
-          className="console-profile-trigger"
+          className="console-menu-item console-profile-item"
           aria-expanded={menuOpen}
           aria-haspopup="menu"
           onClick={() => setMenuOpen((value) => !value)}
         >
-          <span className="console-avatar">
-            {logo ? <img src={logo} alt="Business logo" /> : initial}
-          </span>
-          <span className="console-user-copy">
-            <strong>{userName}</strong>
-            <small>Free Plan · Profile settings</small>
-          </span>
-        </Button>
-      </div>
+          <UserRound />
+          <span>Profile</span>
+        </button>
 
-      {menuOpen ? (
-        <>
-          <button type="button" className="console-menu-scrim" aria-label="Close profile menu" onClick={() => setMenuOpen(false)} />
-          <div className="console-profile-menu" role="menu">
-            <button
-              type="button"
-              role="menuitem"
-              className="console-profile-menu-item"
-              onClick={() => { setMenuOpen(false); setDialogOpen(true); }}
-            >
-              <Settings />
-              <span>Profile settings</span>
-            </button>
-            <button
-              type="button"
-              role="menuitem"
-              className="console-profile-menu-item is-danger"
-              onClick={() => void onSignOut()}
-            >
-              <LogOut />
-              <span>Sign out</span>
-            </button>
-          </div>
-        </>
-      ) : null}
+        {menuOpen ? (
+          <>
+            <button type="button" className="console-menu-scrim" aria-label="Close profile menu" onClick={() => setMenuOpen(false)} />
+            <div className="console-profile-menu" role="menu">
+              <button
+                type="button"
+                role="menuitem"
+                className="console-profile-menu-item"
+                onClick={() => { setMenuOpen(false); setDialogOpen(true); }}
+              >
+                <Settings />
+                <span>Profile settings</span>
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                className="console-profile-menu-item is-danger"
+                onClick={() => void onSignOut()}
+              >
+                <LogOut />
+                <span>Sign out</span>
+              </button>
+            </div>
+          </>
+        ) : null}
+      </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="console-profile-dialog">
