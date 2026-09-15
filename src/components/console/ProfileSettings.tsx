@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import { Swal } from "@/lib/swal";
 
 const MAX_LOGO_BYTES = 512 * 1024;
 const ALLOWED_LOGO_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
@@ -91,10 +92,12 @@ export function ProfileSettings({
     setSavingLogo(false);
     if (error) {
       setLogoMessage(error.message);
+      void Swal.fire({ icon: "error", title: "Could not save logo", text: error.message });
       return;
     }
     applyFavicon(logo);
     setLogoMessage("Business logo and favicon updated.");
+    void Swal.fire({ icon: "success", title: "Logo updated", text: "Business logo and favicon updated.", draggable: true });
   }
 
   async function changePassword(event: FormEvent<HTMLFormElement>) {
@@ -102,10 +105,12 @@ export function ProfileSettings({
     setPasswordMessage("");
     if (newPassword.length < 8) {
       setPasswordMessage("New password must be at least 8 characters.");
+      void Swal.fire({ icon: "error", title: "Password too short", text: "New password must be at least 8 characters." });
       return;
     }
     if (newPassword !== confirmPassword) {
       setPasswordMessage("New passwords do not match.");
+      void Swal.fire({ icon: "error", title: "Passwords do not match", text: "Please enter the same new password in both fields." });
       return;
     }
     setSavingPassword(true);
@@ -116,12 +121,14 @@ export function ProfileSettings({
     setSavingPassword(false);
     if (error) {
       setPasswordMessage(error.message);
+      void Swal.fire({ icon: "error", title: "Could not change password", text: error.message });
       return;
     }
     setCurrentPassword("");
     setNewPassword("");
     setConfirmPassword("");
     setPasswordMessage("Password changed successfully.");
+    void Swal.fire({ icon: "success", title: "Password changed", text: "Your password has been updated successfully.", draggable: true });
   }
 
   return (
@@ -155,7 +162,19 @@ export function ProfileSettings({
                 type="button"
                 role="menuitem"
                 className="console-profile-menu-item is-danger"
-                onClick={() => void onSignOut()}
+                onClick={() => {
+                  setMenuOpen(false);
+                  void Swal.fire({
+                    title: "Sign out?",
+                    text: "You will need to sign in again to access your account.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, sign out",
+                    cancelButtonText: "Cancel",
+                  }).then((result) => {
+                    if (result.isConfirmed) void onSignOut();
+                  });
+                }}
               >
                 <LogOut />
                 <span>Sign out</span>
