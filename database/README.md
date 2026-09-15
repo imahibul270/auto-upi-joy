@@ -38,6 +38,8 @@ Add your site URLs under **Authentication → URL Configuration**:
 
 ## 4. Point the app at your backend
 
+### Option A — Self-host / sell the app
+
 Copy `.env.example` to `.env` and fill in your own project values:
 
 ```
@@ -55,6 +57,30 @@ the second during server-side rendering. The anon/publishable key is safe to shi
 Never put the service role key in a `VITE_` variable.
 
 Restart the dev server (or rebuild) after changing `.env`.
+
+### Option B — Use your own backend inside Lovable Cloud
+
+Your credentials are already saved as runtime secrets:
+
+- `CUSTOM_SUPABASE_URL`
+- `CUSTOM_SUPABASE_ANON_KEY`
+- `CUSTOM_SUPABASE_SERVICE_ROLE_KEY`
+
+To make the live preview/published app use your backend, update the managed
+environment variables in your Lovable project settings:
+
+```
+VITE_SUPABASE_URL=<your Supabase URL>
+VITE_SUPABASE_PUBLISHABLE_KEY=<your anon key>
+VITE_SUPABASE_PROJECT_ID=<your project ref>
+
+SUPABASE_URL=<your Supabase URL>
+SUPABASE_PUBLISHABLE_KEY=<your anon key>
+SUPABASE_PROJECT_ID=<your project ref>
+```
+
+These variables are managed by the Lovable Cloud integration, so they must be
+changed from the project settings UI, not from code.
 
 ## 5. Verify
 
