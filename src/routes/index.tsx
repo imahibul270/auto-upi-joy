@@ -144,7 +144,7 @@ function Index() {
             <a href="#pricing" onClick={() => setMenuOpen(false)}>Pricing</a>
             <Link to="/docs" onClick={() => setMenuOpen(false)}>API Docs</Link>
             <Link to="/auth" onClick={() => setMenuOpen(false)}>Sign in</Link>
-            <Link className="button button-primary nav-cta" to="/register">Create account <ArrowRight /></Link>
+            <Link className="button button-primary nav-cta" to="/register">Create account</Link>
           </nav>
           <button className="menu-button" type="button" aria-label={menuOpen ? "Close menu" : "Open menu"} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button>
         </header>
@@ -207,7 +207,7 @@ function Index() {
 
       <section className="section pricing-section" id="pricing">
         <div className="section-heading" data-reveal><span>PLANS THAT SCALE WITH YOU</span><h2>Start focused. Upgrade when ready.</h2><p>Simple plans for every stage of your payment journey.</p></div>
-        <div className="pricing-grid">{plans.map((plan, index) => <article className={`${plan.popular ? "price-card popular" : "price-card"} reveal-delay-${index + 1}`} data-reveal key={plan.name}>{plan.popular && <div className="popular-label">MOST POPULAR</div>}<h3>{plan.name}</h3><div className="price"><strong>{plan.price}</strong><span>{plan.suffix}</span></div><ul>{plan.items.map(item => <li key={item}><Check /> {item}</li>)}</ul><a className={plan.popular ? "button button-primary" : "button button-dark"} href="mailto:support@autoupi.in">{plan.name === 'Enterprise' ? 'Contact sales' : `Choose ${plan.name}`} <ArrowRight /></a></article>)}</div>
+        <div className="pricing-grid">{plans.map((plan, index) => <article className={`${plan.popular ? "price-card popular" : "price-card"} reveal-delay-${index + 1}`} data-reveal key={plan.name}>{plan.popular && <div className="popular-label">MOST POPULAR</div>}<h3>{plan.name}</h3><div className="price"><strong>{plan.price}</strong><span>{plan.suffix}</span></div><ul>{plan.items.map(item => <li key={item}><Check /> {item}</li>)}</ul><a className={plan.popular ? "button button-primary" : "button button-dark"} href="mailto:support@autoupi.in">{plan.name === 'Custom' ? 'Contact sales' : `Choose ${plan.name}`} <ArrowRight /></a></article>)}</div>
       </section>
 
        <section className="cta-section" data-reveal><div><span>READY FOR PRODUCTION</span><h2>Turn every payment into a clear,<br /> trackable workflow.</h2><p>Set up your merchant workspace and create your first payment link.</p><Link className="button button-primary" to="/register">Create free account <ArrowRight /></Link></div></section>

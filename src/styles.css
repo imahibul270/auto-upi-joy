@@ -201,6 +201,7 @@
 .hero-section { padding-top: var(--header-height); color: var(--hero-foreground); min-height: 610px; background-color: var(--hero); background-image: linear-gradient(color-mix(in oklab, var(--hero-foreground) 3%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in oklab, var(--hero-foreground) 3%, transparent) 1px, transparent 1px), radial-gradient(circle at 72% 25%, color-mix(in oklab, var(--primary) 9%, transparent), transparent 32%); background-size: 64px 64px,64px 64px,100% 100%; }
 .logo { display:inline-flex; align-items:center; gap:.55rem; flex-shrink:0; }
 .logo strong { font-size:1.23rem; letter-spacing:0; }
+.header-bar .logo strong, footer .logo strong { color: var(--hero-foreground); font-weight:800; }
 .logo em { font-style:normal; font-size:.58rem; font-weight:800; color:var(--primary-foreground); background:var(--primary); border-radius:999px; padding:.2rem .42rem; }
 .brand-mark { width:2.05rem; height:2.05rem; background:var(--primary); color:var(--primary-foreground); border-radius:.68rem; display:grid; place-items:center; position:relative; box-shadow:0 8px 18px color-mix(in oklab,var(--primary) 22%,transparent); }
 .brand-mark svg { width:1.4rem; fill:none; stroke:currentColor; stroke-width:2.1; stroke-linecap:round; stroke-linejoin:round; }
