@@ -228,8 +228,8 @@
 .dash-head .brand-mark svg { width:1rem; }
 .live-dot { padding:.3rem .55rem; border-radius:999px; background:var(--mint); color:oklch(0.45 0.14 160); font-size:.55rem; font-weight:800; }
 .dash-grid { display:grid; grid-template-columns:1.7fr .72fr; gap:.8rem; }
-.revenue-card,.pay-card { border:1px solid var(--border); border-radius:.85rem; padding:1rem; height:210px; }
-.revenue-card small,.pay-card small { color:var(--muted-foreground); font-size:.52rem; font-weight:700; }
+.revenue-card,.dash-grid .pay-card { border:1px solid var(--border); border-radius:.85rem; padding:1rem; height:210px; }
+.revenue-card small,.dash-grid .pay-card small { color:var(--muted-foreground); font-size:.52rem; font-weight:700; }
 .bars { height:145px; display:flex; align-items:end; justify-content:center; gap:.7rem; padding-top:2rem; }
 .bars i { display:block; width:12%; height:30%; background:var(--primary); border-radius:.25rem .25rem 0 0; transform-origin:bottom; animation:bar-rise 1.3s ease both; }
 .bars i:nth-child(2){height:43%}.bars i:nth-child(3){height:62%}.bars i:nth-child(4){height:55%}.bars i:nth-child(5){height:74%}.bars i:nth-child(6){height:88%}
