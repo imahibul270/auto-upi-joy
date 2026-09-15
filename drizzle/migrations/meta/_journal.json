@@ -92,6 +92,13 @@
       "when": 1789496021194,
       "tag": "0012_poll_throttle_claim",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1789496433150,
+      "tag": "0013_function_grant_hardening",
+      "breakpoints": true
     }
   ]
 }
