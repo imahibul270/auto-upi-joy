@@ -41,20 +41,6 @@ function rangeStart(range: (typeof RANGES)[number]) {
 }
 
 function buildSeries(rows: PaymentLinkRow[], range: (typeof RANGES)[number]) {
-  if (range === "Today") {
-    const buckets = [0, 4, 8, 12, 16, 20];
-    return buckets.map((hour) => {
-      const slot = rows.filter((row) => {
-        const d = new Date(row.paid_at ?? row.created_at);
-        return row.status === "paid" && d.getHours() >= hour && d.getHours() < hour + 4;
-      });
-      return {
-        day: `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour} ${hour < 12 ? "AM" : "PM"}`,
-        revenue: slot.reduce((s, r) => s + Number(r.payable_amount), 0),
-        orders: slot.length,
-      };
-    });
-  }
   const days = RANGE_DAYS[range];
   return Array.from({ length: days }, (_, index) => {
     const day = new Date(Date.now() - (days - 1 - index) * 86400000);
