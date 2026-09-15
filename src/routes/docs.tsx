@@ -144,6 +144,7 @@ function DocsPage() {
               <tbody>
                 <tr><td><code>amount</code></td><td>number</td><td>Yes</td><td>Order amount in INR, 1 to 10,00,000.</td></tr>
                 <tr><td><code>customer_name</code></td><td>string</td><td>No</td><td>Shown on the checkout page.</td></tr>
+                <tr><td><code>webhook_url</code></td><td>string</td><td>No</td><td>HTTPS URL that receives the signed <code>payment.paid</code> webhook.</td></tr>
                 <tr><td><code>link_type</code></td><td>string</td><td>No</td><td><code>one_time</code> (default) or <code>reusable</code>.</td></tr>
               </tbody>
             </table>
