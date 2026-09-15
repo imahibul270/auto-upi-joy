@@ -551,7 +551,7 @@ section[id]{scroll-margin-top:var(--header-height)}
   background-size: 64px 64px;
 }
 .pay-card {
-  width: min(390px, 100%); overflow: hidden; display: block;
+  width: min(320px, 100%); overflow: hidden; display: block;
   background: var(--card); border-radius: 1.35rem;
   border: 1px solid var(--border); box-shadow: var(--shadow-brand); text-align: center;
 }
@@ -563,10 +563,10 @@ section[id]{scroll-margin-top:var(--header-height)}
 .pay-total span, .pay-total strong { display: flex; align-items: center; padding: .8rem 1.35rem; color: var(--hero); }
 .pay-total span { font-size: .95rem; font-weight: 700; text-align: left; }
 .pay-total strong { justify-content: center; border-left: 1px solid var(--border); font-size: 1.3rem; }
-.pay-code-area { padding: 1.1rem 1.5rem 1rem; display: flex; flex-direction: column; align-items: center; }
-.pay-qr { width: min(210px, 62vw, 34vh); height: auto; aspect-ratio: 1; border-radius: .3rem; }
+.pay-code-area { padding: 1rem 1.15rem .9rem; display: flex; flex-direction: column; align-items: center; }
+.pay-qr { width: min(180px, 58vw, 32vh); height: auto; aspect-ratio: 1; border-radius: .3rem; }
 .pay-qr-skeleton { background: var(--muted); }
-.pay-apps { width: min(270px, 84%); height: 34px; object-fit: contain; margin-top: .7rem; }
+.pay-apps { width: min(230px, 88%); height: 30px; object-fit: contain; margin-top: .6rem; }
 .pay-footer { padding: .85rem 1.4rem; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); }
 .pay-footer p { margin: 0; color: var(--muted-foreground); font-size: .93rem; }
 .pay-footer strong { color: var(--hero); font-size: 1rem; }
@@ -584,7 +584,7 @@ section[id]{scroll-margin-top:var(--header-height)}
   .pay-head { padding-top: 1.1rem; }
   .pay-bhim-logo { height: 44px; }
   .pay-code-area { padding-block: .9rem; }
-  .pay-qr { width: min(200px, 62vw); }
+  .pay-qr { width: min(170px, 58vw); }
   .pay-total span, .pay-total strong { padding-inline: 1rem; }
 }
 
