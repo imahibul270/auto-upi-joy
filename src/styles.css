@@ -265,7 +265,7 @@ section[id]{scroll-margin-top:var(--header-height)}
 
 /* Merchant console dashboard */
 .console{min-height:100vh;display:grid;grid-template-columns:272px 1fr;background:var(--background)}
-.console-side{position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:.35rem;padding:1.25rem 1rem;background:var(--hero);color:var(--hero-foreground);z-index:40}
+.console-side{position:sticky;top:0;height:100vh;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:.35rem;padding:1.25rem 1rem;background:var(--hero);color:var(--hero-foreground);z-index:40}
 .console-brand{display:flex;align-items:center;gap:.6rem;padding:.35rem .35rem 1.35rem}
 .console-mark{display:grid;place-items:center;width:2.2rem;height:2.2rem;border-radius:.6rem;background:var(--primary);color:var(--primary-foreground);font-weight:800}
 .console-brand strong{font-size:1.15rem}
@@ -277,7 +277,7 @@ section[id]{scroll-margin-top:var(--header-height)}
 .console-menu-item span{flex:1;text-align:left}
 .console-menu-item em{font-style:normal;font-size:.55rem;font-weight:800;padding:.15rem .4rem;border-radius:999px;background:var(--primary);color:var(--primary-foreground)}
 .console-menu-item em.tag-earn{background:oklch(.78 .16 62);color:oklch(.25 .07 60)}
-.console-menu-item:hover{background:color-mix(in oklab,var(--hero-foreground) 8%,transparent);color:var(--hero-foreground);transform:translateX(3px)}
+.console-menu-item:hover{background:color-mix(in oklab,var(--hero-foreground) 10%,transparent);color:var(--hero-foreground)}
 .console-menu-item.is-active{background:linear-gradient(95deg,var(--primary),oklch(.82 .18 135));color:var(--primary-foreground);font-weight:700}
 .console-user{display:flex;align-items:center;gap:.7rem;margin-top:1rem;padding:.8rem;border-radius:.7rem;background:color-mix(in oklab,var(--hero-foreground) 7%,transparent)}
 .console-avatar{display:grid;place-items:center;width:2.2rem;height:2.2rem;border-radius:.55rem;background:var(--primary);color:var(--primary-foreground);font-weight:800}
