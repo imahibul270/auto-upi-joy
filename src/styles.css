@@ -466,3 +466,96 @@ section[id]{scroll-margin-top:var(--header-height)}
 @media (max-width: 620px) {
   .console-quota-meta { flex-direction: column; gap: 4px; }
 }
+
+/* ---- Gateway: forms, tables, connect status, pay page ---- */
+.console-connect-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); margin-bottom: 1rem; }
+.console-form { display: grid; gap: .85rem; }
+.console-field { display: grid; gap: .35rem; font-size: .8rem; font-weight: 600; }
+.console-field em { font-style: normal; font-weight: 400; opacity: .6; }
+.console-field small { font-weight: 400; font-size: .7rem; opacity: .65; }
+.console-select { position: relative; display: block; }
+.console-select select {
+  width: 100%; appearance: none; padding: .55rem 2.2rem .55rem .75rem;
+  border: 1px solid var(--border); border-radius: .6rem; background: var(--background);
+  font-size: .88rem; font-weight: 600; color: var(--foreground); cursor: pointer;
+}
+.console-select select:focus-visible { outline: 2px solid color-mix(in srgb, var(--primary) 45%, transparent); outline-offset: 1px; }
+.console-select svg { position: absolute; right: .7rem; top: 50%; translate: 0 -50%; width: 1rem; opacity: .6; pointer-events: none; }
+.console-form-actions { display: flex; flex-wrap: wrap; gap: .6rem; }
+.console-note { display: flex; align-items: center; gap: .45rem; margin: .4rem 0 0; font-size: .72rem; opacity: .7; }
+.console-note svg { width: .95rem; flex: none; }
+
+.console-conn-badge {
+  display: inline-flex; align-items: center; gap: .4rem; width: fit-content;
+  padding: .25rem .7rem; border-radius: 999px; font-size: .7rem; font-weight: 700;
+  background: color-mix(in srgb, var(--muted-foreground) 14%, transparent); color: var(--muted-foreground);
+}
+.console-conn-badge i { width: .45rem; height: .45rem; border-radius: 999px; background: currentColor; }
+.console-conn-badge.is-on {
+  background: color-mix(in srgb, oklch(.75 .19 148) 18%, transparent); color: oklch(.45 .13 155);
+}
+.console-conn-badge.is-on i { box-shadow: 0 0 0 3px color-mix(in srgb, oklch(.75 .19 148) 25%, transparent); }
+.console-conn-list { display: grid; gap: .5rem; }
+.console-conn-row {
+  display: grid; align-items: center; gap: .6rem;
+  grid-template-columns: 1.1fr 1.4fr 1.4fr auto;
+  padding: .7rem .85rem; border: 1px solid var(--border); border-radius: .7rem;
+}
+.console-conn-name { display: flex; align-items: center; gap: .45rem; font-weight: 700; font-size: .85rem; }
+.console-conn-name svg { width: 1rem; color: var(--primary); }
+.console-conn-upi, .console-conn-mail { font-size: .78rem; opacity: .75; overflow-wrap: anywhere; }
+
+.console-key-create { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; }
+.console-key-create > :first-child { flex: 1 1 220px; }
+.console-key-fresh {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin-top: .9rem;
+  padding: .75rem .9rem; border-radius: .7rem;
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--primary) 35%, transparent);
+}
+.console-key-fresh code { font-size: .78rem; overflow-wrap: anywhere; }
+
+.console-table-wrap { overflow-x: auto; }
+.console-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+.console-table th {
+  text-align: left; padding: .6rem .7rem; font-size: .65rem; letter-spacing: .09em;
+  color: var(--muted-foreground); border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+.console-table td { padding: .75rem .7rem; border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent); vertical-align: middle; }
+.console-table tr:last-child td { border-bottom: 0; }
+.console-cell-customer { color: oklch(.55 .12 55); font-weight: 600; }
+.console-paid-count { color: oklch(.5 .14 152); }
+.console-secret { display: inline-flex; align-items: center; gap: .4rem; }
+.console-secret code { font-size: .76rem; }
+.console-secret button, .console-row-action {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.7rem; height: 1.7rem; border-radius: .45rem; border: 1px solid var(--border);
+  background: var(--background); color: var(--muted-foreground); cursor: pointer;
+}
+.console-secret button:hover, .console-row-action:hover { color: var(--foreground); }
+.console-secret svg, .console-row-action svg { width: .85rem; }
+.console-pill { display: inline-block; padding: .18rem .6rem; border-radius: 999px; font-size: .68rem; font-weight: 700; }
+.console-pill.is-active { background: color-mix(in srgb, oklch(.75 .19 148) 16%, transparent); color: oklch(.45 .13 155); }
+.console-pill.is-paid { background: color-mix(in srgb, oklch(.75 .19 148) 28%, transparent); color: oklch(.4 .13 155); }
+.console-pill.is-type { background: color-mix(in srgb, oklch(.87 .21 125) 25%, transparent); color: oklch(.42 .1 110); }
+.console-pill.is-muted { background: color-mix(in srgb, var(--muted-foreground) 14%, transparent); color: var(--muted-foreground); }
+.console-link-form { display: grid; gap: .85rem; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); align-items: end; }
+
+.pay-screen { min-height: 100dvh; display: grid; place-items: center; padding: 1.2rem; background: var(--muted, #f3f6f4); }
+.pay-card {
+  width: min(380px, 100%); display: grid; justify-items: center; gap: .6rem;
+  background: #fff; border-radius: 1.1rem; padding: 1.6rem 1.3rem;
+  border: 1px solid rgba(0,0,0,.06); box-shadow: 0 18px 40px rgba(0,0,0,.08); text-align: center;
+}
+.pay-brand { font-weight: 800; letter-spacing: .02em; color: var(--primary); }
+.pay-payee { margin: 0; font-size: .9rem; opacity: .75; }
+.pay-amount { margin: 0; font-size: 1.9rem; font-weight: 800; }
+.pay-qr { border-radius: .7rem; }
+.pay-qr-skeleton { width: 220px; height: 220px; background: rgba(0,0,0,.05); }
+.pay-note { margin: 0; font-size: .78rem; opacity: .65; }
+.pay-order { margin: 0; font-size: .72rem; opacity: .5; }
+.pay-success { margin: 0; font-weight: 700; color: oklch(.5 .14 152); }
+
+@media (max-width: 620px) {
+  .console-conn-row { grid-template-columns: 1fr; }
+}
