@@ -447,3 +447,24 @@ section[id]{scroll-margin-top:var(--header-height)}
 @media (prefers-reduced-motion: reduce) {
   .swal2-popup { animation: none !important; transition: none !important; }
 }
+
+/* ---- Plan quota ---- */
+.console-quota { display: grid; gap: 14px; }
+.console-quota-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.console-quota-head h3 { margin: 6px 0 0; font-size: 1.05rem; }
+.console-quota-head strong { font-size: 1.35rem; }
+.console-quota-tag {
+  display: inline-block; padding: 3px 10px; border-radius: 999px;
+  font-size: .68rem; letter-spacing: .12em;
+  background: color-mix(in srgb, var(--primary) 18%, transparent);
+  color: var(--primary);
+}
+.console-quota-bar { height: 10px; border-radius: 999px; background: color-mix(in srgb, currentColor 10%, transparent); overflow: hidden; }
+.console-quota-bar i { display: block; height: 100%; border-radius: 999px; background: var(--primary); transition: width .4s ease; }
+.console-quota-meta { display: flex; justify-content: space-between; gap: 12px; font-size: .85rem; opacity: .75; }
+.console-quota-warn { margin: 0; font-size: .88rem; color: var(--destructive); }
+.console-plan-cta { margin-top: 14px; width: 100%; }
+.inline-rupee { display: inline-block; width: 1em; height: 1em; vertical-align: -0.08em; }
+@media (max-width: 620px) {
+  .console-quota-meta { flex-direction: column; gap: 4px; }
+}

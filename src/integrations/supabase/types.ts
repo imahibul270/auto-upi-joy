@@ -41,15 +41,110 @@ export type Database = {
         }
         Relationships: []
       }
+      qr_codes: {
+        Row: {
+          amount: number | null
+          created_at: string
+          id: string
+          label: string
+          payload: string
+          upi_id: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          id?: string
+          label?: string
+          payload: string
+          upi_id?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          id?: string
+          label?: string
+          payload?: string
+          upi_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          amount_inr: number | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          plan: Database["public"]["Enums"]["plan_tier"]
+          reference: string | null
+          started_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_inr?: number | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan?: Database["public"]["Enums"]["plan_tier"]
+          reference?: string | null
+          started_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_inr?: number | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan?: Database["public"]["Enums"]["plan_tier"]
+          reference?: string | null
+          started_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      activate_pro_subscription: {
+        Args: { _amount?: number; _reference?: string; _user: string }
+        Returns: {
+          amount_inr: number | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          plan: Database["public"]["Enums"]["plan_tier"]
+          reference: string | null
+          started_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "subscriptions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      generate_qr: {
+        Args: {
+          _amount?: number
+          _label?: string
+          _payload: string
+          _upi_id?: string
+        }
+        Returns: Json
+      }
+      get_qr_quota: { Args: never; Returns: Json }
     }
     Enums: {
-      [_ in never]: never
+      plan_tier: "free" | "pro"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -176,6 +271,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      plan_tier: ["free", "pro"],
+    },
   },
 } as const
