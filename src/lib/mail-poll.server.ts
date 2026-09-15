@@ -46,8 +46,9 @@ function extractName(text: string): string | null {
 }
 
 function senderMatches(from: string): boolean {
-  const f = from.toLowerCase();
-  return MONITOR_SENDERS.some((s) => f.includes(s));
+  // Take the real address inside <> when present, else the whole header.
+  const address = (from.match(/<([^>]+)>/)?.[1] ?? from).trim().toLowerCase();
+  return MONITOR_SENDERS.includes(address);
 }
 
 /** Scan the merchant's mailbox and settle any matching pending payment link. */

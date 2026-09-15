@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { QrCode, ScanLine } from "lucide-react";
+import { QrCode } from "lucide-react";
+import { BrandLogo } from "@/components/BrandLogo";
 import type { ReactNode } from "react";
 
 export function AuthShell({ children }: { children: ReactNode }) {

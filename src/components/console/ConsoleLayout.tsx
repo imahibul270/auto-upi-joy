@@ -1,4 +1,5 @@
 import { useRouterState } from "@tanstack/react-router";
+import { BrandLogo } from "@/components/BrandLogo";
 import {
   ArrowLeftRight, Bell, BookOpen, CreditCard, KeyRound, LayoutGrid, LifeBuoy, Link2, Menu, Sparkles, X,
 } from "lucide-react";
