@@ -50,6 +50,54 @@ export type Database = {
         }
         Relationships: []
       }
+      gmail_connections: {
+        Row: {
+          access_token: string | null
+          connected_at: string | null
+          created_at: string
+          email: string | null
+          last_polled_at: string | null
+          oauth_client_id: string | null
+          oauth_client_secret: string | null
+          refresh_token: string | null
+          scope: string | null
+          status: string
+          token_expires_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token?: string | null
+          connected_at?: string | null
+          created_at?: string
+          email?: string | null
+          last_polled_at?: string | null
+          oauth_client_id?: string | null
+          oauth_client_secret?: string | null
+          refresh_token?: string | null
+          scope?: string | null
+          status?: string
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string | null
+          connected_at?: string | null
+          created_at?: string
+          email?: string | null
+          last_polled_at?: string | null
+          oauth_client_id?: string | null
+          oauth_client_secret?: string | null
+          refresh_token?: string | null
+          scope?: string | null
+          status?: string
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       merchant_accounts: {
         Row: {
           app_password: string
@@ -98,6 +146,8 @@ export type Database = {
           clicks: number
           created_at: string
           customer_name: string
+          detected_at: string | null
+          expires_at: string
           id: string
           link_type: string
           order_id: string
@@ -106,6 +156,7 @@ export type Database = {
           paid_email_id: string | null
           payable_amount: number
           payee_name: string
+          payer_email: string | null
           payer_name: string | null
           provider: Database["public"]["Enums"]["upi_provider"] | null
           slug: string
@@ -118,6 +169,8 @@ export type Database = {
           clicks?: number
           created_at?: string
           customer_name?: string
+          detected_at?: string | null
+          expires_at?: string
           id?: string
           link_type?: string
           order_id: string
@@ -126,6 +179,7 @@ export type Database = {
           paid_email_id?: string | null
           payable_amount: number
           payee_name?: string
+          payer_email?: string | null
           payer_name?: string | null
           provider?: Database["public"]["Enums"]["upi_provider"] | null
           slug: string
@@ -138,6 +192,8 @@ export type Database = {
           clicks?: number
           created_at?: string
           customer_name?: string
+          detected_at?: string | null
+          expires_at?: string
           id?: string
           link_type?: string
           order_id?: string
@@ -146,12 +202,37 @@ export type Database = {
           paid_email_id?: string | null
           payable_amount?: number
           payee_name?: string
+          payer_email?: string | null
           payer_name?: string | null
           provider?: Database["public"]["Enums"]["upi_provider"] | null
           slug?: string
           status?: Database["public"]["Enums"]["link_status"]
           upi_id?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      processed_emails: {
+        Row: {
+          amount: number | null
+          created_at: string
+          link_id: string | null
+          message_id: string
+          user_id: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          link_id?: string | null
+          message_id: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          link_id?: string | null
+          message_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -286,6 +367,7 @@ export type Database = {
         Returns: Json
       }
       expire_payment_link: { Args: { _id: string }; Returns: Json }
+      expire_stale_payment_links: { Args: { _user?: string }; Returns: number }
       generate_qr: {
         Args: {
           _amount?: number
