@@ -1,25 +1,80 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { CreditCard, Link2, LogOut, UserRound } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  Activity, BadgeIndianRupee, Bell, CreditCard, Gift, KeyRound, LayoutGrid, Link2,
+  LogOut, Menu, Palette, Receipt, ShieldCheck, ShoppingBag, TrendingDown, TrendingUp,
+  Users, Webhook, X,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import {
+  Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
+} from "recharts";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [
     { title: "Dashboard — Auto Upi" },
-    { name: "description", content: "View your Auto Upi merchant account and payment workspace." },
+    { name: "description", content: "Track revenue, orders, success rate and payment analytics inside your Auto Upi merchant workspace." },
     { property: "og:title", content: "Dashboard — Auto Upi" },
-    { property: "og:description", content: "Your secure Auto Upi merchant workspace." },
+    { property: "og:description", content: "Your secure Auto Upi merchant workspace with live payment analytics." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },
-  ]}), component: DashboardPage,
+  ]}),
+  component: DashboardPage,
 });
+
+const MENU = [
+  { label: "Dashboard", icon: LayoutGrid, active: true },
+  { label: "Transactions", icon: Receipt },
+  { label: "Customers", icon: Users, tag: "New" },
+  { label: "Reports", icon: Activity, tag: "New" },
+  { label: "Payment Links", icon: Link2 },
+  { label: "Customize Payment", icon: Palette, tag: "New" },
+  { label: "Connect Accounts", icon: CreditCard },
+  { label: "Webhooks", icon: Webhook },
+  { label: "Activity & Security", icon: ShieldCheck, tag: "New" },
+  { label: "API Keys", icon: KeyRound },
+  { label: "Refer & Earn", icon: Gift, tag: "Earn" },
+];
+
+const RANGES = ["Today", "Last 7 Days", "Last 30 Days"] as const;
+
+const SERIES: Record<string, { day: string; revenue: number; orders: number }[]> = {
+  Today: [
+    { day: "12 AM", revenue: 0, orders: 0 }, { day: "4 AM", revenue: 0, orders: 0 },
+    { day: "8 AM", revenue: 0, orders: 0 }, { day: "12 PM", revenue: 0, orders: 0 },
+    { day: "4 PM", revenue: 0, orders: 0 }, { day: "8 PM", revenue: 0, orders: 0 },
+  ],
+  "Last 7 Days": [
+    { day: "Mon", revenue: 0, orders: 0 }, { day: "Tue", revenue: 0, orders: 0 },
+    { day: "Wed", revenue: 0, orders: 0 }, { day: "Thu", revenue: 0, orders: 0 },
+    { day: "Fri", revenue: 0, orders: 0 }, { day: "Sat", revenue: 0, orders: 0 },
+    { day: "Sun", revenue: 0, orders: 0 },
+  ],
+  "Last 30 Days": [
+    { day: "W1", revenue: 0, orders: 0 }, { day: "W2", revenue: 0, orders: 0 },
+    { day: "W3", revenue: 0, orders: 0 }, { day: "W4", revenue: 0, orders: 0 },
+  ],
+};
+
+const METHODS = [
+  { name: "UPI", value: 0 }, { name: "Cards", value: 0 }, { name: "Netbanking", value: 0 },
+];
+const METHOD_COLORS = ["oklch(0.72 0.19 128)", "oklch(0.46 0.14 164)", "oklch(0.8 0.12 88)"];
 
 function DashboardPage() {
   const { user } = Route.useRouteContext();
-  const navigate = useNavigate(); const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [name, setName] = useState((user.user_metadata?.["full_name"] as string) || "Merchant");
+  const [range, setRange] = useState<(typeof RANGES)[number]>("Today");
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const chartData = useMemo(() => SERIES[range] ?? SERIES["Today"], [range]);
+  const initial = (name || "M").trim().charAt(0).toUpperCase();
+  const hasMethodData = METHODS.some((m) => m.value > 0);
+
   useEffect(() => {
     const syncProfile = async () => {
       const fullName = (user.user_metadata?.["full_name"] as string | undefined) ?? "";
@@ -30,6 +85,166 @@ function DashboardPage() {
     };
     void syncProfile();
   }, [user]);
-  async function signOut() { await queryClient.cancelQueries(); queryClient.clear(); await supabase.auth.signOut(); await navigate({ to: "/auth", replace: true }); }
-  return <main className="account-page"><header className="account-header page-enter page-enter-early"><a href="/" className="account-logo">Auto Upi</a><Button variant="outline" onClick={signOut}><LogOut /> Sign out</Button></header><section className="account-content"><div className="account-welcome" data-reveal><span><UserRound /></span><div><p>WELCOME BACK</p><h1>{name}</h1><small>{user.email}</small></div></div><div className="account-grid"><article className="reveal-delay-1" data-reveal><CreditCard /><h2>Payments</h2><p>Your payment activity will appear here.</p></article><article className="reveal-delay-2" data-reveal><Link2 /><h2>Payment links</h2><p>Create and manage your checkout links.</p></article></div></section></main>;
+
+  async function signOut() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    await navigate({ to: "/auth", replace: true });
+  }
+
+  const stats = [
+    { label: "Total Revenue", value: "₹0.00", icon: BadgeIndianRupee, tone: "lime",
+      trend: "+12.5% vs last period", trendIcon: TrendingUp, trendTone: "up" },
+    { label: "Total Orders", value: "0", icon: ShoppingBag, tone: "blue",
+      trend: "+8.2% vs last period", trendIcon: TrendingUp, trendTone: "up" },
+    { label: "Success Rate", value: "0%", icon: ShieldCheck, tone: "mint",
+      trend: "Healthy status", trendIcon: TrendingUp, trendTone: "up" },
+    { label: "Pending / Failed", value: "0 / 0", icon: Activity, tone: "amber",
+      trend: "Actions required", trendIcon: TrendingDown, trendTone: "down" },
+  ];
+
+  return (
+    <div className="console">
+      <aside className={`console-side${menuOpen ? " side-open" : ""}`}>
+        <div className="console-brand">
+          <span className="console-mark">A</span>
+          <strong>Auto Upi</strong>
+          <em>V2</em>
+        </div>
+        <p className="console-side-label">MAIN MENU</p>
+        <nav className="console-menu">
+          {MENU.map((item, index) => (
+            <button
+              key={item.label}
+              type="button"
+              className={`console-menu-item${item.active ? " is-active" : ""} reveal-delay-${(index % 4) + 1}`}
+              data-reveal
+            >
+              <item.icon />
+              <span>{item.label}</span>
+              {item.tag ? <em className={item.tag === "Earn" ? "tag-earn" : ""}>{item.tag}</em> : null}
+            </button>
+          ))}
+        </nav>
+        <div className="console-user">
+          <span className="console-avatar">{initial}</span>
+          <div>
+            <strong>{name}</strong>
+            <small>Free Plan</small>
+          </div>
+        </div>
+      </aside>
+
+      {menuOpen ? <button type="button" className="console-scrim" aria-label="Close menu" onClick={() => setMenuOpen(false)} /> : null}
+
+      <div className="console-main">
+        <header className="console-top page-enter page-enter-early">
+          <button type="button" className="console-burger" aria-label="Toggle menu" onClick={() => setMenuOpen((v) => !v)}>
+            {menuOpen ? <X /> : <Menu />}
+          </button>
+          <h1>Dashboard</h1>
+          <div className="console-top-right">
+            <span className="console-live"><i />Live</span>
+            <button type="button" className="console-icon-btn" aria-label="Notifications"><Bell /></button>
+            <Button variant="outline" size="sm" onClick={signOut}><LogOut /> Sign out</Button>
+          </div>
+        </header>
+
+        <main className="console-body">
+          <section className="console-welcome" data-reveal>
+            <div>
+              <h2>Welcome Back, {name}!</h2>
+              <p>Here&apos;s what&apos;s happening with your payments.</p>
+            </div>
+            <div className="console-range">
+              {RANGES.map((r) => (
+                <button key={r} type="button" className={range === r ? "is-active" : ""} onClick={() => setRange(r)}>{r}</button>
+              ))}
+            </div>
+          </section>
+
+          <section className="console-stats">
+            {stats.map((s, i) => (
+              <article key={s.label} className={`console-stat reveal-delay-${i + 1}`} data-reveal>
+                <div className="console-stat-head">
+                  <span>{s.label}</span>
+                  <i className={`console-stat-icon tone-${s.tone}`}><s.icon /></i>
+                </div>
+                <strong>{s.value}</strong>
+                <p className={`console-trend trend-${s.trendTone}`}><s.trendIcon />{s.trend}</p>
+              </article>
+            ))}
+          </section>
+
+          <section className="console-analytics">
+            <article className="console-card reveal-delay-1" data-reveal>
+              <div className="console-card-head">
+                <h3>Transaction &amp; Revenue Analytics</h3>
+                <small>{range}</small>
+              </div>
+              <div className="console-chart">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData} margin={{ top: 10, right: 8, left: -18, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="revFill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="oklch(0.72 0.19 128)" stopOpacity={0.45} />
+                        <stop offset="100%" stopColor="oklch(0.72 0.19 128)" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="4 6" stroke="var(--border)" vertical={false} />
+                    <XAxis dataKey="day" tickLine={false} axisLine={false} fontSize={11} stroke="var(--muted-foreground)" />
+                    <YAxis tickLine={false} axisLine={false} fontSize={11} stroke="var(--muted-foreground)" allowDecimals />
+                    <Tooltip contentStyle={{ borderRadius: 10, border: "1px solid var(--border)", fontSize: 12 }} />
+                    <Area type="monotone" dataKey="revenue" stroke="oklch(0.58 0.16 128)" strokeWidth={2.4} fill="url(#revFill)" animationDuration={1100} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </article>
+
+            <article className="console-card reveal-delay-2" data-reveal>
+              <div className="console-card-head">
+                <h3>Payment Methods</h3>
+              </div>
+              {hasMethodData ? (
+                <div className="console-chart console-chart-sm">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={METHODS} dataKey="value" nameKey="name" innerRadius="58%" outerRadius="85%" paddingAngle={3} animationDuration={1100}>
+                        {METHODS.map((m, i) => <Cell key={m.name} fill={METHOD_COLORS[i]} />)}
+                      </Pie>
+                      <Tooltip contentStyle={{ borderRadius: 10, border: "1px solid var(--border)", fontSize: 12 }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="console-empty">
+                  <CreditCard />
+                  <p>No payments yet</p>
+                  <small>Method split will appear after your first transaction.</small>
+                </div>
+              )}
+              <ul className="console-legend">
+                {METHODS.map((m, i) => (
+                  <li key={m.name}><i style={{ background: METHOD_COLORS[i] }} />{m.name}<span>{m.value}%</span></li>
+                ))}
+              </ul>
+            </article>
+          </section>
+
+          <section className="console-card console-recent" data-reveal>
+            <div className="console-card-head">
+              <h3>Recent Transactions</h3>
+              <small>Latest activity on your account</small>
+            </div>
+            <div className="console-empty console-empty-row">
+              <Receipt />
+              <p>No transactions yet</p>
+              <small>Share a payment link to receive your first payment.</small>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  );
 }
