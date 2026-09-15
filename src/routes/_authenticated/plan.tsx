@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/plan")({
 function PlanPage() {
   const { user } = Route.useRouteContext();
   const name = useConsoleName(user);
-  const { data: quota, isLoading } = useQrQuota();
+  const { data: quota } = useQrQuota();
 
   const isPro = quota?.plan === "pro";
   const used = quota?.used ?? 0;
