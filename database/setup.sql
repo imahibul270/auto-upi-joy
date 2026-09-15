@@ -394,3 +394,11 @@ END $$;
 
 REVOKE ALL ON FUNCTION public.expire_stale_payment_links(uuid) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.expire_stale_payment_links(uuid) TO service_role;
+-- ============================================================
+-- 0010 Signed webhook delivery for paid orders
+-- ============================================================
+ALTER TABLE public.payment_links
+  ADD COLUMN IF NOT EXISTS webhook_url text,
+  ADD COLUMN IF NOT EXISTS webhook_delivered_at timestamptz,
+  ADD COLUMN IF NOT EXISTS webhook_attempts integer NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS webhook_last_error text;
