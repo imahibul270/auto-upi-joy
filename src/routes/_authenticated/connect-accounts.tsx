@@ -157,47 +157,7 @@ function ConnectAccountsPage() {
           </form>
         </div>
 
-        <div className="console-card reveal-delay-2" data-reveal>
-          <form className="console-form" onSubmit={connect}>
-            <div className="console-settings-heading">
-              <Mail />
-              <div><strong>Payment alert mailbox</strong><small>Email and app password of the inbox that gets {providerLabel} alerts</small></div>
-            </div>
-
-            <span className={`console-conn-badge${current?.connected ? " is-on" : ""}`}>
-              <i />{current?.connected ? "Connected" : "Not connected"}
-            </span>
-
-            <label className="console-field">
-              Email
-              <Input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="alerts@gmail.com" required />
-            </label>
-
-            <label className="console-field">
-              App password
-              <Input
-                type="password"
-                value={appPassword}
-                onChange={(event) => setAppPassword(event.target.value)}
-                placeholder={current?.connected ? "Enter again to reconnect" : "abcd efgh ijkl mnop"}
-                autoComplete="off"
-                required
-              />
-              <small>Use your mail provider's app password, never your login password.</small>
-            </label>
-
-            <div className="console-form-actions">
-              <Button type="submit" disabled={connecting}>
-                <Plug />{connecting ? "Connecting…" : current?.connected ? "Reconnect" : "Connect"}
-              </Button>
-              {current?.connected ? (
-                <Button type="button" variant="outline" onClick={disconnect}><Link2Off />Disconnect</Button>
-              ) : null}
-            </div>
-
-            <p className="console-note"><ShieldCheck />Credentials are stored server side and are never sent back to the browser.</p>
-          </form>
-        </div>
+        <GmailCard />
       </section>
 
       <section className="console-card reveal-delay-3" data-reveal>
