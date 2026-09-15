@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import { Swal } from "@/lib/swal";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [
@@ -34,7 +35,12 @@ function SignInPage() {
     setMessage("");
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setLoading(false);
-    if (error) { setMessage(error.message); return; }
+    if (error) {
+      setMessage(error.message);
+      void Swal.fire({ icon: "error", title: "Login failed", text: error.message });
+      return;
+    }
+    await Swal.fire({ icon: "success", title: "Login successful", text: "Welcome back to Auto Upi.", draggable: true });
     await navigate({ to: "/dashboard", replace: true });
   }
 
