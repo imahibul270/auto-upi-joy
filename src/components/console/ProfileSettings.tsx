@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import type { User } from "@supabase/supabase-js";
-import { Eye, EyeOff, ImageUp, LogOut } from "lucide-react";
+import { Eye, EyeOff, ImageUp, LogOut, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,7 +8,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,6 +36,8 @@ export function ProfileSettings({
   onSignOut: () => Promise<void>;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [logo, setLogo] = useState("");
   const [logoMessage, setLogoMessage] = useState("");
   const [passwordMessage, setPasswordMessage] = useState("");
@@ -124,59 +125,89 @@ export function ProfileSettings({
   }
 
   return (
-    <Dialog>
+    <>
       <div className="console-user console-user-fixed">
-        <DialogTrigger asChild>
-          <Button type="button" variant="ghost" className="console-profile-trigger">
-            <span className="console-avatar">
-              {logo ? <img src={logo} alt="Business logo" /> : initial}
-            </span>
-            <span className="console-user-copy">
-              <strong>{userName}</strong>
-              <small>Free Plan · Profile settings</small>
-            </span>
-          </Button>
-        </DialogTrigger>
-        <Button type="button" variant="ghost" size="icon" className="console-signout" aria-label="Sign out" onClick={() => void onSignOut()}>
-          <LogOut />
+        <Button
+          type="button"
+          variant="ghost"
+          className="console-profile-trigger"
+          aria-expanded={menuOpen}
+          aria-haspopup="menu"
+          onClick={() => setMenuOpen((value) => !value)}
+        >
+          <span className="console-avatar">
+            {logo ? <img src={logo} alt="Business logo" /> : initial}
+          </span>
+          <span className="console-user-copy">
+            <strong>{userName}</strong>
+            <small>Free Plan · Profile settings</small>
+          </span>
         </Button>
       </div>
 
-      <DialogContent className="console-profile-dialog">
-        <DialogHeader>
-          <DialogTitle>Profile settings</DialogTitle>
-          <DialogDescription>Update your business identity and account password.</DialogDescription>
-        </DialogHeader>
+      {menuOpen ? (
+        <>
+          <button type="button" className="console-menu-scrim" aria-label="Close profile menu" onClick={() => setMenuOpen(false)} />
+          <div className="console-profile-menu" role="menu">
+            <button
+              type="button"
+              role="menuitem"
+              className="console-profile-menu-item"
+              onClick={() => { setMenuOpen(false); setDialogOpen(true); }}
+            >
+              <Settings />
+              <span>Profile settings</span>
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              className="console-profile-menu-item is-danger"
+              onClick={() => void onSignOut()}
+            >
+              <LogOut />
+              <span>Sign out</span>
+            </button>
+          </div>
+        </>
+      ) : null}
 
-        <section className="console-settings-section">
-          <div className="console-settings-heading">
-            <ImageUp />
-            <div><strong>Business logo & favicon</strong><small>PNG, JPG or WebP · max 512 KB</small></div>
-          </div>
-          <div className="console-logo-editor">
-            <span className="console-logo-preview">{logo ? <img src={logo} alt="Selected business logo" /> : initial}</span>
-            <input ref={inputRef} className="sr-only" type="file" accept="image/png,image/jpeg,image/webp" onChange={chooseLogo} />
-            <Button type="button" variant="outline" onClick={() => inputRef.current?.click()}>Choose logo</Button>
-            <Button type="button" onClick={() => void saveLogo()} disabled={savingLogo}>{savingLogo ? "Saving…" : "Save"}</Button>
-          </div>
-          {logoMessage ? <p className="console-settings-message" role="status">{logoMessage}</p> : null}
-        </section>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="console-profile-dialog">
+          <DialogHeader>
+            <DialogTitle>Profile settings</DialogTitle>
+            <DialogDescription>Update your business identity and account password.</DialogDescription>
+          </DialogHeader>
 
-        <form className="console-settings-section" onSubmit={changePassword}>
-          <div className="console-settings-heading">
-            <Eye />
-            <div><strong>Change password</strong><small>Your current password is required</small></div>
-          </div>
-          <label>Current password<Input type={showPasswords ? "text" : "password"} autoComplete="current-password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} required /></label>
-          <label>New password<Input type={showPasswords ? "text" : "password"} autoComplete="new-password" minLength={8} value={newPassword} onChange={(event) => setNewPassword(event.target.value)} required /></label>
-          <label>Confirm new password<Input type={showPasswords ? "text" : "password"} autoComplete="new-password" minLength={8} value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} required /></label>
-          <Button type="button" variant="ghost" className="console-password-visibility" onClick={() => setShowPasswords((value) => !value)}>
-            {showPasswords ? <EyeOff /> : <Eye />}{showPasswords ? "Hide passwords" : "Show passwords"}
-          </Button>
-          {passwordMessage ? <p className="console-settings-message" role="status">{passwordMessage}</p> : null}
-          <Button type="submit" disabled={savingPassword}>{savingPassword ? "Changing…" : "Change password"}</Button>
-        </form>
-      </DialogContent>
-    </Dialog>
+          <section className="console-settings-section">
+            <div className="console-settings-heading">
+              <ImageUp />
+              <div><strong>Business logo & favicon</strong><small>PNG, JPG or WebP · max 512 KB</small></div>
+            </div>
+            <div className="console-logo-editor">
+              <span className="console-logo-preview">{logo ? <img src={logo} alt="Selected business logo" /> : initial}</span>
+              <input ref={inputRef} className="sr-only" type="file" accept="image/png,image/jpeg,image/webp" onChange={chooseLogo} />
+              <Button type="button" variant="outline" onClick={() => inputRef.current?.click()}>Choose logo</Button>
+              <Button type="button" onClick={() => void saveLogo()} disabled={savingLogo}>{savingLogo ? "Saving…" : "Save"}</Button>
+            </div>
+            {logoMessage ? <p className="console-settings-message" role="status">{logoMessage}</p> : null}
+          </section>
+
+          <form className="console-settings-section" onSubmit={changePassword}>
+            <div className="console-settings-heading">
+              <Eye />
+              <div><strong>Change password</strong><small>Your current password is required</small></div>
+            </div>
+            <label>Current password<Input type={showPasswords ? "text" : "password"} autoComplete="current-password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} required /></label>
+            <label>New password<Input type={showPasswords ? "text" : "password"} autoComplete="new-password" minLength={8} value={newPassword} onChange={(event) => setNewPassword(event.target.value)} required /></label>
+            <label>Confirm new password<Input type={showPasswords ? "text" : "password"} autoComplete="new-password" minLength={8} value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} required /></label>
+            <Button type="button" variant="ghost" className="console-password-visibility" onClick={() => setShowPasswords((value) => !value)}>
+              {showPasswords ? <EyeOff /> : <Eye />}{showPasswords ? "Hide passwords" : "Show passwords"}
+            </Button>
+            {passwordMessage ? <p className="console-settings-message" role="status">{passwordMessage}</p> : null}
+            <Button type="submit" disabled={savingPassword}>{savingPassword ? "Changing…" : "Change password"}</Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
