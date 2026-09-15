@@ -1,16 +1,13 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
-  Activity, BadgeIndianRupee, Bell, CreditCard, Gift, KeyRound, LayoutGrid, Link2,
-  LogOut, Menu, Palette, Receipt, ShieldCheck, ShoppingBag, TrendingDown, TrendingUp,
-  Users, Webhook, X,
+  Activity, BadgeIndianRupee, CreditCard, Receipt, ShieldCheck, ShoppingBag, TrendingDown, TrendingUp,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import {
   Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
-import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { ConsoleLayout } from "@/components/console/ConsoleLayout";
+import { useConsoleName } from "@/components/console/useConsoleName";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [
@@ -23,20 +20,6 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   ]}),
   component: DashboardPage,
 });
-
-const MENU = [
-  { label: "Dashboard", icon: LayoutGrid, active: true },
-  { label: "Transactions", icon: Receipt },
-  { label: "Customers", icon: Users, tag: "New" },
-  { label: "Reports", icon: Activity, tag: "New" },
-  { label: "Payment Links", icon: Link2 },
-  { label: "Customize Payment", icon: Palette, tag: "New" },
-  { label: "Connect Accounts", icon: CreditCard },
-  { label: "Webhooks", icon: Webhook },
-  { label: "Activity & Security", icon: ShieldCheck, tag: "New" },
-  { label: "API Keys", icon: KeyRound },
-  { label: "Refer & Earn", icon: Gift, tag: "Earn" },
-];
 
 const RANGES = ["Today", "Last 7 Days", "Last 30 Days"] as const;
 
@@ -65,33 +48,10 @@ const METHOD_COLORS = ["oklch(0.72 0.19 128)", "oklch(0.46 0.14 164)", "oklch(0.
 
 function DashboardPage() {
   const { user } = Route.useRouteContext();
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const [name, setName] = useState((user.user_metadata?.["full_name"] as string) || "Merchant");
+  const name = useConsoleName(user);
   const [range, setRange] = useState<(typeof RANGES)[number]>("Today");
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  const chartData = useMemo(() => SERIES[range] ?? SERIES["Today"], [range]);
-  const initial = (name || "M").trim().charAt(0).toUpperCase();
+  const chartData = useMemo(() => SERIES[range] ?? SERIES["Today"] ?? [], [range]);
   const hasMethodData = METHODS.some((m) => m.value > 0);
-
-  useEffect(() => {
-    const syncProfile = async () => {
-      const fullName = (user.user_metadata?.["full_name"] as string | undefined) ?? "";
-      const mobile = (user.user_metadata?.["mobile"] as string | undefined) ?? "";
-      const { data } = await supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle();
-      if (!data) await supabase.from("profiles").insert({ id: user.id, full_name: fullName, mobile });
-      else if (data.full_name) setName(data.full_name);
-    };
-    void syncProfile();
-  }, [user]);
-
-  async function signOut() {
-    await queryClient.cancelQueries();
-    queryClient.clear();
-    await supabase.auth.signOut();
-    await navigate({ to: "/auth", replace: true });
-  }
 
   const stats = [
     { label: "Total Revenue", value: "₹0.00", icon: BadgeIndianRupee, tone: "lime",
@@ -105,146 +65,98 @@ function DashboardPage() {
   ];
 
   return (
-    <div className="console">
-      <aside className={`console-side${menuOpen ? " side-open" : ""}`}>
-        <div className="console-brand">
-          <span className="console-mark">A</span>
-          <strong>Auto Upi</strong>
-          <em>V2</em>
+    <ConsoleLayout title="Dashboard" userName={name}>
+      <section className="console-welcome" data-reveal>
+        <div>
+          <h2>Welcome Back, {name}!</h2>
+          <p>Here&apos;s what&apos;s happening with your payments.</p>
         </div>
-        <p className="console-side-label">MAIN MENU</p>
-        <nav className="console-menu">
-          {MENU.map((item, index) => (
-            <button
-              key={item.label}
-              type="button"
-              className={`console-menu-item${item.active ? " is-active" : ""} reveal-delay-${(index % 4) + 1}`}
-              data-reveal
-            >
-              <item.icon />
-              <span>{item.label}</span>
-              {item.tag ? <em className={item.tag === "Earn" ? "tag-earn" : ""}>{item.tag}</em> : null}
-            </button>
+        <div className="console-range">
+          {RANGES.map((r) => (
+            <button key={r} type="button" className={range === r ? "is-active" : ""} onClick={() => setRange(r)}>{r}</button>
           ))}
-        </nav>
-        <div className="console-user">
-          <span className="console-avatar">{initial}</span>
-          <div>
-            <strong>{name}</strong>
-            <small>Free Plan</small>
-          </div>
         </div>
-      </aside>
+      </section>
 
-      {menuOpen ? <button type="button" className="console-scrim" aria-label="Close menu" onClick={() => setMenuOpen(false)} /> : null}
+      <section className="console-stats">
+        {stats.map((s, i) => (
+          <article key={s.label} className={`console-stat reveal-delay-${i + 1}`} data-reveal>
+            <div className="console-stat-head">
+              <span>{s.label}</span>
+              <i className={`console-stat-icon tone-${s.tone}`}><s.icon /></i>
+            </div>
+            <strong>{s.value}</strong>
+            <p className={`console-trend trend-${s.trendTone}`}><s.trendIcon />{s.trend}</p>
+          </article>
+        ))}
+      </section>
 
-      <div className="console-main">
-        <header className="console-top page-enter page-enter-early">
-          <button type="button" className="console-burger" aria-label="Toggle menu" onClick={() => setMenuOpen((v) => !v)}>
-            {menuOpen ? <X /> : <Menu />}
-          </button>
-          <h1>Dashboard</h1>
-          <div className="console-top-right">
-            <span className="console-live"><i />Live</span>
-            <button type="button" className="console-icon-btn" aria-label="Notifications"><Bell /></button>
-            <Button variant="outline" size="sm" onClick={signOut}><LogOut /> Sign out</Button>
+      <section className="console-analytics">
+        <article className="console-card reveal-delay-1" data-reveal>
+          <div className="console-card-head">
+            <h3>Transaction &amp; Revenue Analytics</h3>
+            <small>{range}</small>
           </div>
-        </header>
+          <div className="console-chart">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData} margin={{ top: 10, right: 8, left: -18, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="revFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="oklch(0.72 0.19 128)" stopOpacity={0.45} />
+                    <stop offset="100%" stopColor="oklch(0.72 0.19 128)" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="4 6" stroke="var(--border)" vertical={false} />
+                <XAxis dataKey="day" tickLine={false} axisLine={false} fontSize={11} stroke="var(--muted-foreground)" />
+                <YAxis tickLine={false} axisLine={false} fontSize={11} stroke="var(--muted-foreground)" allowDecimals />
+                <Tooltip contentStyle={{ borderRadius: 10, border: "1px solid var(--border)", fontSize: 12 }} />
+                <Area type="monotone" dataKey="revenue" stroke="oklch(0.58 0.16 128)" strokeWidth={2.4} fill="url(#revFill)" animationDuration={1100} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </article>
 
-        <main className="console-body">
-          <section className="console-welcome" data-reveal>
-            <div>
-              <h2>Welcome Back, {name}!</h2>
-              <p>Here&apos;s what&apos;s happening with your payments.</p>
+        <article className="console-card reveal-delay-2" data-reveal>
+          <div className="console-card-head">
+            <h3>Payment Methods</h3>
+          </div>
+          {hasMethodData ? (
+            <div className="console-chart console-chart-sm">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={METHODS} dataKey="value" nameKey="name" innerRadius="58%" outerRadius="85%" paddingAngle={3} animationDuration={1100}>
+                    {METHODS.map((m, i) => <Cell key={m.name} fill={METHOD_COLORS[i]} />)}
+                  </Pie>
+                  <Tooltip contentStyle={{ borderRadius: 10, border: "1px solid var(--border)", fontSize: 12 }} />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
-            <div className="console-range">
-              {RANGES.map((r) => (
-                <button key={r} type="button" className={range === r ? "is-active" : ""} onClick={() => setRange(r)}>{r}</button>
-              ))}
+          ) : (
+            <div className="console-empty">
+              <CreditCard />
+              <p>No payments yet</p>
+              <small>Method split will appear after your first transaction.</small>
             </div>
-          </section>
-
-          <section className="console-stats">
-            {stats.map((s, i) => (
-              <article key={s.label} className={`console-stat reveal-delay-${i + 1}`} data-reveal>
-                <div className="console-stat-head">
-                  <span>{s.label}</span>
-                  <i className={`console-stat-icon tone-${s.tone}`}><s.icon /></i>
-                </div>
-                <strong>{s.value}</strong>
-                <p className={`console-trend trend-${s.trendTone}`}><s.trendIcon />{s.trend}</p>
-              </article>
+          )}
+          <ul className="console-legend">
+            {METHODS.map((m, i) => (
+              <li key={m.name}><i style={{ background: METHOD_COLORS[i] }} />{m.name}<span>{m.value}%</span></li>
             ))}
-          </section>
+          </ul>
+        </article>
+      </section>
 
-          <section className="console-analytics">
-            <article className="console-card reveal-delay-1" data-reveal>
-              <div className="console-card-head">
-                <h3>Transaction &amp; Revenue Analytics</h3>
-                <small>{range}</small>
-              </div>
-              <div className="console-chart">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData} margin={{ top: 10, right: 8, left: -18, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="revFill" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="oklch(0.72 0.19 128)" stopOpacity={0.45} />
-                        <stop offset="100%" stopColor="oklch(0.72 0.19 128)" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="4 6" stroke="var(--border)" vertical={false} />
-                    <XAxis dataKey="day" tickLine={false} axisLine={false} fontSize={11} stroke="var(--muted-foreground)" />
-                    <YAxis tickLine={false} axisLine={false} fontSize={11} stroke="var(--muted-foreground)" allowDecimals />
-                    <Tooltip contentStyle={{ borderRadius: 10, border: "1px solid var(--border)", fontSize: 12 }} />
-                    <Area type="monotone" dataKey="revenue" stroke="oklch(0.58 0.16 128)" strokeWidth={2.4} fill="url(#revFill)" animationDuration={1100} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </article>
-
-            <article className="console-card reveal-delay-2" data-reveal>
-              <div className="console-card-head">
-                <h3>Payment Methods</h3>
-              </div>
-              {hasMethodData ? (
-                <div className="console-chart console-chart-sm">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie data={METHODS} dataKey="value" nameKey="name" innerRadius="58%" outerRadius="85%" paddingAngle={3} animationDuration={1100}>
-                        {METHODS.map((m, i) => <Cell key={m.name} fill={METHOD_COLORS[i]} />)}
-                      </Pie>
-                      <Tooltip contentStyle={{ borderRadius: 10, border: "1px solid var(--border)", fontSize: 12 }} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              ) : (
-                <div className="console-empty">
-                  <CreditCard />
-                  <p>No payments yet</p>
-                  <small>Method split will appear after your first transaction.</small>
-                </div>
-              )}
-              <ul className="console-legend">
-                {METHODS.map((m, i) => (
-                  <li key={m.name}><i style={{ background: METHOD_COLORS[i] }} />{m.name}<span>{m.value}%</span></li>
-                ))}
-              </ul>
-            </article>
-          </section>
-
-          <section className="console-card console-recent" data-reveal>
-            <div className="console-card-head">
-              <h3>Recent Transactions</h3>
-              <small>Latest activity on your account</small>
-            </div>
-            <div className="console-empty console-empty-row">
-              <Receipt />
-              <p>No transactions yet</p>
-              <small>Share a payment link to receive your first payment.</small>
-            </div>
-          </section>
-        </main>
-      </div>
-    </div>
+      <section className="console-card console-recent" data-reveal>
+        <div className="console-card-head">
+          <h3>Recent Transactions</h3>
+          <small>Latest activity on your account</small>
+        </div>
+        <div className="console-empty console-empty-row">
+          <Receipt />
+          <p>No transactions yet</p>
+          <small>Share a payment link to receive your first payment.</small>
+        </div>
+      </section>
+    </ConsoleLayout>
   );
 }
