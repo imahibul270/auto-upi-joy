@@ -388,17 +388,17 @@ section[id]{scroll-margin-top:var(--header-height)}
 }
 .swal2-styled.swal2-confirm,
 .swal2-confirm.swal2-styled {
-  background: var(--primary);
-  color: var(--primary-foreground);
+  background: var(--hero);
+  color: var(--hero-foreground);
   box-shadow: none;
 }
 .swal2-styled.swal2-confirm:hover,
 .swal2-confirm.swal2-styled:hover {
-  background: oklch(0.91 0.19 122);
+  background: oklch(0.22 0.05 164);
 }
 .swal2-styled.swal2-confirm:focus,
 .swal2-confirm.swal2-styled:focus {
-  background: var(--primary);
+  background: var(--hero);
   box-shadow: 0 0 0 3px oklch(0.87 0.21 125 / 0.45);
   outline: none;
 }
