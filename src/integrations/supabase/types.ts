@@ -106,6 +106,7 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          last_polled_at: string | null
           payee_name: string
           provider: Database["public"]["Enums"]["upi_provider"]
           updated_at: string
@@ -119,6 +120,7 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          last_polled_at?: string | null
           payee_name?: string
           provider: Database["public"]["Enums"]["upi_provider"]
           updated_at?: string
@@ -132,6 +134,7 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          last_polled_at?: string | null
           payee_name?: string
           provider?: Database["public"]["Enums"]["upi_provider"]
           updated_at?: string
@@ -402,6 +405,7 @@ export type Database = {
       get_qr_quota: { Args: never; Returns: Json }
       issue_api_key: { Args: { _label?: string }; Returns: Json }
       list_merchant_accounts: { Args: never; Returns: Json }
+      new_payment_slug: { Args: never; Returns: string }
       record_detected_payment: {
         Args: {
           _amount: number
@@ -419,6 +423,10 @@ export type Database = {
       save_merchant_account: {
         Args: { _payee_name?: string; _provider: string; _upi_id: string }
         Returns: Json
+      }
+      try_claim_mail_poll: {
+        Args: { _min_gap_seconds?: number; _user: string }
+        Returns: boolean
       }
     }
     Enums: {

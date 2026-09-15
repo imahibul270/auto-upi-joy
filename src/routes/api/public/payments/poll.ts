@@ -17,11 +17,13 @@ export const Route = createFileRoute("/api/public/payments/poll")({
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data: link } = await (supabaseAdmin.from("payment_links") as any)
-          .select("user_id")
+          .select("user_id,status")
           .eq("slug", slug)
           .maybeSingle();
 
         if (!link?.user_id) return Response.json({ ok: false, error: "not_found" }, { status: 404 });
+        // A settled or expired link never needs another mailbox scan.
+        if (link.status !== "active") return Response.json({ ok: true, matched: 0, connected: true });
 
         const { pollPaymentsForUser } = await import("@/lib/mail-poll.server");
         const result = await pollPaymentsForUser(link.user_id);

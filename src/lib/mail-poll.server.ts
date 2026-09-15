@@ -109,7 +109,7 @@ async function deliverWebhook(
 }
 
 /** Scan the merchant's mailbox and settle any matching pending payment link. */
-export async function pollPaymentsForUser(userId: string): Promise<PollResult> {
+export async function pollPaymentsForUser(userId: string, throttle = true): Promise<PollResult> {
   const admin = supabaseAdmin as any;
 
   const { data: expiredCount } = await admin.rpc("expire_stale_payment_links", { _user: userId });
@@ -126,6 +126,13 @@ export async function pollPaymentsForUser(userId: string): Promise<PollResult> {
     if (row.email && row.app_password) mailboxes.set(String(row.email).toLowerCase(), String(row.app_password));
   }
   if (mailboxes.size === 0) return { ok: true, connected: false, scanned: 0, matched: 0, expired };
+
+  // One IMAP scan per merchant every few seconds, however many payers are
+  // watching a pay page — keeps mailbox load flat as merchant count grows.
+  if (throttle) {
+    const { data: claimed } = await admin.rpc("try_claim_mail_poll", { _user: userId, _min_gap_seconds: 6 });
+    if (claimed !== true) return { ok: true, connected: true, scanned: 0, matched: 0, expired };
+  }
 
   let scanned = 0;
   let matched = 0;
