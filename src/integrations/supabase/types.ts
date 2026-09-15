@@ -402,6 +402,7 @@ export type Database = {
       get_qr_quota: { Args: never; Returns: Json }
       issue_api_key: { Args: { _label?: string }; Returns: Json }
       list_merchant_accounts: { Args: never; Returns: Json }
+      new_payment_slug: { Args: never; Returns: string }
       record_detected_payment: {
         Args: {
           _amount: number
