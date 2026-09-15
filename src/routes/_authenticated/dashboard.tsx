@@ -8,6 +8,9 @@ import {
 } from "recharts";
 import { ConsoleLayout } from "@/components/console/ConsoleLayout";
 import { useConsoleName } from "@/components/console/useConsoleName";
+import {
+  formatInr, formatTime, usePaymentDetection, usePaymentLinks, type PaymentLinkRow,
+} from "@/lib/gateway";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [
@@ -22,46 +25,91 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 const RANGES = ["Today", "Last 7 Days", "Last 30 Days"] as const;
-
-const SERIES: Record<string, { day: string; revenue: number; orders: number }[]> = {
-  Today: [
-    { day: "12 AM", revenue: 0, orders: 0 }, { day: "4 AM", revenue: 0, orders: 0 },
-    { day: "8 AM", revenue: 0, orders: 0 }, { day: "12 PM", revenue: 0, orders: 0 },
-    { day: "4 PM", revenue: 0, orders: 0 }, { day: "8 PM", revenue: 0, orders: 0 },
-  ],
-  "Last 7 Days": [
-    { day: "Mon", revenue: 0, orders: 0 }, { day: "Tue", revenue: 0, orders: 0 },
-    { day: "Wed", revenue: 0, orders: 0 }, { day: "Thu", revenue: 0, orders: 0 },
-    { day: "Fri", revenue: 0, orders: 0 }, { day: "Sat", revenue: 0, orders: 0 },
-    { day: "Sun", revenue: 0, orders: 0 },
-  ],
-  "Last 30 Days": [
-    { day: "W1", revenue: 0, orders: 0 }, { day: "W2", revenue: 0, orders: 0 },
-    { day: "W3", revenue: 0, orders: 0 }, { day: "W4", revenue: 0, orders: 0 },
-  ],
+const RANGE_DAYS: Record<(typeof RANGES)[number], number> = {
+  Today: 1, "Last 7 Days": 7, "Last 30 Days": 30,
 };
-
-const METHODS = [
-  { name: "UPI", value: 0 }, { name: "Cards", value: 0 }, { name: "Netbanking", value: 0 },
-];
 const METHOD_COLORS = ["oklch(0.72 0.19 128)", "oklch(0.46 0.14 164)", "oklch(0.8 0.12 88)"];
+
+function rangeStart(range: (typeof RANGES)[number]) {
+  const now = new Date();
+  if (range === "Today") {
+    const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
+    return start;
+  }
+  return new Date(now.getTime() - (RANGE_DAYS[range] - 1) * 86400000);
+}
+
+function buildSeries(rows: PaymentLinkRow[], range: (typeof RANGES)[number]) {
+  if (range === "Today") {
+    const buckets = [0, 4, 8, 12, 16, 20];
+    return buckets.map((hour) => {
+      const slot = rows.filter((row) => {
+        const d = new Date(row.paid_at ?? row.created_at);
+        return row.status === "paid" && d.getHours() >= hour && d.getHours() < hour + 4;
+      });
+      return {
+        day: `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour} ${hour < 12 ? "AM" : "PM"}`,
+        revenue: slot.reduce((s, r) => s + Number(r.payable_amount), 0),
+        orders: slot.length,
+      };
+    });
+  }
+  const days = RANGE_DAYS[range];
+  return Array.from({ length: days }, (_, index) => {
+    const day = new Date(Date.now() - (days - 1 - index) * 86400000);
+    const key = day.toDateString();
+    const slot = rows.filter((row) => row.status === "paid" && new Date(row.paid_at ?? row.created_at).toDateString() === key);
+    return {
+      day: day.toLocaleDateString("en-IN", { day: "2-digit", month: "short" }),
+      revenue: slot.reduce((s, r) => s + Number(r.payable_amount), 0),
+      orders: slot.length,
+    };
+  });
+}
 
 function DashboardPage() {
   const { user } = Route.useRouteContext();
   const name = useConsoleName(user);
+  usePaymentDetection();
+  const { data: links = [] } = usePaymentLinks();
   const [range, setRange] = useState<(typeof RANGES)[number]>("Today");
-  const chartData = useMemo(() => SERIES[range] ?? SERIES["Today"] ?? [], [range]);
-  const hasMethodData = METHODS.some((m) => m.value > 0);
+
+  const rows = useMemo(() => {
+    const start = rangeStart(range).getTime();
+    return links.filter((row) => Date.parse(row.paid_at ?? row.created_at) >= start);
+  }, [links, range]);
+
+  const chartData = useMemo(() => buildSeries(rows, range), [rows, range]);
+
+  const paid = rows.filter((row) => row.status === "paid");
+  const active = rows.filter((row) => row.status === "active");
+  const failed = rows.filter((row) => row.status === "expired");
+  const revenue = paid.reduce((sum, row) => sum + Number(row.payable_amount), 0);
+  const settled = paid.length + failed.length;
+  const successRate = settled === 0 ? 0 : Math.round((paid.length / settled) * 100);
+
+  const methods = [
+    { name: "UPI", value: paid.length ? 100 : 0 },
+    { name: "Cards", value: 0 },
+    { name: "Netbanking", value: 0 },
+  ];
+  const hasMethodData = methods.some((m) => m.value > 0);
+
+  const recent = [...links]
+    .filter((row) => row.status !== "active")
+    .sort((a, b) => Date.parse(b.paid_at ?? b.created_at) - Date.parse(a.paid_at ?? a.created_at))
+    .slice(0, 6);
 
   const stats = [
-    { label: "Total Revenue", value: "₹0.00", icon: BadgeIndianRupee, tone: "lime",
-      trend: "+12.5% vs last period", trendIcon: TrendingUp, trendTone: "up" },
-    { label: "Total Orders", value: "0", icon: ShoppingBag, tone: "blue",
-      trend: "+8.2% vs last period", trendIcon: TrendingUp, trendTone: "up" },
-    { label: "Success Rate", value: "0%", icon: ShieldCheck, tone: "mint",
-      trend: "Healthy status", trendIcon: TrendingUp, trendTone: "up" },
-    { label: "Pending / Failed", value: "0 / 0", icon: Activity, tone: "amber",
-      trend: "Actions required", trendIcon: TrendingDown, trendTone: "down" },
+    { label: "Total Revenue", value: formatInr(revenue), icon: BadgeIndianRupee, tone: "lime",
+      trend: `${paid.length} successful payments`, trendIcon: TrendingUp, trendTone: "up" },
+    { label: "Total Orders", value: String(rows.length), icon: ShoppingBag, tone: "blue",
+      trend: `${active.length} still awaiting payment`, trendIcon: TrendingUp, trendTone: "up" },
+    { label: "Success Rate", value: `${successRate}%`, icon: ShieldCheck, tone: "mint",
+      trend: settled ? "Based on settled links" : "No settled links yet", trendIcon: TrendingUp, trendTone: "up" },
+    { label: "Pending / Failed", value: `${active.length} / ${failed.length}`, icon: Activity, tone: "amber",
+      trend: active.length ? "Waiting for payment" : "Nothing pending", trendIcon: TrendingDown, trendTone: "down" },
   ];
 
   return (
@@ -124,8 +172,8 @@ function DashboardPage() {
             <div className="console-chart console-chart-sm">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={METHODS} dataKey="value" nameKey="name" innerRadius="58%" outerRadius="85%" paddingAngle={3} animationDuration={1100}>
-                    {METHODS.map((m, i) => <Cell key={m.name} fill={METHOD_COLORS[i]} />)}
+                  <Pie data={methods} dataKey="value" nameKey="name" innerRadius="58%" outerRadius="85%" paddingAngle={3} animationDuration={1100}>
+                    {methods.map((m, i) => <Cell key={m.name} fill={METHOD_COLORS[i]} />)}
                   </Pie>
                   <Tooltip contentStyle={{ borderRadius: 10, border: "1px solid var(--border)", fontSize: 12 }} />
                 </PieChart>
@@ -139,7 +187,7 @@ function DashboardPage() {
             </div>
           )}
           <ul className="console-legend">
-            {METHODS.map((m, i) => (
+            {methods.map((m, i) => (
               <li key={m.name}><i style={{ background: METHOD_COLORS[i] }} />{m.name}<span>{m.value}%</span></li>
             ))}
           </ul>
@@ -151,11 +199,36 @@ function DashboardPage() {
           <h3>Recent Transactions</h3>
           <small>Latest activity on your account</small>
         </div>
-        <div className="console-empty console-empty-row">
-          <Receipt />
-          <p>No transactions yet</p>
-          <small>Share a payment link to receive your first payment.</small>
-        </div>
+        {recent.length === 0 ? (
+          <div className="console-empty console-empty-row">
+            <Receipt />
+            <p>No transactions yet</p>
+            <small>Share a payment link to receive your first payment.</small>
+          </div>
+        ) : (
+          <div className="console-table-wrap">
+            <table className="console-table">
+              <thead>
+                <tr><th>ORDER ID</th><th>CUSTOMER</th><th>AMOUNT</th><th>STATUS</th><th>TIME</th></tr>
+              </thead>
+              <tbody>
+                {recent.map((row) => (
+                  <tr key={row.id}>
+                    <td><strong>{row.order_id}</strong></td>
+                    <td className="console-cell-customer">{row.payer_name || row.customer_name || "—"}</td>
+                    <td><strong>{formatInr(row.payable_amount)}</strong></td>
+                    <td>
+                      <span className={`console-pill ${row.status === "paid" ? "is-paid" : "is-muted"}`}>
+                        {row.status === "paid" ? "Success" : "Failed"}
+                      </span>
+                    </td>
+                    <td>{formatTime(row.paid_at ?? row.created_at)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
     </ConsoleLayout>
   );
