@@ -50,7 +50,7 @@ function DashboardPage() {
   const { user } = Route.useRouteContext();
   const name = useConsoleName(user);
   const [range, setRange] = useState<(typeof RANGES)[number]>("Today");
-  const chartData = useMemo(() => SERIES[range] ?? SERIES["Today"], [range]);
+  const chartData = useMemo(() => SERIES[range] ?? SERIES["Today"] ?? [], [range]);
   const hasMethodData = METHODS.some((m) => m.value > 0);
 
   const stats = [
