@@ -34,7 +34,8 @@ function ApiKeysPage() {
   const { data: keys = [] } = useApiKeys();
   const [creating, setCreating] = useState(false);
   const [freshKey, setFreshKey] = useState<string | null>(null);
-  const hasActiveKey = keys.some((key) => key.active);
+  const activeKey = keys.find((key) => key.active) ?? null;
+  const hasActiveKey = Boolean(activeKey);
 
   async function create() {
     setCreating(true);
@@ -53,22 +54,6 @@ function ApiKeysPage() {
     } finally {
       setCreating(false);
     }
-  }
-
-  function revoke(id: string) {
-    void Swal.fire({
-      icon: "warning",
-      title: "Revoke this key?",
-      text: "Any app using it will stop working immediately.",
-      showCancelButton: true,
-      confirmButtonText: "Yes, revoke",
-      cancelButtonText: "Cancel",
-    }).then(async (result) => {
-      if (!result.isConfirmed) return;
-      await revokeApiKey(id);
-      await queryClient.invalidateQueries({ queryKey: ["api-keys"] });
-      void Swal.fire({ icon: "success", title: "Key revoked", draggable: true });
-    });
   }
 
   return (
