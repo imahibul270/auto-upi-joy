@@ -44,7 +44,7 @@ export async function generateQr(input: { payload: string; label?: string; upiId
     _payload: input.payload,
     _label: input.label ?? "",
     _upi_id: input.upiId ?? "",
-    _amount: input.amount ?? null,
+    _amount: input.amount ?? undefined,
   });
   if (error) {
     if (error.message.includes("QUOTA_EXCEEDED")) {
