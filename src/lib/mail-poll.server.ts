@@ -111,16 +111,22 @@ export async function pollPaymentsForUser(userId: string): Promise<PollResult> {
           .maybeSingle();
         if (alreadyUsed) continue;
 
-        // Exactly one pending link may claim an amount — this is what keeps
-        // double payments of the same value from crediting the wrong order.
+        // Exactly one pending link may claim an amount — every active link of a
+        // merchant carries a unique paise marker, so a plain/random payment of
+        // the same rupee value can never settle an order.
+        const exact = Number(amount.toFixed(2));
+        // The alert email must be newer than the link (60s clock skew allowed).
+        const createdBefore = new Date(Date.parse(emailTime) + 60_000).toISOString();
         const { data: candidates } = await admin
           .from("payment_links")
           .select("id,order_id,payable_amount")
           .eq("user_id", userId)
           .eq("status", "active")
-          .eq("payable_amount", amount);
+          .eq("payable_amount", exact)
+          .lte("created_at", createdBefore);
 
         if (!candidates || candidates.length !== 1) continue;
+        if (Number(candidates[0].payable_amount) !== exact) continue;
 
         const link = candidates[0];
         const { data: updated } = await admin
