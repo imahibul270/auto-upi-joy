@@ -1,4 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { pollMyPayments } from "@/lib/gmail.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 export type Provider = "phonepe" | "paytm";
@@ -180,4 +182,28 @@ export function formatInr(value: number) {
 
 export function formatDate(value: string) {
   return new Date(value).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+}
+
+/**
+ * Runs the mailbox scan for the signed-in merchant every few seconds so
+ * payments show up on the dashboard and transactions list in real time.
+ */
+export function usePaymentDetection(enabled = true) {
+  const queryClient = useQueryClient();
+  const poll = useServerFn(pollMyPayments);
+
+  return useQuery({
+    queryKey: ["payment-detection"],
+    enabled,
+    refetchInterval: 5000,
+    refetchOnWindowFocus: true,
+    retry: false,
+    queryFn: async () => {
+      const result = await poll({ data: undefined as never });
+      if (result.matched > 0 || result.expired > 0) {
+        await queryClient.invalidateQueries({ queryKey: ["payment-links"] });
+      }
+      return result;
+    },
+  });
 }
