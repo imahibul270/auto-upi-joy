@@ -6,7 +6,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
   return (
     <main className="auth-page">
       <Link to="/" className="auth-brand page-enter page-enter-early" aria-label="Auto Upi home">
-        <span className="auth-brand-mark"><ScanLine /></span>
+        <BrandLogo className="brand-logo-lg" />
         <strong>Auto Upi</strong>
       </Link>
       <section className="auth-layout">

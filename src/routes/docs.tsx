@@ -81,7 +81,7 @@ function DocsPage() {
   return (
     <main className="docs-page" id="top">
       <header className="docs-header">
-        <Link to="/" className="docs-logo"><strong>Auto Upi</strong><em>Docs</em></Link>
+        <Link to="/" className="docs-logo"><BrandLogo /><strong>Auto Upi</strong><em>Docs</em></Link>
         <nav>
           <Link to="/">Home</Link>
           <a href="#pricing">Pricing</a>

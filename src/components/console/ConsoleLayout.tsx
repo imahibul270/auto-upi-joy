@@ -45,7 +45,7 @@ export function ConsoleLayout({
     <div className="console">
       <aside className={`console-side${menuOpen ? " side-open" : ""}`}>
         <div className="console-brand">
-          <span className="console-mark">A</span>
+          <BrandLogo />
           <strong>Auto Upi</strong>
           <em>V2</em>
         </div>

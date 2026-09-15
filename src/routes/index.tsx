@@ -63,14 +63,7 @@ const plans = [
 ];
 
 function BrandMark() {
-  return (
-    <span className="brand-mark" aria-hidden="true">
-      <span />
-      <span />
-      <span />
-      <svg viewBox="0 0 32 32"><path d="M9 20 14 15l5 3 5-7M9 20h.01M14 15h.01M19 18h.01M24 11h.01" /></svg>
-    </span>
-  );
+  return <BrandLogo />;
 }
 
 function Logo({ compact = false }: { compact?: boolean }) {

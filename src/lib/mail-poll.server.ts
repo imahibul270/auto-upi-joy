@@ -4,7 +4,8 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { fetchRecentMessages, parseMessage } from "@/lib/imap.server";
 
-const MONITOR_SENDERS = ["paytm.com", "phonepe.com"];
+// Only credit alerts from this exact PhonePe address may settle a payment.
+const MONITOR_SENDERS = ["noreply@phonepe.com"];
 const PAYTM_AMOUNT_RE = /Rs\.?\s*([0-9]+(?:\.[0-9]{1,2})?)\s+(?:paid|received|credited)/i;
 const PHONEPE_AMOUNT_RE = /(?:Received|Payment of)\s*(?:₹|Rs\.?|INR)?\s*([0-9]+(?:\.[0-9]{1,2})?)/i;
 const GENERIC_AMOUNT_RE = /(?:₹|Rs\.?|INR)\s*([0-9]+(?:\.[0-9]{1,2})?)/i;
