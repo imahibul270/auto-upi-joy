@@ -104,14 +104,17 @@ export type PaymentLinkRow = {
   clicks: number;
   paid_count: number;
   paid_at: string | null;
+  detected_at: string | null;
+  expires_at: string;
   payer_name: string | null;
+  payer_email: string | null;
   created_at: string;
 };
 
 export async function fetchPaymentLinks(): Promise<PaymentLinkRow[]> {
   const { data, error } = await supabase
     .from("payment_links")
-    .select("id,order_id,slug,customer_name,amount,payable_amount,link_type,status,clicks,paid_count,paid_at,payer_name,created_at")
+    .select("id,order_id,slug,customer_name,amount,payable_amount,link_type,status,clicks,paid_count,paid_at,detected_at,expires_at,payer_name,payer_email,created_at")
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as PaymentLinkRow[];
@@ -122,8 +125,33 @@ export function usePaymentLinks() {
   return useQuery({
     queryKey: ["payment-links"],
     queryFn: fetchPaymentLinks,
-    refetchInterval: 5000,
+    refetchInterval: 3000,
     refetchOnWindowFocus: true,
+  });
+}
+
+/** Only links that can still be paid. */
+export function useActiveLinks() {
+  const query = usePaymentLinks();
+  return { ...query, rows: (query.data ?? []).filter((row) => row.status === "active") };
+}
+
+/** Settled links — these are the transactions. */
+export function useTransactions() {
+  const query = usePaymentLinks();
+  return { ...query, rows: (query.data ?? []).filter((row) => row.status !== "active") };
+}
+
+/** How long detection took, in seconds. */
+export function detectionSeconds(row: PaymentLinkRow): number | null {
+  if (!row.paid_at || !row.detected_at) return null;
+  const seconds = Math.round((Date.parse(row.detected_at) - Date.parse(row.paid_at)) / 1000);
+  return seconds >= 0 ? seconds : null;
+}
+
+export function formatTime(value: string) {
+  return new Date(value).toLocaleString("en-IN", {
+    day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit",
   });
 }
 
