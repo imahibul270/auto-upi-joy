@@ -4,6 +4,7 @@ import { AuthShell } from "@/components/auth/AuthShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import { Swal } from "@/lib/swal";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({ meta: [
@@ -31,9 +32,18 @@ function ResetPasswordPage() {
   }, []);
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setMessage("");
-    if (password !== confirm) { setMessage("Passwords do not match."); return; }
+    if (password !== confirm) {
+      setMessage("Passwords do not match.");
+      void Swal.fire({ icon: "error", title: "Passwords do not match", text: "Please enter the same password in both fields." });
+      return;
+    }
     setLoading(true); const { error } = await supabase.auth.updateUser({ password }); setLoading(false);
-    if (error) { setMessage(error.message); return; }
+    if (error) {
+      setMessage(error.message);
+      void Swal.fire({ icon: "error", title: "Could not update password", text: error.message });
+      return;
+    }
+    await Swal.fire({ icon: "success", title: "Password updated", text: "Your password has been changed successfully.", draggable: true });
     await navigate({ to: "/dashboard", replace: true });
   }
   if (!recoveryReady) return <AuthShell><div className="auth-form auth-success"><span>RESET LINK REQUIRED</span><h1>Open your recovery email</h1><p>Please use the secure link from your password reset email to choose a new password.</p><Button asChild className="auth-submit"><Link to="/forgot-password">REQUEST A NEW LINK</Link></Button></div></AuthShell>;

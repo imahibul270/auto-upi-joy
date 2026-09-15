@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import { Swal } from "@/lib/swal";
 
 export const Route = createFileRoute("/register")({
   head: () => ({ meta: [
@@ -32,22 +33,36 @@ function RegisterPage() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
-    if (form.password !== form.confirm) { setMessage("Passwords do not match."); return; }
-    if (!agreed) { setMessage("Please accept the terms and privacy policy."); return; }
+    if (form.password !== form.confirm) {
+      setMessage("Passwords do not match.");
+      void Swal.fire({ icon: "error", title: "Passwords do not match", text: "Please enter the same password in both fields." });
+      return;
+    }
+    if (!agreed) {
+      setMessage("Please accept the terms and privacy policy.");
+      void Swal.fire({ icon: "warning", title: "Terms not accepted", text: "Please accept the terms and privacy policy to continue." });
+      return;
+    }
     setLoading(true);
     const { data, error } = await supabase.auth.signUp({
       email: form.email.trim(), password: form.password,
       options: { emailRedirectTo: `${window.location.origin}/auth`, data: { full_name: form.name.trim(), mobile: form.mobile.trim() } },
     });
-    if (error) { setLoading(false); setMessage(error.message); return; }
+    if (error) {
+      setLoading(false); setMessage(error.message);
+      void Swal.fire({ icon: "error", title: "Account creation failed", text: error.message });
+      return;
+    }
     if (data.session && data.user) {
       await supabase.from("profiles").upsert({ id: data.user.id, full_name: form.name.trim(), mobile: form.mobile.trim(), updated_at: new Date().toISOString() });
       setLoading(false);
+      await Swal.fire({ icon: "success", title: "Account created", text: "Welcome to Auto Upi.", draggable: true });
       await navigate({ to: "/dashboard", replace: true });
       return;
     }
     setLoading(false);
     setSuccess(true);
+    void Swal.fire({ icon: "success", title: "Account created", text: `We sent a confirmation link to ${form.email}.`, draggable: true });
   }
 
   if (success) return <AuthShell><div className="auth-form auth-success"><span>ACCOUNT CREATED</span><h1>Check your email</h1><p>We sent a confirmation link to <strong>{form.email}</strong>. Confirm it, then sign in to continue.</p><Button asChild className="auth-submit"><Link to="/auth">GO TO LOGIN</Link></Button></div></AuthShell>;
