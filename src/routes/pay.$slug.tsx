@@ -8,9 +8,9 @@ import upiAppsRow from "@/assets/upi-apps-row.png.asset.json";
 
 export const Route = createFileRoute("/pay/$slug")({
   head: () => ({ meta: [
-    { title: "Scan and Pay — Auto Upi" },
+    { title: "autoupi | Scan and Pay" },
     { name: "description", content: "Scan the UPI QR code and pay securely through Auto Upi." },
-    { property: "og:title", content: "Scan and Pay — Auto Upi" },
+    { property: "og:title", content: "autoupi | Scan and Pay" },
     { property: "og:description", content: "Scan the UPI QR code and pay securely through Auto Upi." },
   ]}),
   ssr: false,

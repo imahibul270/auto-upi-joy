@@ -10,9 +10,9 @@ import {
 
 export const Route = createFileRoute("/_authenticated/plan")({
   head: () => ({ meta: [
-    { title: "Plan — Auto Upi" },
+    { title: "autoupi | Plan" },
     { name: "description", content: "See your current Auto Upi plan, QR limits, validity and upgrade options." },
-    { property: "og:title", content: "Plan — Auto Upi" },
+    { property: "og:title", content: "autoupi | Plan" },
     { property: "og:description", content: "Your Auto Upi subscription, QR limits and upgrade options." },
   ]}),
   component: PlanPage,

@@ -26,7 +26,7 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "Auto Upi — Payment Infrastructure for India" },
+      { title: "autoupi | Payment Infrastructure for India" },
       {
         name: "description",
         content:

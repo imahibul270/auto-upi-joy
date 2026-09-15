@@ -14,9 +14,9 @@ import {
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [
-    { title: "Dashboard — Auto Upi" },
+    { title: "autoupi | Dashboard" },
     { name: "description", content: "Track revenue, orders, success rate and payment analytics inside your Auto Upi merchant workspace." },
-    { property: "og:title", content: "Dashboard — Auto Upi" },
+    { property: "og:title", content: "autoupi | Dashboard" },
     { property: "og:description", content: "Your secure Auto Upi merchant workspace with live payment analytics." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },
@@ -48,7 +48,7 @@ function buildSeries(rows: PaymentLinkRow[], range: (typeof RANGES)[number]) {
     const slot = rows.filter((row) => row.status === "paid" && new Date(row.paid_at ?? row.created_at).toDateString() === key);
     return {
       day: day.toLocaleDateString("en-IN", { day: "2-digit", month: "short" }),
-      revenue: slot.reduce((s, r) => s + Number(r.payable_amount), 0),
+      revenue: slot.reduce((s, r) => s + Number(r.amount), 0),
       orders: slot.length,
     };
   });
@@ -71,7 +71,7 @@ function DashboardPage() {
   const paid = rows.filter((row) => row.status === "paid");
   const active = rows.filter((row) => row.status === "active");
   const failed = rows.filter((row) => row.status === "expired");
-  const revenue = paid.reduce((sum, row) => sum + Number(row.payable_amount), 0);
+  const revenue = paid.reduce((sum, row) => sum + Number(row.amount), 0);
   const settled = paid.length + failed.length;
   const successRate = settled === 0 ? 0 : Math.round((paid.length / settled) * 100);
 
@@ -202,7 +202,7 @@ function DashboardPage() {
                   <tr key={row.id}>
                     <td><strong>{row.order_id}</strong></td>
                     <td className="console-cell-customer">{row.payer_name || row.customer_name || "—"}</td>
-                    <td><strong>{formatInr(row.payable_amount)}</strong></td>
+                    <td><strong>{formatInr(row.amount)}</strong></td>
                     <td>
                       <span className={`console-pill ${row.status === "paid" ? "is-paid" : "is-muted"}`}>
                         {row.status === "paid" ? "Success" : "Failed"}

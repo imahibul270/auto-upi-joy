@@ -10,9 +10,9 @@ import { Swal } from "@/lib/swal";
 
 export const Route = createFileRoute("/register")({
   head: () => ({ meta: [
-    { title: "Create account — Auto Upi" },
+    { title: "autoupi | Create account" },
     { name: "description", content: "Create your Auto Upi merchant account and start managing UPI payments." },
-    { property: "og:title", content: "Create account — Auto Upi" },
+    { property: "og:title", content: "autoupi | Create account" },
     { property: "og:description", content: "Register for a secure Auto Upi merchant workspace." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },

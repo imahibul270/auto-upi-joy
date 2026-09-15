@@ -10,9 +10,9 @@ import { formatDate, issueApiKey, useApiKeys } from "@/lib/gateway";
 
 export const Route = createFileRoute("/_authenticated/api-keys")({
   head: () => ({ meta: [
-    { title: "API Keys — Auto Upi" },
+    { title: "autoupi | API Keys" },
     { name: "description", content: "Create, copy and revoke the API keys and webhook secrets your apps use with Auto Upi." },
-    { property: "og:title", content: "API Keys — Auto Upi" },
+    { property: "og:title", content: "autoupi | API Keys" },
     { property: "og:description", content: "Create and rotate keys for your Auto Upi integrations." },
   ]}),
   component: ApiKeysPage,

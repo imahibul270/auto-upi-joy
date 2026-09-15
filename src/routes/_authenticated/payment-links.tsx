@@ -20,9 +20,9 @@ import {
 
 export const Route = createFileRoute("/_authenticated/payment-links")({
   head: () => ({ meta: [
-    { title: "Payment Links — Auto Upi" },
+    { title: "autoupi | Payment Links" },
     { name: "description", content: "Create and share Auto Upi payment links to collect money without writing any code." },
-    { property: "og:title", content: "Payment Links — Auto Upi" },
+    { property: "og:title", content: "autoupi | Payment Links" },
     { property: "og:description", content: "Share a link, get paid instantly with Auto Upi." },
   ]}),
   component: PaymentLinksPage,
@@ -137,7 +137,7 @@ function PaymentLinksPage() {
                   <tr key={row.id}>
                     <td><strong>{row.order_id}</strong></td>
                     <td className="console-cell-customer">{row.customer_name || "—"}</td>
-                    <td><strong>{formatInr(row.payable_amount)}</strong></td>
+                    <td><strong>{formatInr(row.amount)}</strong></td>
                     <td>
                       <span className="console-secret">
                         <code>{paymentLinkUrl(row.slug).replace(/^https?:\/\//, "").slice(0, 26)}…</code>

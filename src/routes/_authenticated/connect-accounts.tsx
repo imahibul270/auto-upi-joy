@@ -18,9 +18,9 @@ import {
 
 export const Route = createFileRoute("/_authenticated/connect-accounts")({
   head: () => ({ meta: [
-    { title: "Connect Accounts — Auto Upi" },
+    { title: "autoupi | Connect Accounts" },
     { name: "description", content: "Connect your PhonePe or Paytm UPI ID and payment alert mailbox so Auto Upi detects payments automatically." },
-    { property: "og:title", content: "Connect Accounts — Auto Upi" },
+    { property: "og:title", content: "autoupi | Connect Accounts" },
     { property: "og:description", content: "Link UPI IDs and payment alert mailboxes for automatic payment detection." },
   ]}),
   component: ConnectAccountsPage,
