@@ -1,6 +1,6 @@
 import { useRouterState } from "@tanstack/react-router";
 import {
-  ArrowLeftRight, Bell, CreditCard, KeyRound, LayoutGrid, LifeBuoy, Link2, Menu, Sparkles, X,
+  ArrowLeftRight, Bell, BookOpen, CreditCard, KeyRound, LayoutGrid, LifeBuoy, Link2, Menu, Sparkles, X,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -17,6 +17,7 @@ export const CONSOLE_MENU = [
   { label: "Plan", href: "/plan", icon: Sparkles },
   { label: "API Keys", href: "/api-keys", icon: KeyRound },
   { label: "Support", href: "/support", icon: LifeBuoy },
+  { label: "Docs", href: "/docs", icon: BookOpen },
 ];
 
 export function ConsoleLayout({
