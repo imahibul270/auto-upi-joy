@@ -19,7 +19,7 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -114,6 +114,19 @@ function PaymentVisual() {
 function Index() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const headerBarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (headerBarRef.current) {
+        headerBarRef.current.classList.toggle("scrolled", window.scrollY > 10);
+      }
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const copyCode = async () => {
     await navigator.clipboard.writeText("curl -X POST https://autoupi.in/api/create-order");
     setCopied(true);
@@ -122,7 +135,7 @@ function Index() {
 
   return (
     <main id="top">
-      <section className="hero-section">
+      <div className="header-bar" ref={headerBarRef}>
         <header className="site-header">
           <Logo />
           <nav className={menuOpen ? "nav-links nav-open" : "nav-links"} aria-label="Main navigation">
@@ -136,6 +149,8 @@ function Index() {
           </nav>
           <button className="menu-button" type="button" aria-label={menuOpen ? "Close menu" : "Open menu"} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button>
         </header>
+      </div>
+      <section className="hero-section">
 
         <div className="hero-content">
           <div className="hero-copy">
