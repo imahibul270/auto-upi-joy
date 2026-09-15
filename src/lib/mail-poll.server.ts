@@ -51,6 +51,63 @@ function senderMatches(from: string): boolean {
   return MONITOR_SENDERS.includes(address);
 }
 
+/** Send the HMAC-signed `payment.paid` webhook — the merchant's only trusted signal. */
+async function deliverWebhook(
+  userId: string,
+  link: { id: string; order_id: string; amount: number; payable_amount: number; webhook_url?: string | null },
+  payerName: string | null,
+): Promise<void> {
+  const url = link.webhook_url;
+  if (!url || !/^https:\/\//i.test(url)) return;
+
+  const admin = supabaseAdmin as any;
+  const { data: key } = await admin
+    .from("api_keys")
+    .select("webhook_secret")
+    .eq("user_id", userId)
+    .eq("active", true)
+    .maybeSingle();
+  if (!key?.webhook_secret) return;
+
+  const timestamp = Math.floor(Date.now() / 1000).toString();
+  const payload = JSON.stringify({
+    event: "payment.paid",
+    order_id: link.order_id,
+    amount: Number(link.amount),
+    payable_amount: Number(link.payable_amount),
+    status: "paid",
+    payer_name: payerName,
+    paid_at: new Date().toISOString(),
+  });
+  const { createHmac } = await import("crypto");
+  const signature = createHmac("sha256", key.webhook_secret).update(`${timestamp}.${payload}`).digest("hex");
+
+  let error: string | null = null;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-autoupi-signature": `t=${timestamp},v1=${signature}`,
+        },
+        body: payload,
+      });
+      if (response.ok) {
+        await admin
+          .from("payment_links")
+          .update({ webhook_delivered_at: new Date().toISOString(), webhook_attempts: attempt, webhook_last_error: null })
+          .eq("id", link.id);
+        return;
+      }
+      error = `http_${response.status}`;
+    } catch (cause) {
+      error = cause instanceof Error ? cause.message : "webhook_failed";
+    }
+  }
+  await admin.from("payment_links").update({ webhook_attempts: 3, webhook_last_error: error }).eq("id", link.id);
+}
+
 /** Scan the merchant's mailbox and settle any matching pending payment link. */
 export async function pollPaymentsForUser(userId: string): Promise<PollResult> {
   const admin = supabaseAdmin as any;
