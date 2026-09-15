@@ -581,10 +581,10 @@ section[id]{scroll-margin-top:var(--header-height)}
 @media (max-width: 480px) {
   .pay-screen { padding: .85rem; place-items: center; }
   .pay-card { border-radius: 1rem; }
-  .pay-head { min-height: 150px; padding-top: 1.4rem; }
-  .pay-bhim-logo { height: 55px; }
-  .pay-code-area { padding-block: 1rem; }
-  .pay-qr { width: min(230px, 72vw); }
+  .pay-head { padding-top: 1.1rem; }
+  .pay-bhim-logo { height: 44px; }
+  .pay-code-area { padding-block: .9rem; }
+  .pay-qr { width: min(200px, 62vw); }
   .pay-total span, .pay-total strong { padding-inline: 1rem; }
 }
 
