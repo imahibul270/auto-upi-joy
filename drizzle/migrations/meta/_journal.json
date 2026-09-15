@@ -50,6 +50,13 @@
       "when": 1789486696704,
       "tag": "0006_gmail_payment_detection",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789489460773,
+      "tag": "0007_api_key_single_and_public_api",
+      "breakpoints": true
     }
   ]
 }

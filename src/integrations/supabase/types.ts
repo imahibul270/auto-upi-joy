@@ -354,6 +354,15 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      api_create_payment_link: {
+        Args: {
+          _amount: number
+          _customer_name?: string
+          _link_type?: string
+          _user: string
+        }
+        Returns: Json
+      }
       connect_merchant_account: {
         Args: { _app_password: string; _email: string; _provider: string }
         Returns: Json
