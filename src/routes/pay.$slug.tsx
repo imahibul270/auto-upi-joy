@@ -66,6 +66,10 @@ function PayPage() {
       if (!active) return;
       const next = (data as unknown as PublicLink) ?? null;
       pending = next?.status === "active";
+      if (next?.expires_at) {
+        setExpiryMs(Date.parse(next.expires_at));
+        if (next.server_now) setSkewMs(Date.parse(next.server_now) - Date.now());
+      }
       setLink(next);
       setLoading(false);
     };
