@@ -115,13 +115,6 @@ export async function pollPaymentsForUser(userId: string, throttle = true): Prom
   const { data: expiredCount } = await admin.rpc("expire_stale_payment_links", { _user: userId });
   const expired = Number(expiredCount ?? 0);
 
-  // One IMAP scan per merchant every few seconds, however many payers are
-  // watching a pay page — keeps mailbox load flat as merchant count grows.
-  if (throttle) {
-    const { data: claimed } = await admin.rpc("try_claim_mail_poll", { _user: userId, _min_gap_seconds: 6 });
-    if (claimed !== true) return { ok: true, connected: true, scanned: 0, matched: 0, expired };
-  }
-
   const { data: accounts } = await admin
     .from("merchant_accounts")
     .select("email,app_password,connected")
@@ -133,6 +126,13 @@ export async function pollPaymentsForUser(userId: string, throttle = true): Prom
     if (row.email && row.app_password) mailboxes.set(String(row.email).toLowerCase(), String(row.app_password));
   }
   if (mailboxes.size === 0) return { ok: true, connected: false, scanned: 0, matched: 0, expired };
+
+  // One IMAP scan per merchant every few seconds, however many payers are
+  // watching a pay page — keeps mailbox load flat as merchant count grows.
+  if (throttle) {
+    const { data: claimed } = await admin.rpc("try_claim_mail_poll", { _user: userId, _min_gap_seconds: 6 });
+    if (claimed !== true) return { ok: true, connected: true, scanned: 0, matched: 0, expired };
+  }
 
   let scanned = 0;
   let matched = 0;
