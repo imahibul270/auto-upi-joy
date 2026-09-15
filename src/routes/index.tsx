@@ -153,7 +153,7 @@ function Index() {
       <section className="hero-section">
 
         <div className="hero-content">
-          <div className="hero-copy">
+          <div className="hero-copy page-enter page-enter-left">
             <div className="eyebrow"><span /> PRODUCTION PAYMENT INFRASTRUCTURE · V2</div>
             <h1>Payments that move at the speed of <mark>your business.</mark></h1>
             <p>Create secure UPI checkout links, connect merchant accounts, verify transactions and automate payment updates—all from one focused platform.</p>
@@ -163,27 +163,27 @@ function Index() {
             </div>
             <div className="trust-row"><span><ShieldCheck /> Secure checkout</span><span><Webhook /> Real-time webhooks</span><span><Code2 /> Developer-ready API</span></div>
           </div>
-          <PaymentVisual />
+          <div className="page-enter page-enter-right"><PaymentVisual /></div>
         </div>
       </section>
 
-      <section className="stat-wrap" aria-label="Platform highlights">
+      <section className="stat-wrap" aria-label="Platform highlights" data-reveal>
         {[['UPI', 'QR & app intents'], ['24×7', 'Payment collection'], ['REST', 'Simple JSON APIs'], ['Live', 'Status notifications']].map(([value, label]) => <div className="stat" key={value}><strong>{value}</strong><span>{label}</span></div>)}
       </section>
 
       <section className="section product-section" id="product">
-        <div className="section-heading"><span>ONE CONNECTED PAYMENT WORKSPACE</span><h2>Everything required to collect,<br /> verify and manage payments.</h2><p>V2 brings the complete workflow together with clearer operations, stronger controls and a checkout that merchants can brand.</p></div>
-        <div className="feature-grid">{features.map(({ icon: Icon, title, text }) => <article className="feature-card" key={title}><div className="feature-icon"><Icon /></div><h3>{title}</h3><p>{text}</p><ChevronRight /></article>)}</div>
+        <div className="section-heading" data-reveal><span>ONE CONNECTED PAYMENT WORKSPACE</span><h2>Everything required to collect,<br /> verify and manage payments.</h2><p>V2 brings the complete workflow together with clearer operations, stronger controls and a checkout that merchants can brand.</p></div>
+        <div className="feature-grid">{features.map(({ icon: Icon, title, text }, index) => <article className={`feature-card reveal-delay-${(index % 3) + 1}`} data-reveal key={title}><div className="feature-icon"><Icon /></div><h3>{title}</h3><p>{text}</p><ChevronRight /></article>)}</div>
       </section>
 
       <section className="workflow-section" id="how-it-works">
         <div className="section workflow-inner">
-          <div className="section-heading align-left"><span>SIMPLE FROM DAY ONE</span><h2>From account setup to verified payment in four steps.</h2><p>A focused workflow keeps merchants in control while customers get a fast, mobile-ready UPI checkout.</p></div>
+          <div className="section-heading align-left" data-reveal><span>SIMPLE FROM DAY ONE</span><h2>From account setup to verified payment in four steps.</h2><p>A focused workflow keeps merchants in control while customers get a fast, mobile-ready UPI checkout.</p></div>
           <div className="workflow-grid">
             <div className="steps">
-              {[['01','Connect an account','Add the business name, mobile number and merchant UPI details.'],['02','Create an order or payment link','Use the dashboard or REST API with amount, customer and callback data.'],['03','Customer completes UPI payment','Share the hosted checkout with QR, UPI intent and reference submission.'],['04','Verify and automate','Update the transaction, notify the merchant and dispatch the configured webhook.']].map(([n,t,d]) => <div className="step" key={n}><span>{n}</span><div><h3>{t}</h3><p>{d}</p></div></div>)}
+              {[['01','Connect an account','Add the business name, mobile number and merchant UPI details.'],['02','Create an order or payment link','Use the dashboard or REST API with amount, customer and callback data.'],['03','Customer completes UPI payment','Share the hosted checkout with QR, UPI intent and reference submission.'],['04','Verify and automate','Update the transaction, notify the merchant and dispatch the configured webhook.']].map(([n,t,d], index) => <div className={`step reveal-delay-${index + 1}`} data-reveal key={n}><span>{n}</span><div><h3>{t}</h3><p>{d}</p></div></div>)}
             </div>
-            <div className="checkout-card">
+            <div className="checkout-card reveal-delay-2" data-reveal>
               <div className="verified"><CheckCircle2 /> Verified merchant</div><h3>Your Business</h3><small>ORDER REF: ORD2026V2</small><strong>₹1,499.00</strong><div className="qr-wrap"><QrCode /></div><p>merchant@upi · Scan demo QR</p><button className="button button-primary" type="button">Pay with any UPI app</button>
             </div>
           </div>
@@ -192,8 +192,8 @@ function Index() {
 
       <section className="developer-section" id="developers">
         <div className="section developer-grid">
-          <div><div className="section-heading align-left light"><span>BUILT FOR DEVELOPERS</span><h2>A clean API, without the integration maze.</h2><p>Create an order with JSON, redirect the customer to hosted checkout and verify the result through status APIs or webhooks.</p></div><div className="dev-points"><span><strong>API credentials</strong>Dedicated key and secret</span><span><strong>Order status</strong>Server-side verification</span><span><strong>Webhooks</strong>Automatic event delivery</span></div><a className="button button-primary" href="#code-example">Read API documentation <ArrowRight /></a></div>
-          <div className="code-panel" id="code-example"><div className="code-head"><span><i /><i /><i /></span><small>create-order.php</small><button type="button" onClick={copyCode} aria-label="Copy API example">{copied ? <Check /> : <Copy />}</button></div><pre><code><b>curl</b> -X POST https://autoupi.in/api/create-order \
+          <div data-reveal><div className="section-heading align-left light"><span>BUILT FOR DEVELOPERS</span><h2>A clean API, without the integration maze.</h2><p>Create an order with JSON, redirect the customer to hosted checkout and verify the result through status APIs or webhooks.</p></div><div className="dev-points"><span><strong>API credentials</strong>Dedicated key and secret</span><span><strong>Order status</strong>Server-side verification</span><span><strong>Webhooks</strong>Automatic event delivery</span></div><a className="button button-primary" href="#code-example">Read API documentation <ArrowRight /></a></div>
+          <div className="code-panel reveal-delay-2" data-reveal id="code-example"><div className="code-head"><span><i /><i /><i /></span><small>create-order.php</small><button type="button" onClick={copyCode} aria-label="Copy API example">{copied ? <Check /> : <Copy />}</button></div><pre><code><b>curl</b> -X POST https://autoupi.in/api/create-order \
   -H <em>"X-API-Key: pi_live_your_key"</em> \
   -H <em>"X-API-Secret: sk_live_your_secret"</em> \
   -H <em>"Content-Type: application/json"</em> \
@@ -207,12 +207,12 @@ function Index() {
       </section>
 
       <section className="section pricing-section" id="pricing">
-        <div className="section-heading"><span>PLANS THAT SCALE WITH YOU</span><h2>Start focused. Upgrade when ready.</h2><p>Simple plans for every stage of your payment journey.</p></div>
-        <div className="pricing-grid">{plans.map(plan => <article className={plan.popular ? "price-card popular" : "price-card"} key={plan.name}>{plan.popular && <div className="popular-label">MOST POPULAR</div>}<h3>{plan.name}</h3><div className="price"><strong>{plan.price}</strong><span>{plan.suffix}</span></div><ul>{plan.items.map(item => <li key={item}><Check /> {item}</li>)}</ul><a className={plan.popular ? "button button-primary" : "button button-dark"} href="mailto:support@autoupi.in">{plan.name === 'Enterprise' ? 'Contact sales' : `Choose ${plan.name}`} <ArrowRight /></a></article>)}</div>
+        <div className="section-heading" data-reveal><span>PLANS THAT SCALE WITH YOU</span><h2>Start focused. Upgrade when ready.</h2><p>Simple plans for every stage of your payment journey.</p></div>
+        <div className="pricing-grid">{plans.map((plan, index) => <article className={`${plan.popular ? "price-card popular" : "price-card"} reveal-delay-${index + 1}`} data-reveal key={plan.name}>{plan.popular && <div className="popular-label">MOST POPULAR</div>}<h3>{plan.name}</h3><div className="price"><strong>{plan.price}</strong><span>{plan.suffix}</span></div><ul>{plan.items.map(item => <li key={item}><Check /> {item}</li>)}</ul><a className={plan.popular ? "button button-primary" : "button button-dark"} href="mailto:support@autoupi.in">{plan.name === 'Enterprise' ? 'Contact sales' : `Choose ${plan.name}`} <ArrowRight /></a></article>)}</div>
       </section>
 
-       <section className="cta-section"><div><span>READY FOR PRODUCTION</span><h2>Turn every payment into a clear,<br /> trackable workflow.</h2><p>Set up your merchant workspace and create your first payment link.</p><Link className="button button-primary" to="/register">Create free account <ArrowRight /></Link></div></section>
-      <footer><div><Logo /><p>Payment infrastructure built for ambitious Indian businesses.</p></div><div><a href="#product">Product</a><a href="#developers">Developers</a><a href="#pricing">Pricing</a></div><span>© 2026 Auto Upi. All rights reserved.</span></footer>
+       <section className="cta-section" data-reveal><div><span>READY FOR PRODUCTION</span><h2>Turn every payment into a clear,<br /> trackable workflow.</h2><p>Set up your merchant workspace and create your first payment link.</p><Link className="button button-primary" to="/register">Create free account <ArrowRight /></Link></div></section>
+      <footer data-reveal><div><Logo /><p>Payment infrastructure built for ambitious Indian businesses.</p></div><div><a href="#product">Product</a><a href="#developers">Developers</a><a href="#pricing">Pricing</a></div><span>© 2026 Auto Upi. All rights reserved.</span></footer>
     </main>
   );
 }
