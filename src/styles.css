@@ -183,8 +183,8 @@
 .button:hover { transform: translateY(-2px); }
 .button svg { width: 1.15rem; height: 1.15rem; }
 .header-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: var(--hero); border-bottom: 1px solid transparent; transition: background .2s ease, border-color .2s ease, backdrop-filter .2s ease; }
+.header-bar.scrolled { background: color-mix(in oklab, var(--hero) 92%, transparent); border-bottom-color: color-mix(in oklab, var(--hero-foreground) 10%, transparent); backdrop-filter: blur(10px); }
 .site-header { width: min(100% - 2rem,1060px); height: var(--header-height); margin-inline:auto; display:flex; align-items:center; justify-content:space-between; }
-.site-header.scrolled { background: color-mix(in oklab, var(--hero) 92%, transparent); border-bottom-color: color-mix(in oklab, var(--hero-foreground) 10%, transparent); backdrop-filter: blur(10px); }
 .hero-section { padding-top: var(--header-height); color: var(--hero-foreground); min-height: 610px; background-color: var(--hero); background-image: linear-gradient(color-mix(in oklab, var(--hero-foreground) 3%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in oklab, var(--hero-foreground) 3%, transparent) 1px, transparent 1px), radial-gradient(circle at 72% 25%, color-mix(in oklab, var(--primary) 9%, transparent), transparent 32%); background-size: 64px 64px,64px 64px,100% 100%; }
 .logo { display:inline-flex; align-items:center; gap:.55rem; flex-shrink:0; }
 .logo strong { font-size:1.23rem; letter-spacing:0; }
