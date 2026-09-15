@@ -14,6 +14,147 @@ export type Database = {
   }
   public: {
     Tables: {
+      api_keys: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          key_hash: string
+          key_prefix: string
+          label: string
+          last_used_at: string | null
+          user_id: string
+          webhook_secret: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          key_hash: string
+          key_prefix: string
+          label?: string
+          last_used_at?: string | null
+          user_id: string
+          webhook_secret: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          key_hash?: string
+          key_prefix?: string
+          label?: string
+          last_used_at?: string | null
+          user_id?: string
+          webhook_secret?: string
+        }
+        Relationships: []
+      }
+      merchant_accounts: {
+        Row: {
+          app_password: string
+          connected: boolean
+          connected_at: string | null
+          created_at: string
+          email: string
+          id: string
+          payee_name: string
+          provider: Database["public"]["Enums"]["upi_provider"]
+          updated_at: string
+          upi_id: string
+          user_id: string
+        }
+        Insert: {
+          app_password?: string
+          connected?: boolean
+          connected_at?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          payee_name?: string
+          provider: Database["public"]["Enums"]["upi_provider"]
+          updated_at?: string
+          upi_id?: string
+          user_id: string
+        }
+        Update: {
+          app_password?: string
+          connected?: boolean
+          connected_at?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          payee_name?: string
+          provider?: Database["public"]["Enums"]["upi_provider"]
+          updated_at?: string
+          upi_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      payment_links: {
+        Row: {
+          amount: number
+          clicks: number
+          created_at: string
+          customer_name: string
+          id: string
+          link_type: string
+          order_id: string
+          paid_at: string | null
+          paid_count: number
+          paid_email_id: string | null
+          payable_amount: number
+          payee_name: string
+          payer_name: string | null
+          provider: Database["public"]["Enums"]["upi_provider"] | null
+          slug: string
+          status: Database["public"]["Enums"]["link_status"]
+          upi_id: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          clicks?: number
+          created_at?: string
+          customer_name?: string
+          id?: string
+          link_type?: string
+          order_id: string
+          paid_at?: string | null
+          paid_count?: number
+          paid_email_id?: string | null
+          payable_amount: number
+          payee_name?: string
+          payer_name?: string | null
+          provider?: Database["public"]["Enums"]["upi_provider"] | null
+          slug: string
+          status?: Database["public"]["Enums"]["link_status"]
+          upi_id?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          clicks?: number
+          created_at?: string
+          customer_name?: string
+          id?: string
+          link_type?: string
+          order_id?: string
+          paid_at?: string | null
+          paid_count?: number
+          paid_email_id?: string | null
+          payable_amount?: number
+          payee_name?: string
+          payer_name?: string | null
+          provider?: Database["public"]["Enums"]["upi_provider"] | null
+          slug?: string
+          status?: Database["public"]["Enums"]["link_status"]
+          upi_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           business_logo: string | null
@@ -132,6 +273,19 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      connect_merchant_account: {
+        Args: { _app_password: string; _email: string; _provider: string }
+        Returns: Json
+      }
+      create_payment_link: {
+        Args: { _amount: number; _customer_name?: string; _link_type?: string }
+        Returns: Json
+      }
+      disconnect_merchant_account: {
+        Args: { _provider: string }
+        Returns: Json
+      }
+      expire_payment_link: { Args: { _id: string }; Returns: Json }
       generate_qr: {
         Args: {
           _amount?: number
@@ -141,10 +295,33 @@ export type Database = {
         }
         Returns: Json
       }
+      get_public_payment_link: { Args: { _slug: string }; Returns: Json }
       get_qr_quota: { Args: never; Returns: Json }
+      issue_api_key: { Args: { _label?: string }; Returns: Json }
+      list_merchant_accounts: { Args: never; Returns: Json }
+      record_detected_payment: {
+        Args: {
+          _amount: number
+          _email_id?: string
+          _payer?: string
+          _user: string
+        }
+        Returns: Json
+      }
+      register_payment_link_click: {
+        Args: { _slug: string }
+        Returns: undefined
+      }
+      revoke_api_key: { Args: { _id: string }; Returns: Json }
+      save_merchant_account: {
+        Args: { _payee_name?: string; _provider: string; _upi_id: string }
+        Returns: Json
+      }
     }
     Enums: {
+      link_status: "active" | "paid" | "expired"
       plan_tier: "free" | "pro"
+      upi_provider: "phonepe" | "paytm"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -272,7 +449,9 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      link_status: ["active", "paid", "expired"],
       plan_tier: ["free", "pro"],
+      upi_provider: ["phonepe", "paytm"],
     },
   },
 } as const
