@@ -233,7 +233,7 @@
 .bars { height:145px; display:flex; align-items:end; justify-content:center; gap:.7rem; padding-top:2rem; }
 .bars i { display:block; width:12%; height:30%; background:var(--primary); border-radius:.25rem .25rem 0 0; transform-origin:bottom; animation:bar-rise 1.3s ease both; }
 .bars i:nth-child(2){height:43%}.bars i:nth-child(3){height:62%}.bars i:nth-child(4){height:55%}.bars i:nth-child(5){height:74%}.bars i:nth-child(6){height:88%}
-.pay-card { display:flex; flex-direction:column; align-items:center; }
+.dash-grid .pay-card { display:flex; flex-direction:column; align-items:center; }
 .qr-code { color:var(--foreground); width:92px; height:92px; margin:auto; }
 .pay-card span { font-size:.5rem; font-weight:700; background:var(--soft-green); padding:.45rem .6rem; border-radius:.45rem; width:100%; text-align:center; }
 .payment-toast { position:absolute; z-index:2; display:flex; gap:.65rem; align-items:center; padding:.7rem .9rem; border-radius:.65rem; background:var(--background); color:var(--foreground); box-shadow:var(--shadow-brand); animation:toast-in 5s ease infinite; }
