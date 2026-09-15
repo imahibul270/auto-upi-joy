@@ -25,6 +25,8 @@ type PublicLink = {
   upi_id: string;
   payee_name: string;
   customer_name: string;
+  expires_at: string;
+  server_now: string;
 };
 
 function PayPage() {
@@ -32,14 +34,18 @@ function PayPage() {
   const [link, setLink] = useState<PublicLink | null>(null);
   const [qr, setQr] = useState("");
   const [loading, setLoading] = useState(true);
-  const [secondsLeft, setSecondsLeft] = useState(5 * 60);
+  // Countdown comes from the server-side expiry, so a refresh never restarts it.
+  const [expiryMs, setExpiryMs] = useState<number | null>(null);
+  const [skewMs, setSkewMs] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
-    const timer = window.setInterval(() => {
-      setSecondsLeft((seconds) => Math.max(seconds - 1, 0));
-    }, 1000);
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(timer);
   }, []);
+
+  const secondsLeft =
+    expiryMs === null ? 0 : Math.max(0, Math.round((expiryMs - (now + skewMs)) / 1000));
 
   useEffect(() => {
     let active = true;
@@ -60,6 +66,10 @@ function PayPage() {
       if (!active) return;
       const next = (data as unknown as PublicLink) ?? null;
       pending = next?.status === "active";
+      if (next?.expires_at) {
+        setExpiryMs(Date.parse(next.expires_at));
+        if (next.server_now) setSkewMs(Date.parse(next.server_now) - Date.now());
+      }
       setLink(next);
       setLoading(false);
     };
