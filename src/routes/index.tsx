@@ -114,12 +114,12 @@ function PaymentVisual() {
 function Index() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const headerRef = useRef<HTMLElement>(null);
+  const headerBarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => {
-      if (headerRef.current) {
-        headerRef.current.classList.toggle("scrolled", window.scrollY > 10);
+      if (headerBarRef.current) {
+        headerBarRef.current.classList.toggle("scrolled", window.scrollY > 10);
       }
     };
     onScroll();
@@ -135,8 +135,8 @@ function Index() {
 
   return (
     <main id="top">
-      <div className="header-bar">
-        <header className="site-header" ref={headerRef}>
+      <div className="header-bar" ref={headerBarRef}>
+        <header className="site-header">
           <Logo />
           <nav className={menuOpen ? "nav-links nav-open" : "nav-links"} aria-label="Main navigation">
             <a href="#product" onClick={() => setMenuOpen(false)}>Product</a>
