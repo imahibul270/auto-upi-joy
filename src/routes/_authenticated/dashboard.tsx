@@ -41,20 +41,6 @@ function rangeStart(range: (typeof RANGES)[number]) {
 }
 
 function buildSeries(rows: PaymentLinkRow[], range: (typeof RANGES)[number]) {
-  if (range === "Today") {
-    const buckets = [0, 4, 8, 12, 16, 20];
-    return buckets.map((hour) => {
-      const slot = rows.filter((row) => {
-        const d = new Date(row.paid_at ?? row.created_at);
-        return row.status === "paid" && d.getHours() >= hour && d.getHours() < hour + 4;
-      });
-      return {
-        day: `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour} ${hour < 12 ? "AM" : "PM"}`,
-        revenue: slot.reduce((s, r) => s + Number(r.payable_amount), 0),
-        orders: slot.length,
-      };
-    });
-  }
   const days = RANGE_DAYS[range];
   return Array.from({ length: days }, (_, index) => {
     const day = new Date(Date.now() - (days - 1 - index) * 86400000);
@@ -99,7 +85,7 @@ function DashboardPage() {
   const recent = [...links]
     .filter((row) => row.status !== "active")
     .sort((a, b) => Date.parse(b.paid_at ?? b.created_at) - Date.parse(a.paid_at ?? a.created_at))
-    .slice(0, 6);
+    .slice(0, 4);
 
   const stats = [
     { label: "Total Revenue", value: formatInr(revenue), icon: BadgeIndianRupee, tone: "lime",
@@ -158,7 +144,7 @@ function DashboardPage() {
                 <XAxis dataKey="day" tickLine={false} axisLine={false} fontSize={11} stroke="var(--muted-foreground)" />
                 <YAxis tickLine={false} axisLine={false} fontSize={11} stroke="var(--muted-foreground)" allowDecimals />
                 <Tooltip contentStyle={{ borderRadius: 10, border: "1px solid var(--border)", fontSize: 12 }} />
-                <Area type="monotone" dataKey="revenue" stroke="oklch(0.58 0.16 128)" strokeWidth={2.4} fill="url(#revFill)" animationDuration={1100} />
+                <Area type="monotone" dataKey="revenue" stroke="oklch(0.58 0.16 128)" strokeWidth={2.4} fill="url(#revFill)" dot={{ r: 3 }} animationDuration={1100} />
               </AreaChart>
             </ResponsiveContainer>
           </div>

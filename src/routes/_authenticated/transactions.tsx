@@ -29,11 +29,6 @@ function TransactionsPage() {
 
   return (
     <ConsoleLayout title="Transactions" user={user} userName={name}>
-      <section className="console-page-head" data-reveal>
-        <h2>Transactions</h2>
-      </section>
-
-
       <section className="console-card reveal-delay-1" data-reveal>
         <div className="console-card-head"><h3>All transactions</h3><small>Live</small></div>
         {rows.length === 0 ? (
