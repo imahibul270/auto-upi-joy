@@ -121,7 +121,7 @@ export async function pollPaymentsForUser(userId: string): Promise<PollResult> {
         const createdBefore = new Date(Date.parse(emailTime) + 60_000).toISOString();
         const { data: candidates } = await admin
           .from("payment_links")
-          .select("id,order_id,payable_amount")
+          .select("id,order_id,payable_amount,amount,webhook_url")
           .eq("user_id", userId)
           .eq("status", "active")
           .eq("payable_amount", exact)
