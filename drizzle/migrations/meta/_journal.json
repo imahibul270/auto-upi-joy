@@ -64,6 +64,13 @@
       "when": 1789493274293,
       "tag": "0008_fixed_5min_expiry_and_exact_amounts",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1789494453544,
+      "tag": "0009_unique_payable_amount_per_link",
+      "breakpoints": true
     }
   ]
 }
