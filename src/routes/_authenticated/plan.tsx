@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/plan")({
 function PlanPage() {
   const { user } = Route.useRouteContext();
   const name = useConsoleName(user);
-  const { data: quota, isLoading } = useQrQuota();
+  const { data: quota } = useQrQuota();
 
   const isPro = quota?.plan === "pro";
   const used = quota?.used ?? 0;
@@ -50,17 +50,6 @@ function PlanPage() {
 
   return (
     <ConsoleLayout title="Plan" user={user} userName={name}>
-      <section className="console-page-head" data-reveal>
-        <h2>Your Plan</h2>
-        <p>
-          {isLoading
-            ? "Loading your plan…"
-            : isPro
-              ? `Pro plan active · ${left} day${left === 1 ? "" : "s"} left in this cycle.`
-              : "You are on the Free plan. Upgrade when your free QR codes are used up."}
-        </p>
-      </section>
-
       <section className="console-card console-quota reveal-delay-1" data-reveal>
         <div className="console-quota-head">
           <div>
