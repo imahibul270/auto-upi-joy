@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { pollMyPayments } from "@/lib/gmail.functions";
+import { pollMyPayments } from "@/lib/mailbox.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 export type Provider = "phonepe" | "paytm";

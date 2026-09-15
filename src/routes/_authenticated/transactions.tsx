@@ -26,8 +26,6 @@ function TransactionsPage() {
   usePaymentDetection();
   const { rows } = useTransactions();
 
-  const paid = rows.filter((row) => row.status === "paid");
-  const collected = paid.reduce((sum, row) => sum + Number(row.payable_amount), 0);
 
   return (
     <ConsoleLayout title="Transactions" user={user} userName={name}>
@@ -36,20 +34,6 @@ function TransactionsPage() {
         <p>Links move here the moment they are paid or expired. Updates in real time.</p>
       </section>
 
-      <section className="console-stats">
-        <article className="console-stat reveal-delay-1" data-reveal>
-          <div className="console-stat-head"><span>Collected</span></div>
-          <strong>{formatInr(collected)}</strong>
-        </article>
-        <article className="console-stat reveal-delay-2" data-reveal>
-          <div className="console-stat-head"><span>Successful</span></div>
-          <strong>{paid.length}</strong>
-        </article>
-        <article className="console-stat reveal-delay-3" data-reveal>
-          <div className="console-stat-head"><span>Failed / Expired</span></div>
-          <strong>{rows.length - paid.length}</strong>
-        </article>
-      </section>
 
       <section className="console-card reveal-delay-1" data-reveal>
         <div className="console-card-head"><h3>All transactions</h3><small>Live</small></div>
