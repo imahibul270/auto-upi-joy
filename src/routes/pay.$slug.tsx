@@ -170,7 +170,9 @@ function PayPage() {
               {copied ? <Check strokeWidth={2.6} /> : <Copy strokeWidth={2.2} />}
             </button>
           </div>
+          {closeBlocked ? <p className="pay-done-note">You can close this window.</p> : null}
         </div>
+
       </div>
     );
   }
