@@ -674,3 +674,127 @@ END $function$;
 
 -- Legacy OAuth table is no longer used; lock it down instead of dropping it.
 REVOKE ALL ON TABLE public.gmail_connections FROM PUBLIC, anon, authenticated;
+-- ---------------------------------------------------------------------------
+-- 9) Admin panel (/admin)
+-- ---------------------------------------------------------------------------
+-- Change the email below to YOUR admin email before running this file.
+-- It must match ADMIN_EMAIL in src/routes/admin.tsx.
+ALTER TABLE public.subscriptions ADD COLUMN IF NOT EXISTS qr_limit integer;
+
+CREATE OR REPLACE FUNCTION public.is_platform_admin()
+ RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path TO 'public'
+AS $function$
+  SELECT lower(coalesce(nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'email', ''))
+         = 'aminulislam78131@gmail.com'
+     AND coalesce(nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'role', '') = 'authenticated';
+$function$;
+
+CREATE OR REPLACE FUNCTION public.admin_overview()
+ RETURNS jsonb LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path TO 'public'
+AS $function$
+BEGIN
+  IF NOT public.is_platform_admin() THEN RAISE EXCEPTION 'NOT_ADMIN'; END IF;
+  RETURN jsonb_build_object(
+    'users', (SELECT count(*) FROM auth.users),
+    'pro_users', (SELECT count(*) FROM public.subscriptions WHERE plan = 'pro' AND expires_at > now()),
+    'qr_codes', (SELECT count(*) FROM public.qr_codes),
+    'links', (SELECT count(*) FROM public.payment_links),
+    'paid_links', (SELECT count(*) FROM public.payment_links WHERE status = 'paid'),
+    'revenue', (SELECT COALESCE(sum(amount), 0) FROM public.payment_links WHERE status = 'paid'),
+    'subscription_revenue', (SELECT COALESCE(sum(amount_inr), 0) FROM public.subscriptions WHERE plan = 'pro')
+  );
+END $function$;
+
+CREATE OR REPLACE FUNCTION public.admin_list_users()
+ RETURNS jsonb LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path TO 'public'
+AS $function$
+DECLARE result jsonb;
+BEGIN
+  IF NOT public.is_platform_admin() THEN RAISE EXCEPTION 'NOT_ADMIN'; END IF;
+  SELECT COALESCE(jsonb_agg(row_to_json(t)::jsonb ORDER BY t.created_at DESC), '[]'::jsonb) INTO result
+  FROM (
+    SELECT
+      u.id AS user_id, u.email, u.created_at,
+      COALESCE(p.full_name, '') AS full_name,
+      COALESCE(p.mobile, '') AS mobile,
+      CASE WHEN s.plan = 'pro' AND s.expires_at > now() THEN 'pro' ELSE 'free' END AS plan,
+      s.started_at, s.expires_at,
+      COALESCE(s.qr_limit, CASE WHEN s.plan = 'pro' AND s.expires_at > now() THEN 3000 ELSE 3 END) AS qr_limit,
+      s.amount_inr,
+      (SELECT count(*) FROM public.qr_codes q
+        WHERE q.user_id = u.id
+          AND q.created_at >= CASE WHEN s.plan = 'pro' AND s.expires_at > now()
+                                   THEN COALESCE(s.started_at, '-infinity'::timestamptz)
+                                   ELSE COALESCE(s.expires_at, '-infinity'::timestamptz) END) AS qr_used,
+      (SELECT count(*) FROM public.payment_links l WHERE l.user_id = u.id) AS links_total,
+      (SELECT count(*) FROM public.payment_links l WHERE l.user_id = u.id AND l.status = 'paid') AS links_paid,
+      (SELECT COALESCE(sum(l.amount), 0) FROM public.payment_links l WHERE l.user_id = u.id AND l.status = 'paid') AS revenue,
+      (SELECT count(*) FROM public.merchant_accounts m WHERE m.user_id = u.id AND m.connected) AS connected_accounts
+    FROM auth.users u
+    LEFT JOIN public.profiles p ON p.id = u.id
+    LEFT JOIN public.subscriptions s ON s.user_id = u.id
+  ) t;
+  RETURN result;
+END $function$;
+
+CREATE OR REPLACE FUNCTION public.admin_payment_logs(_search text DEFAULT ''::text, _limit integer DEFAULT 200)
+ RETURNS json LANGUAGE sql STABLE SECURITY DEFINER SET search_path TO 'public', 'extensions'
+AS $function$
+  select coalesce(json_agg(t order by t.created_at desc), '[]'::json)
+  from (
+    select pl.id, pl.order_id, pl.slug, pl.amount, pl.payable_amount, pl.status::text as status,
+           pl.customer_name, pl.payer_name, pl.clicks, pl.created_at, pl.paid_at, pl.expires_at, pl.user_id,
+           coalesce(p.full_name, '') as merchant_name, coalesce(u.email, '') as merchant_email
+    from public.payment_links pl
+    left join public.profiles p on p.id = pl.user_id
+    left join auth.users u on u.id = pl.user_id
+    where public.is_platform_admin()
+      and (coalesce(_search, '') = ''
+        or pl.order_id ilike '%' || _search || '%'
+        or coalesce(u.email, '') ilike '%' || _search || '%'
+        or coalesce(p.full_name, '') ilike '%' || _search || '%'
+        or coalesce(pl.customer_name, '') ilike '%' || _search || '%')
+    order by pl.created_at desc
+    limit least(greatest(coalesce(_limit, 200), 1), 1000)
+  ) t;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.admin_set_plan(_user uuid, _plan text, _days integer DEFAULT 30, _qr_limit integer DEFAULT NULL::integer, _amount numeric DEFAULT 299, _reset_usage boolean DEFAULT false)
+ RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public'
+AS $function$
+DECLARE lim INT := NULLIF(_qr_limit, 0);
+BEGIN
+  IF NOT public.is_platform_admin() THEN RAISE EXCEPTION 'NOT_ADMIN'; END IF;
+  IF _user IS NULL OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = _user) THEN RAISE EXCEPTION 'USER_NOT_FOUND'; END IF;
+  IF _plan NOT IN ('free', 'pro') THEN RAISE EXCEPTION 'INVALID_PLAN'; END IF;
+  IF lim IS NOT NULL AND (lim < 0 OR lim > 1000000) THEN RAISE EXCEPTION 'INVALID_LIMIT'; END IF;
+
+  IF _plan = 'pro' THEN
+    INSERT INTO public.subscriptions (user_id, plan, started_at, expires_at, amount_inr, reference, qr_limit)
+    VALUES (_user, 'pro', now(), now() + make_interval(days => GREATEST(COALESCE(_days, 30), 1)),
+            COALESCE(_amount, 299), 'admin_manual', lim)
+    ON CONFLICT (user_id) DO UPDATE
+      SET plan = 'pro',
+          started_at = CASE WHEN _reset_usage OR public.subscriptions.plan <> 'pro' THEN now() ELSE public.subscriptions.started_at END,
+          expires_at = now() + make_interval(days => GREATEST(COALESCE(_days, 30), 1)),
+          amount_inr = COALESCE(_amount, 299), reference = 'admin_manual', qr_limit = lim;
+  ELSE
+    INSERT INTO public.subscriptions (user_id, plan, started_at, expires_at, amount_inr, reference, qr_limit)
+    VALUES (_user, 'free', now(), CASE WHEN _reset_usage THEN now() ELSE NULL END, 0, 'admin_manual', lim)
+    ON CONFLICT (user_id) DO UPDATE
+      SET plan = 'free',
+          expires_at = CASE WHEN _reset_usage THEN now() ELSE public.subscriptions.expires_at END,
+          amount_inr = 0, reference = 'admin_manual', qr_limit = lim;
+  END IF;
+
+  RETURN jsonb_build_object('ok', true);
+END $function$;
+
+REVOKE ALL ON FUNCTION public.admin_overview() FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.admin_list_users() FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.admin_payment_logs(text, integer) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.admin_set_plan(uuid, text, integer, integer, numeric, boolean) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.admin_overview() TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.admin_list_users() TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.admin_payment_logs(text, integer) TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.admin_set_plan(uuid, text, integer, integer, numeric, boolean) TO authenticated, service_role;
