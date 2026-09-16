@@ -34,6 +34,11 @@ function PayPage() {
   const [link, setLink] = useState<PublicLink | null>(null);
   const [qr, setQr] = useState("");
   const [loading, setLoading] = useState(true);
+  // Show a short "processing" moment before revealing the paid / expired result.
+  const [processing, setProcessing] = useState(false);
+  const [shownStatus, setShownStatus] = useState<PublicLink["status"] | null>(null);
+  const shownRef = useRef<PublicLink["status"] | null>(null);
+  const processingRef = useRef(false);
   // Countdown comes from the server-side expiry, so a refresh never restarts it.
   const [expiryMs, setExpiryMs] = useState<number | null>(null);
   const [skewMs, setSkewMs] = useState(0);
