@@ -12,13 +12,14 @@ import {
   FREE_QR_LIMIT, PRO_QR_LIMIT, SALES_CONTACT_PHONE, SALES_WHATSAPP_URL, daysLeft, useProPrice, useQrQuota,
 } from "@/lib/quota";
 
-/** Shows a result popup with a live "redirecting" countdown, then reloads the Plan page. */
+/** Shows a result popup with a live "redirecting" countdown, then goes to the dashboard. */
 function resultThenRedirect(options: { icon: "success" | "error" | "info"; title: string; html?: string; seconds?: number }) {
-  const total = (options.seconds ?? 5) * 1000;
+  const total = (options.seconds ?? 3) * 1000;
+  const line = (s: number) => `Redirecting back to merchant's website… ${Math.max(s, 0)}s`;
   return Swal.fire({
     icon: options.icon,
     title: options.title,
-    html: `${options.html ? `${options.html}<br/>` : ""}<b class="swal-countdown">Redirecting in ${Math.round(total / 1000)}s…</b>`,
+    html: `${options.html ? `${options.html}<br/>` : ""}<b class="swal-countdown">${line(Math.round(total / 1000))}</b>`,
     timer: total,
     timerProgressBar: true,
     showConfirmButton: false,
@@ -27,7 +28,7 @@ function resultThenRedirect(options: { icon: "success" | "error" | "info"; title
       const node = Swal.getHtmlContainer()?.querySelector(".swal-countdown");
       const id = window.setInterval(() => {
         const left = Math.ceil((Swal.getTimerLeft() ?? 0) / 1000);
-        if (node) node.textContent = `Redirecting in ${Math.max(left, 0)}s…`;
+        if (node) node.textContent = line(left);
       }, 250);
       (Swal as unknown as { __countdown?: number }).__countdown = id;
     },
@@ -35,9 +36,10 @@ function resultThenRedirect(options: { icon: "success" | "error" | "info"; title
       window.clearInterval((Swal as unknown as { __countdown?: number }).__countdown);
     },
   }).then(() => {
-    window.location.href = "/plan";
+    window.location.href = "/dashboard";
   });
 }
+
 
 export const Route = createFileRoute("/_authenticated/plan")({
   head: () => ({ meta: [
