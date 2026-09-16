@@ -62,6 +62,22 @@ const day = (value: string | null) =>
 const stamp = (value: string) =>
   new Date(value).toLocaleString("en-IN", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
 
+/** Skeleton placeholder rows shown while a table is loading. */
+function SkeletonRows({ rows, cols }: { rows: number; cols: number }) {
+  return (
+    <>
+      {Array.from({ length: rows }).map((_, r) => (
+        <tr key={`skeleton-${r}`} className="admin-skel-row">
+          {Array.from({ length: cols }).map((__, c) => (
+            <td key={c}><span className="admin-skel" /></td>
+          ))}
+        </tr>
+      ))}
+    </>
+  );
+}
+
+
 function AdminPage() {
   const [user, setUser] = useState<User | null>(null);
   const [checking, setChecking] = useState(true);
