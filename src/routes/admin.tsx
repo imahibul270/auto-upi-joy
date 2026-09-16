@@ -147,16 +147,30 @@ function readTab(): Tab {
 function AdminConsole({ user }: { user: User }) {
   const [tab] = useState<Tab>(readTab);
   const [search, setSearch] = useState("");
+  const [query, setQuery] = useState("");
   const [editing, setEditing] = useState<AdminUser | null>(null);
 
+  // Debounce typing so every keystroke does not hit the database.
+  useEffect(() => {
+    const id = window.setTimeout(() => setQuery(search.trim()), 300);
+    return () => window.clearTimeout(id);
+  }, [search]);
+
   const usersQuery = useQuery({
-    queryKey: ["admin-users"],
+    queryKey: ["admin-users", tab, query],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_list_users");
+      const { data, error } = await supabase.rpc("admin_list_users", {
+        _search: query,
+        _limit: tab === "overview" ? 6 : 200,
+        _plan: tab === "subscriptions" ? "pro" : "",
+      } as never);
       if (error) throw error;
       return (data as unknown as AdminUser[]) ?? [];
     },
-    refetchInterval: 15000,
+    enabled: tab !== "logs",
+    placeholderData: (previous) => previous,
+    staleTime: 20000,
+    refetchInterval: 30000,
   });
 
   const overviewQuery = useQuery({
@@ -166,28 +180,27 @@ function AdminConsole({ user }: { user: User }) {
       if (error) throw error;
       return data as unknown as Overview;
     },
-    refetchInterval: 15000,
+    enabled: tab === "overview",
+    staleTime: 20000,
+    refetchInterval: 30000,
   });
 
   const logsQuery = useQuery({
-    queryKey: ["admin-logs", search],
+    queryKey: ["admin-logs", query],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_payment_logs", { _search: search.trim(), _limit: 300 } as never);
+      const { data, error } = await supabase.rpc("admin_payment_logs", { _search: query, _limit: 200 } as never);
       if (error) throw error;
       return (data as unknown as PaymentLog[]) ?? [];
     },
     enabled: tab === "logs",
-    refetchInterval: 5000,
+    placeholderData: (previous) => previous,
+    refetchInterval: 8000,
   });
 
-  const rows = usersQuery.data ?? [];
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    const base = tab === "subscriptions" ? rows.filter((r) => r.plan === "pro") : rows;
-    if (!q) return base;
-    return base.filter((r) =>
-      `${r.email} ${r.full_name} ${r.mobile}`.toLowerCase().includes(q));
-  }, [rows, search, tab]);
+  const filtered = useMemo(() => usersQuery.data ?? [], [usersQuery.data]);
+  const usersLoading = usersQuery.isPending && tab !== "logs";
+  const logsLoading = logsQuery.isPending && tab === "logs";
+
 
   async function signOut() {
     await supabase.auth.signOut();
