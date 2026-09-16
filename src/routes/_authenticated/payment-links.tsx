@@ -32,6 +32,7 @@ const LINK_ERRORS: Record<string, string> = {
   UPI_NOT_CONFIGURED: "Save a UPI ID on Connect Accounts first.",
   INVALID_AMOUNT: "Enter an amount between ₹1 and ₹10,00,000.",
   ALL_PAYMENT_SLOTS_BUSY: "Too many open links for this amount. Try again in a moment.",
+  QUOTA_EXCEEDED: "Your QR limit is finished. Upgrade to Pro (₹299 / 30 days) from the Plan page to keep generating links.",
 };
 
 function PaymentLinksPage() {
