@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Receipt } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Receipt, Search } from "lucide-react";
 import { ConsoleLayout } from "@/components/console/ConsoleLayout";
 import { useConsoleName } from "@/components/console/useConsoleName";
 import {
