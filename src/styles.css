@@ -584,7 +584,7 @@ section[id]{scroll-margin-top:var(--header-height)}
 .pay-done { width: min(340px, 100%); border-radius: 1.1rem; overflow: hidden; background: var(--card); box-shadow: 0 18px 46px rgb(0 0 0 / .12); animation: pay-done-in .45s cubic-bezier(.2,.8,.3,1); }
 .pay-done-top { padding: 2rem 1.5rem 3.4rem; text-align: center; background: oklch(.44 .11 152); color: oklch(.99 0 0); }
 .pay-done-tick { width: 84px; height: 84px; margin: 0 auto 1.1rem; border-radius: 50%; background: oklch(.99 0 0); color: oklch(.4 .11 152); display: grid; place-items: center; animation: pay-tick-pop .5s cubic-bezier(.2,1.5,.4,1) both; }
-.pay-done-tick svg { width: 40px; height: 40px; stroke-dasharray: 48; stroke-dashoffset: 48; animation: pay-tick-draw .5s .25s ease-out forwards; }
+.pay-done-tick svg { width: 40px; height: 40px; animation: pay-tick-in .4s .18s cubic-bezier(.2,1.4,.4,1) both; }
 .pay-done-top h1 { margin: 0; font-size: 1.5rem; font-weight: 800; }
 .pay-done-top p { margin: .5rem 0 0; font-size: .92rem; opacity: .9; }
 .pay-done-row { position: relative; margin: -2.4rem 1rem 0; padding: .85rem 1rem; display: flex; align-items: center; gap: .85rem; border-radius: .9rem; background: var(--card); box-shadow: 0 10px 26px rgb(0 0 0 / .12); animation: pay-rise .45s .12s ease-out both; }
