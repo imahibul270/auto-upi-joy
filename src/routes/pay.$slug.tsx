@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,11 @@ function PayPage() {
   const [link, setLink] = useState<PublicLink | null>(null);
   const [qr, setQr] = useState("");
   const [loading, setLoading] = useState(true);
+  // Show a short "processing" moment before revealing the paid / expired result.
+  const [processing, setProcessing] = useState(false);
+  const [shownStatus, setShownStatus] = useState<PublicLink["status"] | null>(null);
+  const shownRef = useRef<PublicLink["status"] | null>(null);
+  const processingRef = useRef(false);
   // Countdown comes from the server-side expiry, so a refresh never restarts it.
   const [expiryMs, setExpiryMs] = useState<number | null>(null);
   const [skewMs, setSkewMs] = useState(0);
@@ -72,6 +77,26 @@ function PayPage() {
       }
       setLink(next);
       setLoading(false);
+
+      if (next) {
+        const previous = shownRef.current;
+        if (previous === "active" && next.status !== "active") {
+          // Hold the QR behind a short processing state before the final result.
+          if (!processingRef.current) {
+            processingRef.current = true;
+            setProcessing(true);
+            window.setTimeout(() => {
+              processingRef.current = false;
+              setProcessing(false);
+              shownRef.current = next.status;
+              setShownStatus(next.status);
+            }, 2000);
+          }
+        } else if (!processingRef.current) {
+          shownRef.current = next.status;
+          setShownStatus(next.status);
+        }
+      }
     };
     void load();
     kickDetection();
@@ -86,29 +111,49 @@ function PayPage() {
     void QRCode.toDataURL(uri, { width: 640, margin: 1, errorCorrectionLevel: "H" }).then(setQr);
   }, [link]);
 
+  const status = processing ? "active" : shownStatus ?? link?.status ?? "active";
+
   return (
     <div className="pay-screen">
       <div className="pay-card">
         <header className="pay-head">
           <img className="pay-bhim-logo" src={bhimUpiLogo.url} alt="BHIM UPI" />
-          {!loading && link && (
+          {loading ? (
+            <>
+              <span className="pay-skeleton pay-skeleton-title" />
+              <span className="pay-skeleton pay-skeleton-line" />
+            </>
+          ) : link ? (
             <>
               <h1 className="pay-payee">{link.payee_name || link.upi_id}</h1>
               <p className="pay-transfer-label">Transfer to</p>
             </>
-          )}
+          ) : null}
         </header>
         {loading ? (
-          <div className="pay-state"><p className="pay-note">Loading payment…</p></div>
+          <>
+            <section className="pay-total">
+              <span>Total Amount</span>
+              <strong><span className="pay-skeleton pay-skeleton-amount" /></strong>
+            </section>
+            <section className="pay-code-area">
+              <div className="pay-qr pay-skeleton" />
+              <span className="pay-skeleton pay-skeleton-apps" />
+            </section>
+            <footer className="pay-footer">
+              <span className="pay-skeleton pay-skeleton-line" />
+              <span className="pay-skeleton pay-skeleton-button" />
+            </footer>
+          </>
         ) : !link ? (
           <div className="pay-state"><p className="pay-note">This payment link does not exist.</p></div>
-        ) : link.status === "paid" ? (
+        ) : status === "paid" ? (
           <div className="pay-state">
             <h1 className="pay-amount">₹{link.payable_amount.toFixed(2)}</h1>
             <p className="pay-success">Payment received</p>
             <p className="pay-note">Order {link.order_id}</p>
           </div>
-        ) : link.status === "expired" ? (
+        ) : status === "expired" ? (
           <div className="pay-state">
             <h1 className="pay-amount">₹{link.payable_amount.toFixed(2)}</h1>
             <p className="pay-note">This payment link has expired.</p>
@@ -120,7 +165,15 @@ function PayPage() {
               <strong>₹{link.payable_amount.toFixed(2)}</strong>
             </section>
             <section className="pay-code-area">
-              {qr ? <img className="pay-qr" src={qr} alt="UPI QR code" width={250} height={250} /> : <div className="pay-qr pay-qr-skeleton" />}
+              <div className="pay-qr-wrap">
+                {qr ? <img className="pay-qr" src={qr} alt="UPI QR code" width={250} height={250} /> : <div className="pay-qr pay-skeleton" />}
+                {processing && (
+                  <div className="pay-processing">
+                    <span className="pay-spinner" />
+                    <p>Processing payment…</p>
+                  </div>
+                )}
+              </div>
               <img className="pay-apps" src={upiAppsRow.url} alt="Supported UPI payment apps" />
             </section>
             <footer className="pay-footer">
