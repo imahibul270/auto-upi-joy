@@ -575,9 +575,33 @@ section[id]{scroll-margin-top:var(--header-height)}
 .pay-skeleton-button { width: 103px; height: 2.1rem; border-radius: .6rem; }
 @keyframes pay-shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
 .pay-qr-wrap:has(.pay-processing) .pay-qr { filter: blur(4px); opacity: .7; }
-.pay-processing { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: .5rem; border-radius: .3rem; background: color-mix(in oklab, var(--card) 55%, transparent); backdrop-filter: blur(3px); }
-.pay-processing p { margin: 0; font-size: .78rem; font-weight: 700; color: var(--hero); }
-.pay-spinner { width: 26px; height: 26px; border-radius: 50%; border: 3px solid color-mix(in oklab, var(--hero) 22%, transparent); border-top-color: var(--hero); animation: pay-spin .8s linear infinite; }
+.pay-processing { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: inline-flex; align-items: center; gap: .5rem; padding: .5rem .95rem; border-radius: 999px; background: var(--card); box-shadow: 0 8px 22px rgb(0 0 0 / .14); animation: pay-pill-in .25s ease-out; }
+.pay-processing p { margin: 0; font-size: .82rem; font-weight: 700; color: var(--hero); white-space: nowrap; }
+.pay-spinner { width: 15px; height: 15px; border-radius: 50%; border: 2px solid color-mix(in oklab, var(--hero) 22%, transparent); border-top-color: var(--hero); animation: pay-spin .8s linear infinite; }
+@keyframes pay-pill-in { from { opacity: 0; transform: translate(-50%, -50%) scale(.9); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+
+/* Success screen */
+.pay-done { width: min(340px, 100%); border-radius: 1.1rem; overflow: hidden; background: var(--card); box-shadow: 0 18px 46px rgb(0 0 0 / .12); animation: pay-done-in .45s cubic-bezier(.2,.8,.3,1); }
+.pay-done-top { padding: 2rem 1.5rem 3.4rem; text-align: center; background: oklch(.44 .11 152); color: oklch(.99 0 0); }
+.pay-done-tick { width: 84px; height: 84px; margin: 0 auto 1.1rem; border-radius: 50%; background: oklch(.99 0 0); color: oklch(.4 .11 152); display: grid; place-items: center; animation: pay-tick-pop .5s cubic-bezier(.2,1.5,.4,1) both; }
+.pay-done-tick svg { width: 40px; height: 40px; stroke-dasharray: 48; stroke-dashoffset: 48; animation: pay-tick-draw .5s .25s ease-out forwards; }
+.pay-done-top h1 { margin: 0; font-size: 1.5rem; font-weight: 800; }
+.pay-done-top p { margin: .5rem 0 0; font-size: .92rem; opacity: .9; }
+.pay-done-row { position: relative; margin: -2.4rem 1rem 0; padding: .85rem 1rem; display: flex; align-items: center; gap: .85rem; border-radius: .9rem; background: var(--card); box-shadow: 0 10px 26px rgb(0 0 0 / .12); animation: pay-rise .45s .12s ease-out both; }
+.pay-done-avatar { width: 46px; height: 46px; border-radius: .7rem; display: grid; place-items: center; background: oklch(.79 .15 78); color: oklch(.99 0 0); flex: none; }
+.pay-done-meta { display: grid; gap: .1rem; min-width: 0; }
+.pay-done-meta strong { font-size: .98rem; font-weight: 700; word-break: break-all; }
+.pay-done-meta b { font-size: 1.22rem; font-weight: 800; }
+.pay-done-order { padding: 1rem 1.4rem 1.3rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; animation: pay-rise .45s .2s ease-out both; }
+.pay-done-order span { display: block; font-size: 1rem; font-weight: 700; }
+.pay-done-order small { display: block; margin-top: .2rem; font-size: .82rem; color: var(--muted-foreground); word-break: break-all; }
+.pay-done-order button { flex: none; width: 36px; height: 36px; display: grid; place-items: center; border-radius: .6rem; color: var(--hero); background: color-mix(in oklab, var(--hero) 8%, var(--card)); transition: background .15s ease; }
+.pay-done-order button:hover { background: color-mix(in oklab, var(--hero) 15%, var(--card)); }
+.pay-done-order button svg { width: 18px; height: 18px; }
+@keyframes pay-done-in { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes pay-tick-pop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: scale(1); } }
+@keyframes pay-tick-draw { to { stroke-dashoffset: 0; } }
+@keyframes pay-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 @keyframes pay-spin { to { transform: rotate(360deg); } }
 .pay-apps { width: min(230px, 88%); height: 30px; object-fit: contain; margin-top: .6rem; }
 .pay-footer { padding: .85rem 1.4rem; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); }
