@@ -113,6 +113,45 @@ function PayPage() {
 
   const status = processing ? "active" : shownStatus ?? link?.status ?? "active";
 
+  const copyOrder = async () => {
+    if (!link) return;
+    try {
+      await navigator.clipboard.writeText(link.order_id);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    } catch { /* clipboard unavailable */ }
+  };
+
+  if (!loading && link && status === "paid") {
+    return (
+      <div className="pay-screen">
+        <div className="pay-done">
+          <div className="pay-done-top">
+            <div className="pay-done-tick"><Check strokeWidth={4} /></div>
+            <h1>Payment successful!</h1>
+            <p>Redirecting back to merchant&apos;s website...</p>
+          </div>
+          <div className="pay-done-row">
+            <span className="pay-done-avatar"><Store strokeWidth={2.4} /></span>
+            <div className="pay-done-meta">
+              <strong>{link.order_id}</strong>
+              <b>₹{link.amount.toFixed(2)}</b>
+            </div>
+          </div>
+          <div className="pay-done-order">
+            <div>
+              <span>Order ID</span>
+              <small>{link.order_id}</small>
+            </div>
+            <button type="button" onClick={copyOrder} aria-label="Copy order ID">
+              {copied ? <Check strokeWidth={2.6} /> : <Copy strokeWidth={2.2} />}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="pay-screen">
       <div className="pay-card">
