@@ -260,6 +260,24 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: number
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: number
+        }
+        Relationships: []
+      }
       processed_emails: {
         Row: {
           amount: number | null
@@ -428,6 +446,7 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_set_pro_price: { Args: { _price: number }; Returns: number }
       api_create_payment_link: {
         Args: {
           _amount: number
@@ -471,6 +490,7 @@ export type Database = {
         }
         Returns: Json
       }
+      get_pro_price: { Args: never; Returns: number }
       get_public_payment_link: { Args: { _slug: string }; Returns: Json }
       get_qr_quota: { Args: never; Returns: Json }
       is_platform_admin: { Args: never; Returns: boolean }
