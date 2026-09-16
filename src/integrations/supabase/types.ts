@@ -435,6 +435,10 @@ export type Database = {
         Args: { _limit?: number; _search?: string }
         Returns: Json
       }
+      admin_set_free_plan_enabled: {
+        Args: { _enabled: boolean }
+        Returns: boolean
+      }
       admin_set_plan: {
         Args: {
           _amount?: number
@@ -493,6 +497,7 @@ export type Database = {
       get_pro_price: { Args: never; Returns: number }
       get_public_payment_link: { Args: { _slug: string }; Returns: Json }
       get_qr_quota: { Args: never; Returns: Json }
+      is_free_plan_enabled: { Args: never; Returns: boolean }
       is_platform_admin: { Args: never; Returns: boolean }
       issue_api_key: { Args: { _label?: string }; Returns: Json }
       list_merchant_accounts: { Args: never; Returns: Json }

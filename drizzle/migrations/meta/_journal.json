@@ -155,6 +155,13 @@
       "when": 1789534262989,
       "tag": "0021_fix_qr_quota_enforcement",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1789563636548,
+      "tag": "0022_free_plan_toggle",
+      "breakpoints": true
     }
   ]
 }
