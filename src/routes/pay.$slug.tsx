@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Check, Copy, Store } from "lucide-react";
 import bhimUpiLogo from "@/assets/bhim-upi-logo.png.asset.json";
 import upiAppsRow from "@/assets/upi-apps-row.png.asset.json";
 
@@ -42,6 +43,7 @@ function PayPage() {
   // Countdown comes from the server-side expiry, so a refresh never restarts it.
   const [expiryMs, setExpiryMs] = useState<number | null>(null);
   const [skewMs, setSkewMs] = useState(0);
+  const [copied, setCopied] = useState(false);
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -112,6 +114,45 @@ function PayPage() {
   }, [link]);
 
   const status = processing ? "active" : shownStatus ?? link?.status ?? "active";
+
+  const copyOrder = async () => {
+    if (!link) return;
+    try {
+      await navigator.clipboard.writeText(link.order_id);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    } catch { /* clipboard unavailable */ }
+  };
+
+  if (!loading && link && status === "paid") {
+    return (
+      <div className="pay-screen">
+        <div className="pay-done">
+          <div className="pay-done-top">
+            <div className="pay-done-tick"><Check strokeWidth={4} /></div>
+            <h1>Payment successful!</h1>
+            <p>Redirecting back to merchant&apos;s website...</p>
+          </div>
+          <div className="pay-done-row">
+            <span className="pay-done-avatar"><Store strokeWidth={2.4} /></span>
+            <div className="pay-done-meta">
+              <strong>{link.order_id}</strong>
+              <b>₹{link.amount.toFixed(2)}</b>
+            </div>
+          </div>
+          <div className="pay-done-order">
+            <div>
+              <span>Order ID</span>
+              <small>{link.order_id}</small>
+            </div>
+            <button type="button" onClick={copyOrder} aria-label="Copy order ID">
+              {copied ? <Check strokeWidth={2.6} /> : <Copy strokeWidth={2.2} />}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pay-screen">
