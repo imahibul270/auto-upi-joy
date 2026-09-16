@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Check, Copy, Store } from "lucide-react";
 import bhimUpiLogo from "@/assets/bhim-upi-logo.png.asset.json";
 import upiAppsRow from "@/assets/upi-apps-row.png.asset.json";
 
