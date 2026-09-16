@@ -231,9 +231,9 @@ const order = await res.json();
 }`}
             />
             <p className="docs-note">
-              <strong>Unique paise:</strong> every active order gets its own payable amount with an extra ₹0.01 – ₹0.99
-              (never more). That is how a bank alert is matched to exactly one order. The customer pays
-              <code>payable_amount</code>; your books are credited with the base <code>amount</code>.
+              <strong>Always charge <code>payable_amount</code>:</strong> it can differ from <code>amount</code> by up to
+              ₹0.99 so each active order stays unique. The customer pays <code>payable_amount</code>; your books are
+              credited with the base <code>amount</code>.
             </p>
           </section>
 
