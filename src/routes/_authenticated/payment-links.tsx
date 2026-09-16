@@ -82,6 +82,7 @@ function PaymentLinksPage() {
       setAmount("");
       setCustomer("");
       await queryClient.invalidateQueries({ queryKey: ["payment-links"] });
+      await queryClient.invalidateQueries({ queryKey: ["qr-quota"] });
       void Swal.fire({
         icon: "success",
         title: "Payment link ready",
@@ -90,6 +91,8 @@ function PaymentLinksPage() {
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
+      await queryClient.invalidateQueries({ queryKey: ["qr-quota"] });
+      if (message.includes("QUOTA_EXCEEDED")) { showUpgrade(); return; }
       const key = Object.keys(LINK_ERRORS).find((code) => message.includes(code));
       void Swal.fire({ icon: "error", title: "Could not generate link", text: key ? LINK_ERRORS[key] : message });
     } finally {
