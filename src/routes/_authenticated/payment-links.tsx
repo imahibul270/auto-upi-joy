@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
+import { PRO_PRICE_INR, useQrQuota } from "@/lib/quota";
 import { useState, type FormEvent } from "react";
 import { Copy, Link2, Sparkles, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
