@@ -33,7 +33,7 @@ const NAV = [
   ["order-status", "Order status"],
   ["webhooks", "Webhooks"],
   ["php", "PHP integration"],
-  ["detection", "Payment detection"],
+  
   ["errors", "Errors"],
   ["pricing", "Pricing"],
   ["faq", "FAQ"],
@@ -128,8 +128,8 @@ function DocsPage() {
             <h1>Auto Upi API documentation</h1>
             <p>
               Auto Upi is a self-serve UPI collection gateway. Create an order from your server, send the customer to the
-              hosted checkout page, and the payment is confirmed automatically from your own bank alert email — no
-              commission, no reconciliation, money straight into your UPI account.
+              hosted checkout page, and the order is confirmed automatically — no commission, no reconciliation, money
+              straight into your UPI account.
             </p>
             <div className="docs-quick">
               <a href="#quickstart">Quickstart</a>
@@ -148,7 +148,7 @@ function DocsPage() {
             <h2>Quickstart</h2>
             <ol className="docs-steps">
               <li><strong>Create an account</strong> and sign in to the merchant console.</li>
-              <li><strong>Connect an account</strong> — pick PhonePe or Paytm, save your UPI ID, then connect your payment-alert mailbox with an email address and app password.</li>
+              <li><strong>Connect an account</strong> — pick PhonePe or Paytm and complete the setup on the Connect Accounts page.</li>
               <li><strong>Generate an API key</strong> on the API Keys page. Copy it once; regenerating replaces the old key.</li>
               <li><strong>Create an order</strong> from your server and redirect the customer to the returned <code>payment_url</code>.</li>
               <li><strong>Confirm</strong> the payment through the status endpoint or your webhook, then fulfil the order.</li>
@@ -231,9 +231,9 @@ const order = await res.json();
 }`}
             />
             <p className="docs-note">
-              <strong>Unique paise:</strong> every active order gets its own payable amount with an extra ₹0.01 – ₹0.99
-              (never more). That is how a bank alert is matched to exactly one order. The customer pays
-              <code>payable_amount</code>; your books are credited with the base <code>amount</code>.
+              <strong>Always charge <code>payable_amount</code>:</strong> it can differ from <code>amount</code> by up to
+              ₹0.99 so each active order stays unique. The customer pays <code>payable_amount</code>; your books are
+              credited with the base <code>amount</code>.
             </p>
           </section>
 
@@ -302,7 +302,7 @@ if (($order["status"] ?? "") === "paid") {
             <p>
               Each API key ships with a webhook secret (<code>whsec_…</code>) shown on the API Keys page. Pass a
               <code>webhook_url</code> when creating an order and we POST a signed <code>payment.paid</code> event the
-              moment the payment is detected.
+              moment the order is confirmed as paid.
             </p>
             <CodeBlock
               title="payload"
@@ -466,16 +466,6 @@ echo "ok";`}
             </p>
           </section>
 
-          <section id="detection" className="docs-section">
-            <h2>How payment detection works</h2>
-            <div className="docs-grid-2">
-              <div><strong>1. Unique amount</strong><p>Each pending order gets its own paise value (₹0.01–₹0.99 extra), so two orders can never collide on one alert.</p></div>
-              <div><strong>2. Mailbox read</strong><p>Your payment-alert mailbox is read securely with the app password you saved. Nothing is sent back to the browser.</p></div>
-              <div><strong>3. Exact match</strong><p>An alert is credited only when exactly one of your active orders matches the amount. Two candidates means neither is paid.</p></div>
-              <div><strong>4. Dedupe</strong><p>Every alert is claimed by message ID, so a single email can never mark two orders paid or double-credit one.</p></div>
-            </div>
-            <p className="docs-note">Typical capture time is 5–15 seconds from the alert email.</p>
-          </section>
 
           <section id="errors" className="docs-section">
             <h2>Errors</h2>
@@ -503,7 +493,7 @@ echo "ok";`}
                   <li><Check /> 3 payment QR codes total</li>
                   <li><Check /> 1 merchant account</li>
                   <li><Check /> Full REST API access</li>
-                  <li><Check /> Email payment detection</li>
+                  <li><Check /> Automatic payment confirmation</li>
                 </ul>
                 <Link className="docs-btn" to="/register">Create account</Link>
               </div>
@@ -543,8 +533,8 @@ echo "ok";`}
           <section id="faq" className="docs-section">
             <h2>FAQ</h2>
             <div className="docs-faq">
-              <div><strong>Do I need a payment gateway account?</strong><p>No. Money reaches your own UPI account directly; Auto Upi only detects and records the payment.</p></div>
-              <div><strong>What if two customers pay the same amount?</strong><p>They can't — each pending order carries its own unique paise value between ₹0.01 and ₹0.99.</p></div>
+              <div><strong>Do I need a payment gateway account?</strong><p>No. Money reaches your own UPI account directly; Auto Upi only confirms and records the order.</p></div>
+              <div><strong>What if two customers pay the same amount?</strong><p>They can't — each active order carries its own unique <code>payable_amount</code>.</p></div>
               <div><strong>How long is a link valid?</strong><p>5 minutes. After that the order becomes <code>expired</code> and moves to Transactions.</p></div>
               <div><strong>Which PHP version do I need?</strong><p>PHP 7.4 or newer with the cURL extension — no composer package required.</p></div>
               <div><strong>Can I regenerate my API key?</strong><p>Yes. Regenerating issues a new key and instantly disables the previous one.</p></div>

@@ -127,6 +127,13 @@
       "when": 1789528762496,
       "tag": "0017_paise_limit_and_fast_admin",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1789530498807,
+      "tag": "0018_free_plan_fixed_three_qr",
+      "breakpoints": true
     }
   ]
 }
