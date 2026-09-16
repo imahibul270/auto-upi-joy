@@ -564,8 +564,21 @@ section[id]{scroll-margin-top:var(--header-height)}
 .pay-total span { font-size: .95rem; font-weight: 700; text-align: left; }
 .pay-total strong { justify-content: center; border-left: 1px solid var(--border); font-size: 1.3rem; }
 .pay-code-area { padding: 1rem 1.15rem .9rem; display: flex; flex-direction: column; align-items: center; }
+.pay-qr-wrap { position: relative; display: grid; place-items: center; }
 .pay-qr { width: min(180px, 58vw, 32vh); height: auto; aspect-ratio: 1; border-radius: .3rem; }
 .pay-qr-skeleton { background: var(--muted); }
+.pay-skeleton { display: block; border-radius: .4rem; background: linear-gradient(90deg, color-mix(in oklab, var(--muted) 85%, transparent) 25%, color-mix(in oklab, var(--muted) 45%, var(--card)) 37%, color-mix(in oklab, var(--muted) 85%, transparent) 63%); background-size: 400% 100%; animation: pay-shimmer 1.3s ease-in-out infinite; }
+.pay-skeleton-title { width: 60%; height: 1.1rem; margin-top: .25rem; }
+.pay-skeleton-line { width: 40%; height: .7rem; margin-top: .45rem; }
+.pay-skeleton-amount { width: 70px; height: 1rem; }
+.pay-skeleton-apps { width: min(230px, 88%); height: 26px; margin-top: .6rem; }
+.pay-skeleton-button { width: 103px; height: 2.1rem; border-radius: .6rem; }
+@keyframes pay-shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+.pay-qr-wrap:has(.pay-processing) .pay-qr { filter: blur(4px); opacity: .7; }
+.pay-processing { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: .5rem; border-radius: .3rem; background: color-mix(in oklab, var(--card) 55%, transparent); backdrop-filter: blur(3px); }
+.pay-processing p { margin: 0; font-size: .78rem; font-weight: 700; color: var(--hero); }
+.pay-spinner { width: 26px; height: 26px; border-radius: 50%; border: 3px solid color-mix(in oklab, var(--hero) 22%, transparent); border-top-color: var(--hero); animation: pay-spin .8s linear infinite; }
+@keyframes pay-spin { to { transform: rotate(360deg); } }
 .pay-apps { width: min(230px, 88%); height: 30px; object-fit: contain; margin-top: .6rem; }
 .pay-footer { padding: .85rem 1.4rem; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); }
 .pay-footer p { margin: 0; color: var(--muted-foreground); font-size: .93rem; }
