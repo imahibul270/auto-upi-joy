@@ -257,6 +257,8 @@ function AdminConsole({ user }: { user: User }) {
         </header>
 
         <main className="console-body">
+          {tab === "overview" ? <ProPriceCard /> : null}
+
           {tab === "overview" ? (
             <section className="admin-stat-grid">
               {[
