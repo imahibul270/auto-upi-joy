@@ -302,7 +302,7 @@ if (($order["status"] ?? "") === "paid") {
             <p>
               Each API key ships with a webhook secret (<code>whsec_…</code>) shown on the API Keys page. Pass a
               <code>webhook_url</code> when creating an order and we POST a signed <code>payment.paid</code> event the
-              moment the payment is detected.
+              moment the order is confirmed as paid.
             </p>
             <CodeBlock
               title="payload"
