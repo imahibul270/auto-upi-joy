@@ -28,6 +28,23 @@ export async function fetchQrQuota(): Promise<QrQuota> {
   return data as unknown as QrQuota;
 }
 
+/** Live Pro plan price, controlled by the admin panel. */
+export async function fetchProPrice(): Promise<number> {
+  const { data, error } = await supabase.rpc("get_pro_price" as never);
+  if (error) throw error;
+  return Number(data ?? PRO_PRICE_INR);
+}
+
+export function useProPrice() {
+  return useQuery({
+    queryKey: ["pro-price"],
+    queryFn: fetchProPrice,
+    refetchInterval: 8000,
+    refetchOnWindowFocus: true,
+    initialData: PRO_PRICE_INR,
+  });
+}
+
 /** Live plan + usage for the signed-in user. */
 export function useQrQuota() {
   return useQuery({
