@@ -68,13 +68,13 @@ export const startProUpgrade = createServerFn({ method: "POST" })
       user_id: context.userId,
       order_id: body.order_id,
       slug: body.slug,
-      amount: PRO_PRICE,
+      amount: price,
     });
 
     return {
       order_id: body.order_id,
       slug: body.slug,
-      payable_amount: Number(body.payable_amount ?? PRO_PRICE),
+      payable_amount: Number(body.payable_amount ?? price),
       payment_url: body.payment_url ?? `${origin}/pay/${body.slug}`,
     };
   });
