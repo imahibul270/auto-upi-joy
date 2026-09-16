@@ -293,9 +293,11 @@ function AdminConsole({ user }: { user: User }) {
                         <td>{log.paid_at ? stamp(log.paid_at) : "—"}</td>
                       </tr>
                     ))}
-                    {(logsQuery.data ?? []).length === 0 ? (
+                    {logsLoading ? <SkeletonRows rows={6} cols={8} /> : null}
+                    {!logsLoading && (logsQuery.data ?? []).length === 0 ? (
                       <tr><td colSpan={8}><div className="console-empty"><p>No payment activity yet</p></div></td></tr>
                     ) : null}
+
                   </tbody>
                 </table>
               </div>
