@@ -611,6 +611,8 @@ section[id]{scroll-margin-top:var(--header-height)}
 .pay-done-order small { display: block; margin-top: .2rem; font-size: .82rem; color: var(--muted-foreground); word-break: break-all; }
 .pay-done-order button { flex: none; width: 36px; height: 36px; display: grid; place-items: center; border-radius: .6rem; color: var(--hero); background: color-mix(in oklab, var(--hero) 8%, var(--card)); transition: background .15s ease; }
 .pay-done-order button:hover { background: color-mix(in oklab, var(--hero) 15%, var(--card)); }
+.pay-done-note { padding: 0 1.4rem 1.2rem; text-align: center; font-size: .82rem; color: var(--muted-foreground); }
+
 .pay-done-order button svg { width: 18px; height: 18px; }
 @keyframes pay-done-in { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
 @keyframes pay-tick-pop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: scale(1); } }
