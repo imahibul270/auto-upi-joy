@@ -112,6 +112,7 @@ function PaymentVisual() {
 }
 
 function Index() {
+  const { data: proPrice = 299 } = useProPrice();
   const [menuOpen, setMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const headerBarRef = useRef<HTMLDivElement>(null);
