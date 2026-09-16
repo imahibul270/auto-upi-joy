@@ -66,7 +66,7 @@ function TransactionsPage() {
                     <tr key={row.id}>
                       <td><strong>{row.order_id}</strong></td>
                       <td className="console-cell-customer">{row.customer_name || "—"}</td>
-                      <td>{row.payer_name || "—"}</td>
+                      
                       <td><strong>{formatInr(row.amount)}</strong></td>
                       <td>
                         <span className={`console-pill ${row.status === "paid" ? "is-paid" : "is-muted"}`}>
