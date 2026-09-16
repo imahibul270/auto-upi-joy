@@ -15,7 +15,7 @@ import {
 /** Shows a result popup with a live "redirecting" countdown, then goes to the dashboard. */
 function resultThenRedirect(options: { icon: "success" | "error" | "info"; title: string; html?: string; seconds?: number }) {
   const total = (options.seconds ?? 3) * 1000;
-  const line = (s: number) => `Redirecting back to merchant's website… ${Math.max(s, 0)}s`;
+  const line = (s: number) => `Redirecting to your plan page… ${Math.max(s, 0)}s`;
   return Swal.fire({
     icon: options.icon,
     title: options.title,
@@ -36,7 +36,7 @@ function resultThenRedirect(options: { icon: "success" | "error" | "info"; title
       window.clearInterval((Swal as unknown as { __countdown?: number }).__countdown);
     },
   }).then(() => {
-    window.location.href = "/dashboard";
+    window.location.href = "/plan";
   });
 }
 
