@@ -3,12 +3,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { User } from "@supabase/supabase-js";
 import {
-  IndianRupee, LayoutGrid, Lock, LogOut, QrCode, Search, ShieldCheck, Sparkles, Users, X,
+  Activity, IndianRupee, LayoutGrid, Lock, LogOut, QrCode, Search, ShieldCheck, Sparkles, Users, X,
 } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdminAuth as supabase } from "@/integrations/supabase/admin-client";
 import { Swal } from "@/lib/swal";
 
 /** The only account that can ever open this panel. Enforced again in the database. */
@@ -48,9 +48,19 @@ type Overview = {
   paid_links: number; revenue: number; subscription_revenue: number;
 };
 
+type PaymentLog = {
+  id: string; order_id: string; slug: string; amount: number; payable_amount: number;
+  status: "active" | "paid" | "expired"; customer_name: string; payer_name: string | null;
+  clicks: number; created_at: string; paid_at: string | null; expires_at: string;
+  user_id: string; merchant_name: string; merchant_email: string;
+};
+
 const inr = (n: number) => `₹${Number(n || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
 const day = (value: string | null) =>
   value ? new Date(value).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+
+const stamp = (value: string) =>
+  new Date(value).toLocaleString("en-IN", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
 
 function AdminPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -123,12 +133,19 @@ const ADMIN_MENU = [
   { key: "overview", label: "Overview", icon: LayoutGrid },
   { key: "users", label: "Users", icon: Users },
   { key: "subscriptions", label: "Subscriptions", icon: Sparkles },
+  { key: "logs", label: "Logs", icon: Activity },
 ] as const;
 
 type Tab = (typeof ADMIN_MENU)[number]["key"];
 
+function readTab(): Tab {
+  if (typeof window === "undefined") return "overview";
+  const value = new URLSearchParams(window.location.search).get("tab") as Tab | null;
+  return ADMIN_MENU.some((m) => m.key === value) ? (value as Tab) : "overview";
+}
+
 function AdminConsole({ user }: { user: User }) {
-  const [tab, setTab] = useState<Tab>("overview");
+  const [tab] = useState<Tab>(readTab);
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState<AdminUser | null>(null);
 
@@ -150,6 +167,17 @@ function AdminConsole({ user }: { user: User }) {
       return data as unknown as Overview;
     },
     refetchInterval: 15000,
+  });
+
+  const logsQuery = useQuery({
+    queryKey: ["admin-logs", search],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_payment_logs", { _search: search.trim(), _limit: 300 } as never);
+      if (error) throw error;
+      return (data as unknown as PaymentLog[]) ?? [];
+    },
+    enabled: tab === "logs",
+    refetchInterval: 5000,
   });
 
   const rows = usersQuery.data ?? [];
@@ -176,21 +204,20 @@ function AdminConsole({ user }: { user: User }) {
           <p className="console-side-label">ADMIN MENU</p>
           <nav className="console-menu">
             {ADMIN_MENU.map((item) => (
-              <button
+              <a
                 key={item.key}
-                type="button"
                 className={`console-menu-item${tab === item.key ? " is-active" : ""}`}
-                onClick={() => setTab(item.key)}
+                href={`/admin?tab=${item.key}`}
               >
                 <item.icon /><span>{item.label}</span>
-              </button>
+              </a>
             ))}
             <a className="console-menu-item" href="/dashboard"><QrCode /><span>Merchant view</span></a>
           </nav>
         </div>
         <div className="admin-side-foot">
           <span><ShieldCheck /> {user.email}</span>
-          <Button variant="outline" size="sm" onClick={signOut}><LogOut /> Sign out</Button>
+          <Button size="sm" className="admin-signout" onClick={signOut}><LogOut /> Sign out</Button>
         </div>
       </aside>
 
@@ -220,6 +247,47 @@ function AdminConsole({ user }: { user: User }) {
             </section>
           ) : null}
 
+          {tab === "logs" ? (
+            <section className="console-card reveal-delay-1" data-reveal>
+              <div className="console-card-head">
+                <h3>Payment logs</h3>
+                <div className="admin-search"><Search /><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search order, merchant or customer" /></div>
+              </div>
+              <div className="console-table-wrap">
+                <table className="console-table">
+                  <thead>
+                    <tr><th>ORDER ID</th><th>MERCHANT</th><th>CUSTOMER</th><th>AMOUNT</th><th>CHARGED</th><th>STATUS</th><th>CREATED</th><th>PAID AT</th></tr>
+                  </thead>
+                  <tbody>
+                    {(logsQuery.data ?? []).map((log) => (
+                      <tr key={log.id}>
+                        <td><strong>{log.order_id}</strong></td>
+                        <td>
+                          <div className="admin-user-cell">
+                            <strong>{log.merchant_name || log.merchant_email.split("@")[0]}</strong>
+                            <small>{log.merchant_email}</small>
+                          </div>
+                        </td>
+                        <td>{log.customer_name || log.payer_name || "—"}</td>
+                        <td><strong>{inr(log.amount)}</strong></td>
+                        <td>{inr(log.payable_amount)}</td>
+                        <td>
+                          <span className={`console-pill ${log.status === "paid" ? "is-paid" : log.status === "active" ? "is-active" : "is-muted"}`}>
+                            {log.status === "paid" ? "Success" : log.status === "active" ? "Pending" : "Rejected"}
+                          </span>
+                        </td>
+                        <td>{stamp(log.created_at)}</td>
+                        <td>{log.paid_at ? stamp(log.paid_at) : "—"}</td>
+                      </tr>
+                    ))}
+                    {(logsQuery.data ?? []).length === 0 ? (
+                      <tr><td colSpan={8}><div className="console-empty"><p>No payment activity yet</p></div></td></tr>
+                    ) : null}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          ) : (
           <section className="console-card reveal-delay-1" data-reveal>
             <div className="console-card-head">
               <h3>{tab === "subscriptions" ? "Active subscriptions" : tab === "overview" ? "Latest users" : "All users"}</h3>
@@ -256,6 +324,7 @@ function AdminConsole({ user }: { user: User }) {
               </table>
             </div>
           </section>
+          )}
         </main>
       </div>
 
