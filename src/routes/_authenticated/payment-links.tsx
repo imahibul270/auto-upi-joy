@@ -75,6 +75,7 @@ function PaymentLinksPage() {
 
   async function generate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (quotaOver) { showUpgrade(); return; }
     setCreating(true);
     try {
       const created = await createPaymentLink({ amount: Number(amount), customerName: customer });
