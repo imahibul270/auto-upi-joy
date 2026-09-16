@@ -373,7 +373,12 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      admin_list_users: { Args: never; Returns: Json }
+      admin_list_users:
+        | { Args: never; Returns: Json }
+        | {
+            Args: { _limit?: number; _plan?: string; _search?: string }
+            Returns: Json
+          }
       admin_overview: { Args: never; Returns: Json }
       admin_payment_logs: {
         Args: { _limit?: number; _search?: string }

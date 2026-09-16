@@ -63,6 +63,12 @@ const plans = [
   { name: "Custom", price: "Talk to us", suffix: "for higher volume", items: ["Custom QR limits", "Dedicated settlements", "Account manager"] },
 ];
 
+/** Sales / support WhatsApp with a pre-filled message. */
+const SUPPORT_WHATSAPP_URL =
+  "https://wa.me/918472028929?text=" +
+  encodeURIComponent("Hello Auto Upi, I want to know about a custom plan.");
+
+
 function BrandMark() {
   return <BrandLogo />;
 }
@@ -201,7 +207,7 @@ function Index() {
 
       <section className="section pricing-section" id="pricing">
         <div className="section-heading" data-reveal><span>PLANS THAT SCALE WITH YOU</span><h2>Start focused. Upgrade when ready.</h2><p>Simple plans for every stage of your payment journey.</p></div>
-        <div className="pricing-grid">{plans.map((plan, index) => <article className={`${plan.popular ? "price-card popular" : "price-card"} reveal-delay-${index + 1}`} data-reveal key={plan.name}>{plan.popular && <div className="popular-label">MOST POPULAR</div>}<h3>{plan.name}</h3><div className="price"><strong>{plan.price}</strong><span>{plan.suffix}</span></div><ul>{plan.items.map(item => <li key={item}><Check /> {item}</li>)}</ul><a className={plan.popular ? "button button-primary" : "button button-dark"} href="mailto:support@autoupi.in">{plan.name === 'Custom' ? 'Contact sales' : `Choose ${plan.name}`} <ArrowRight /></a></article>)}</div>
+        <div className="pricing-grid">{plans.map((plan, index) => <article className={`${plan.popular ? "price-card popular" : "price-card"} reveal-delay-${index + 1}`} data-reveal key={plan.name}>{plan.popular && <div className="popular-label">MOST POPULAR</div>}<h3>{plan.name}</h3><div className="price"><strong>{plan.price}</strong><span>{plan.suffix}</span></div><ul>{plan.items.map(item => <li key={item}><Check /> {item}</li>)}</ul>{plan.name === 'Custom' ? <a className="button button-dark" href={SUPPORT_WHATSAPP_URL} target="_blank" rel="noreferrer">Talk on WhatsApp +91 84720 28929 <ArrowRight /></a> : <a className={plan.popular ? "button button-primary" : "button button-dark"} href="mailto:support@autoupi.in">Choose {plan.name} <ArrowRight /></a>}</article>)}</div>
       </section>
 
        <section className="cta-section" data-reveal><div><span>READY FOR PRODUCTION</span><h2>Turn every payment into a clear,<br /> trackable workflow.</h2><p>Set up your merchant workspace and create your first payment link.</p><Link className="button button-primary" to="/register">Create free account <ArrowRight /></Link></div></section>

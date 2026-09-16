@@ -62,6 +62,22 @@ const day = (value: string | null) =>
 const stamp = (value: string) =>
   new Date(value).toLocaleString("en-IN", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
 
+/** Skeleton placeholder rows shown while a table is loading. */
+function SkeletonRows({ rows, cols }: { rows: number; cols: number }) {
+  return (
+    <>
+      {Array.from({ length: rows }).map((_, r) => (
+        <tr key={`skeleton-${r}`} className="admin-skel-row">
+          {Array.from({ length: cols }).map((__, c) => (
+            <td key={c}><span className="admin-skel" /></td>
+          ))}
+        </tr>
+      ))}
+    </>
+  );
+}
+
+
 function AdminPage() {
   const [user, setUser] = useState<User | null>(null);
   const [checking, setChecking] = useState(true);
@@ -147,16 +163,30 @@ function readTab(): Tab {
 function AdminConsole({ user }: { user: User }) {
   const [tab] = useState<Tab>(readTab);
   const [search, setSearch] = useState("");
+  const [query, setQuery] = useState("");
   const [editing, setEditing] = useState<AdminUser | null>(null);
 
+  // Debounce typing so every keystroke does not hit the database.
+  useEffect(() => {
+    const id = window.setTimeout(() => setQuery(search.trim()), 300);
+    return () => window.clearTimeout(id);
+  }, [search]);
+
   const usersQuery = useQuery({
-    queryKey: ["admin-users"],
+    queryKey: ["admin-users", tab, query],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_list_users");
+      const { data, error } = await supabase.rpc("admin_list_users", {
+        _search: query,
+        _limit: tab === "overview" ? 6 : 200,
+        _plan: tab === "subscriptions" ? "pro" : "",
+      } as never);
       if (error) throw error;
       return (data as unknown as AdminUser[]) ?? [];
     },
-    refetchInterval: 15000,
+    enabled: tab !== "logs",
+    placeholderData: (previous) => previous,
+    staleTime: 20000,
+    refetchInterval: 30000,
   });
 
   const overviewQuery = useQuery({
@@ -166,28 +196,27 @@ function AdminConsole({ user }: { user: User }) {
       if (error) throw error;
       return data as unknown as Overview;
     },
-    refetchInterval: 15000,
+    enabled: tab === "overview",
+    staleTime: 20000,
+    refetchInterval: 30000,
   });
 
   const logsQuery = useQuery({
-    queryKey: ["admin-logs", search],
+    queryKey: ["admin-logs", query],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_payment_logs", { _search: search.trim(), _limit: 300 } as never);
+      const { data, error } = await supabase.rpc("admin_payment_logs", { _search: query, _limit: 200 } as never);
       if (error) throw error;
       return (data as unknown as PaymentLog[]) ?? [];
     },
     enabled: tab === "logs",
-    refetchInterval: 5000,
+    placeholderData: (previous) => previous,
+    refetchInterval: 8000,
   });
 
-  const rows = usersQuery.data ?? [];
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    const base = tab === "subscriptions" ? rows.filter((r) => r.plan === "pro") : rows;
-    if (!q) return base;
-    return base.filter((r) =>
-      `${r.email} ${r.full_name} ${r.mobile}`.toLowerCase().includes(q));
-  }, [rows, search, tab]);
+  const filtered = useMemo(() => usersQuery.data ?? [], [usersQuery.data]);
+  const usersLoading = usersQuery.isPending && tab !== "logs";
+  const logsLoading = logsQuery.isPending && tab === "logs";
+
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -280,9 +309,11 @@ function AdminConsole({ user }: { user: User }) {
                         <td>{log.paid_at ? stamp(log.paid_at) : "—"}</td>
                       </tr>
                     ))}
-                    {(logsQuery.data ?? []).length === 0 ? (
+                    {logsLoading ? <SkeletonRows rows={6} cols={8} /> : null}
+                    {!logsLoading && (logsQuery.data ?? []).length === 0 ? (
                       <tr><td colSpan={8}><div className="console-empty"><p>No payment activity yet</p></div></td></tr>
                     ) : null}
+
                   </tbody>
                 </table>
               </div>
@@ -317,9 +348,11 @@ function AdminConsole({ user }: { user: User }) {
                       <td><Button size="sm" variant="outline" onClick={() => setEditing(row)}>Manage</Button></td>
                     </tr>
                   ))}
-                  {filtered.length === 0 ? (
+                  {usersLoading ? <SkeletonRows rows={5} cols={7} /> : null}
+                  {!usersLoading && filtered.length === 0 ? (
                     <tr><td colSpan={7}><div className="console-empty"><p>No users found</p></div></td></tr>
                   ) : null}
+
                 </tbody>
               </table>
             </div>

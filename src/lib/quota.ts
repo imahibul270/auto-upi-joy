@@ -2,7 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 /** Shown on the Plan page for custom / enterprise requests. */
-export const SALES_CONTACT_PHONE = "+91 00000 00000";
+export const SALES_CONTACT_PHONE = "+91 84720 28929";
+export const SALES_WHATSAPP_URL =
+  "https://wa.me/918472028929?text=" +
+  encodeURIComponent("Hello Auto Upi, I want to know about a custom plan.");
 
 export const PRO_PRICE_INR = 299;
 export const FREE_QR_LIMIT = 3;

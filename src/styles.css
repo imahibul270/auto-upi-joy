@@ -809,3 +809,17 @@ section[id]{scroll-margin-top:var(--header-height)}
   padding: .2rem .5rem; border-radius: 999px;
   background: var(--hero-deep); color: var(--soft-green);
 }
+
+/* Admin skeleton loading rows */
+.admin-skel {
+  display: block;
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(15, 60, 40, .08) 25%, rgba(15, 60, 40, .16) 37%, rgba(15, 60, 40, .08) 63%);
+  background-size: 400% 100%;
+  animation: admin-skel-shimmer 1.3s ease infinite;
+}
+.admin-skel-row td { padding-block: .95rem }
+.admin-skel-row td:nth-child(2n) .admin-skel { width: 70% }
+@keyframes admin-skel-shimmer { 0% { background-position: 100% 50% } 100% { background-position: 0 50% } }
+@media (prefers-reduced-motion: reduce) { .admin-skel { animation: none } }
