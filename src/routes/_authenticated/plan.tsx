@@ -9,8 +9,35 @@ import { useConsoleName } from "@/components/console/useConsoleName";
 import { Button } from "@/components/ui/button";
 import { Swal } from "@/lib/swal";
 import {
-  FREE_QR_LIMIT, PRO_PRICE_INR, PRO_QR_LIMIT, SALES_CONTACT_PHONE, SALES_WHATSAPP_URL, daysLeft, useQrQuota,
+  FREE_QR_LIMIT, PRO_QR_LIMIT, SALES_CONTACT_PHONE, SALES_WHATSAPP_URL, daysLeft, useProPrice, useQrQuota,
 } from "@/lib/quota";
+
+/** Shows a result popup with a live "redirecting" countdown, then reloads the Plan page. */
+function resultThenRedirect(options: { icon: "success" | "error" | "info"; title: string; html?: string; seconds?: number }) {
+  const total = (options.seconds ?? 5) * 1000;
+  return Swal.fire({
+    icon: options.icon,
+    title: options.title,
+    html: `${options.html ? `${options.html}<br/>` : ""}<b class="swal-countdown">Redirecting in ${Math.round(total / 1000)}s…</b>`,
+    timer: total,
+    timerProgressBar: true,
+    showConfirmButton: false,
+    allowOutsideClick: false,
+    didOpen: () => {
+      const node = Swal.getHtmlContainer()?.querySelector(".swal-countdown");
+      const id = window.setInterval(() => {
+        const left = Math.ceil((Swal.getTimerLeft() ?? 0) / 1000);
+        if (node) node.textContent = `Redirecting in ${Math.max(left, 0)}s…`;
+      }, 250);
+      (Swal as unknown as { __countdown?: number }).__countdown = id;
+    },
+    willClose: () => {
+      window.clearInterval((Swal as unknown as { __countdown?: number }).__countdown);
+    },
+  }).then(() => {
+    window.location.href = "/plan";
+  });
+}
 
 export const Route = createFileRoute("/_authenticated/plan")({
   head: () => ({ meta: [
