@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BrandLogo } from "@/components/BrandLogo";
+import { useProPrice } from "@/lib/quota";
 import {
   ArrowRight,
   BarChart3,
