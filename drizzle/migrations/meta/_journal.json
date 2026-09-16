@@ -134,6 +134,13 @@
       "when": 1789530498807,
       "tag": "0018_free_plan_fixed_three_qr",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1789531395638,
+      "tag": "0019_plan_upgrade_orders",
+      "breakpoints": true
     }
   ]
 }

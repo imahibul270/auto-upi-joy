@@ -227,6 +227,39 @@ export type Database = {
         }
         Relationships: []
       }
+      plan_orders: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          order_id: string
+          paid_at: string | null
+          slug: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          order_id: string
+          paid_at?: string | null
+          slug: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          order_id?: string
+          paid_at?: string | null
+          slug?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       processed_emails: {
         Row: {
           amount: number | null
@@ -404,6 +437,7 @@ export type Database = {
         }
         Returns: Json
       }
+      complete_plan_order: { Args: { _order_id: string }; Returns: Json }
       connect_merchant_account: {
         Args: { _app_password: string; _email: string; _provider: string }
         Returns: Json
