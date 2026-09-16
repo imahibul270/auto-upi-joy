@@ -120,6 +120,13 @@
       "when": 1789526482058,
       "tag": "0016_admin_payment_logs",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1789528762496,
+      "tag": "0017_paise_limit_and_fast_admin",
+      "breakpoints": true
     }
   ]
 }
