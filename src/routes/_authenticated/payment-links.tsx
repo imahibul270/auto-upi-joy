@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
+import { PRO_PRICE_INR, useQrQuota } from "@/lib/quota";
 import { useState, type FormEvent } from "react";
 import { Copy, Link2, Sparkles, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -32,21 +33,36 @@ const LINK_ERRORS: Record<string, string> = {
   UPI_NOT_CONFIGURED: "Save a UPI ID on Connect Accounts first.",
   INVALID_AMOUNT: "Enter an amount between ₹1 and ₹10,00,000.",
   ALL_PAYMENT_SLOTS_BUSY: "Too many open links for this amount. Try again in a moment.",
-  QUOTA_EXCEEDED: "Your QR limit is finished. Upgrade to Pro (₹299 / 30 days) from the Plan page to keep generating links.",
 };
 
 function PaymentLinksPage() {
   const { user } = Route.useRouteContext();
   const name = useConsoleName(user);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   usePaymentDetection();
   const { rows: links } = useActiveLinks();
   const { data: accounts = [] } = useMerchantAccounts();
+  const { data: quota } = useQrQuota();
   const [amount, setAmount] = useState("");
   const [customer, setCustomer] = useState("");
   const [creating, setCreating] = useState(false);
 
   const hasUpi = accounts.some((item) => item.upi_id);
+  const quotaOver = quota ? !quota.can_generate : false;
+
+  function showUpgrade() {
+    void Swal.fire({
+      icon: "warning",
+      title: "QR limit finished",
+      text: `Upgrade to Pro for ₹${PRO_PRICE_INR} to keep generating payment links for 30 days.`,
+      showCancelButton: true,
+      confirmButtonText: "Upgrade to Pro",
+      cancelButtonText: "Not now",
+    }).then((result) => {
+      if (result.isConfirmed) void navigate({ to: "/plan" });
+    });
+  }
 
   async function copyLink(slug: string) {
     try {
@@ -59,12 +75,14 @@ function PaymentLinksPage() {
 
   async function generate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (quotaOver) { showUpgrade(); return; }
     setCreating(true);
     try {
       const created = await createPaymentLink({ amount: Number(amount), customerName: customer });
       setAmount("");
       setCustomer("");
       await queryClient.invalidateQueries({ queryKey: ["payment-links"] });
+      await queryClient.invalidateQueries({ queryKey: ["qr-quota"] });
       void Swal.fire({
         icon: "success",
         title: "Payment link ready",
@@ -73,6 +91,8 @@ function PaymentLinksPage() {
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
+      await queryClient.invalidateQueries({ queryKey: ["qr-quota"] });
+      if (message.includes("QUOTA_EXCEEDED")) { showUpgrade(); return; }
       const key = Object.keys(LINK_ERRORS).find((code) => message.includes(code));
       void Swal.fire({ icon: "error", title: "Could not generate link", text: key ? LINK_ERRORS[key] : message });
     } finally {
@@ -102,7 +122,10 @@ function PaymentLinksPage() {
       </section>
 
       <section className="console-card reveal-delay-1" data-reveal>
-        <div className="console-card-head"><h3>Generate link</h3><small>{hasUpi ? "Uses your saved UPI ID" : "Save a UPI ID first"}</small></div>
+        <div className="console-card-head">
+          <h3>Generate link</h3>
+          <small>{quotaOver ? "QR limit finished — upgrade to Pro" : quota ? `${quota.remaining} of ${quota.limit} QR left` : hasUpi ? "Uses your saved UPI ID" : "Save a UPI ID first"}</small>
+        </div>
         <form className="console-link-form" onSubmit={generate}>
           <label className="console-field">
             Amount (₹)
@@ -112,7 +135,11 @@ function PaymentLinksPage() {
             Customer name
             <Input value={customer} onChange={(event) => setCustomer(event.target.value)} placeholder="Aminul" />
           </label>
-          <Button type="submit" disabled={creating || !hasUpi}><Sparkles />{creating ? "Generating…" : "Generate link"}</Button>
+          {quotaOver ? (
+            <Button type="button" onClick={showUpgrade}><Sparkles />Upgrade to Pro</Button>
+          ) : (
+            <Button type="submit" disabled={creating || !hasUpi}><Sparkles />{creating ? "Generating…" : "Generate link"}</Button>
+          )}
         </form>
       </section>
 
