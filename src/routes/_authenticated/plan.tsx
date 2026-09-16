@@ -53,6 +53,7 @@ function PlanPage() {
   const { user } = Route.useRouteContext();
   const name = useConsoleName(user);
   const { data: quota } = useQrQuota();
+  const { data: proPrice = 299 } = useProPrice();
   const queryClient = useQueryClient();
   const start = useServerFn(startProUpgrade);
   const check = useServerFn(checkProUpgrade);
