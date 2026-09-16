@@ -26,13 +26,25 @@ function TransactionsPage() {
   const name = useConsoleName(user);
   usePaymentDetection();
   const { rows } = useTransactions();
+  const [search, setSearch] = useState("");
 
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter((row) => `${row.order_id} ${row.customer_name}`.toLowerCase().includes(q));
+  }, [rows, search]);
 
   return (
     <ConsoleLayout title="Transactions" user={user} userName={name}>
       <section className="console-card reveal-delay-1" data-reveal>
-        <div className="console-card-head"><h3>All transactions</h3><small>Live</small></div>
-        {rows.length === 0 ? (
+        <div className="console-card-head">
+          <h3>All transactions</h3>
+          <div className="console-search">
+            <Search />
+            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search order ID" />
+          </div>
+        </div>
+        {filtered.length === 0 ? (
           <div className="console-empty console-empty-row">
             <Receipt />
             <p>No transactions yet</p>
