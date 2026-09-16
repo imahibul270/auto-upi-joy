@@ -600,7 +600,7 @@ section[id]{scroll-margin-top:var(--header-height)}
 .pay-done-order button svg { width: 18px; height: 18px; }
 @keyframes pay-done-in { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
 @keyframes pay-tick-pop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: scale(1); } }
-@keyframes pay-tick-draw { to { stroke-dashoffset: 0; } }
+@keyframes pay-tick-in { from { opacity: 0; transform: scale(.3); } to { opacity: 1; transform: scale(1); } }
 @keyframes pay-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 @keyframes pay-spin { to { transform: rotate(360deg); } }
 .pay-apps { width: min(230px, 88%); height: 30px; object-fit: contain; margin-top: .6rem; }
