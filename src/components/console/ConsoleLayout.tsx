@@ -65,6 +65,7 @@ export function ConsoleLayout({
               </a>
             ))}
           </nav>
+          <SidePlanChip />
         </div>
         <ProfileSettings user={user} userName={userName} onSignOut={signOut} />
       </aside>
