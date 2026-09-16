@@ -533,8 +533,8 @@ echo "ok";`}
           <section id="faq" className="docs-section">
             <h2>FAQ</h2>
             <div className="docs-faq">
-              <div><strong>Do I need a payment gateway account?</strong><p>No. Money reaches your own UPI account directly; Auto Upi only detects and records the payment.</p></div>
-              <div><strong>What if two customers pay the same amount?</strong><p>They can't — each pending order carries its own unique paise value between ₹0.01 and ₹0.99.</p></div>
+              <div><strong>Do I need a payment gateway account?</strong><p>No. Money reaches your own UPI account directly; Auto Upi only confirms and records the order.</p></div>
+              <div><strong>What if two customers pay the same amount?</strong><p>They can't — each active order carries its own unique <code>payable_amount</code>.</p></div>
               <div><strong>How long is a link valid?</strong><p>5 minutes. After that the order becomes <code>expired</code> and moves to Transactions.</p></div>
               <div><strong>Which PHP version do I need?</strong><p>PHP 7.4 or newer with the cURL extension — no composer package required.</p></div>
               <div><strong>Can I regenerate my API key?</strong><p>Yes. Regenerating issues a new key and instantly disables the previous one.</p></div>
