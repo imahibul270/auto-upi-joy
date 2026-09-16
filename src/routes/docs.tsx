@@ -466,16 +466,6 @@ echo "ok";`}
             </p>
           </section>
 
-          <section id="detection" className="docs-section">
-            <h2>How payment detection works</h2>
-            <div className="docs-grid-2">
-              <div><strong>1. Unique amount</strong><p>Each pending order gets its own paise value (₹0.01–₹0.99 extra), so two orders can never collide on one alert.</p></div>
-              <div><strong>2. Mailbox read</strong><p>Your payment-alert mailbox is read securely with the app password you saved. Nothing is sent back to the browser.</p></div>
-              <div><strong>3. Exact match</strong><p>An alert is credited only when exactly one of your active orders matches the amount. Two candidates means neither is paid.</p></div>
-              <div><strong>4. Dedupe</strong><p>Every alert is claimed by message ID, so a single email can never mark two orders paid or double-credit one.</p></div>
-            </div>
-            <p className="docs-note">Typical capture time is 5–15 seconds from the alert email.</p>
-          </section>
 
           <section id="errors" className="docs-section">
             <h2>Errors</h2>
