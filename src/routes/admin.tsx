@@ -258,6 +258,8 @@ function AdminConsole({ user }: { user: User }) {
 
         <main className="console-body">
           {tab === "overview" ? <ProPriceCard /> : null}
+          {tab === "overview" ? <FreePlanCard /> : null}
+
 
           {tab === "overview" ? (
             <section className="admin-stat-grid">
