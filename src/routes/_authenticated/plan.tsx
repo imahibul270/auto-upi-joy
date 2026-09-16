@@ -101,16 +101,16 @@ function PlanPage() {
             setPaying(false);
             await queryClient.invalidateQueries({ queryKey: ["qr-quota"] });
             Swal.close();
-            void Swal.fire({
+            void resultThenRedirect({
               icon: "success",
-              title: "Pro plan activated",
-              html: `30 days validity · ${PRO_QR_LIMIT.toLocaleString("en-IN")} QR codes are live now.`,
+              title: "Payment successful",
+              html: `Pro is active · ${PRO_QR_LIMIT.toLocaleString("en-IN")} QR codes for 30 days.`,
             });
           } else if (result?.status === "expired") {
             window.clearInterval(id);
             setPaying(false);
             Swal.close();
-            void Swal.fire({ icon: "error", title: "Payment link expired", text: "Please start the upgrade again." });
+            void resultThenRedirect({ icon: "error", title: "Payment failed", html: "The payment link expired." });
           }
         })();
       }, 3000);
