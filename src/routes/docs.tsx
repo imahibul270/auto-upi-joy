@@ -85,11 +85,11 @@ function CodeTabs({ samples }: { samples: { label: string; code: string }[] }) {
 }
 
 function DocsPage() {
-  const [origin, setOrigin] = useState("https://auto-upi-joy.lovable.app");
+  const origin = "https://autoupi.in";
   const [active, setActive] = useState<string>("introduction");
 
   useEffect(() => {
-    setOrigin(window.location.origin);
+
     const sections = NAV.map(([id]) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
     const io = new IntersectionObserver(
       (entries) => {
