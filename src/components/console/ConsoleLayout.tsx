@@ -9,6 +9,7 @@ import type { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { ProfileSettings } from "@/components/console/ProfileSettings";
 import { supabase } from "@/integrations/supabase/client";
+import { daysLeft, useQrQuota } from "@/lib/quota";
 
 export const CONSOLE_MENU = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutGrid },
@@ -64,6 +65,7 @@ export function ConsoleLayout({
               </a>
             ))}
           </nav>
+          <SidePlanChip />
         </div>
         <ProfileSettings user={user} userName={userName} onSignOut={signOut} />
       </aside>
@@ -86,5 +88,26 @@ export function ConsoleLayout({
         <main className="console-body">{children}</main>
       </div>
     </div>
+  );
+}
+
+/** Live plan badge: always shows the plan the user is on right now. */
+function SidePlanChip() {
+  const { data: quota } = useQrQuota();
+  if (!quota) return null;
+  const isPro = quota.plan === "pro";
+  const left = daysLeft(quota.period_end);
+  return (
+    <a href="/plan" className={`console-plan-chip${isPro ? " is-pro" : ""}`}>
+      <span className="console-plan-chip-top">
+        <Sparkles />
+        <strong>{isPro ? "Pro plan" : "Free plan"}</strong>
+        <em>Current</em>
+      </span>
+      <span className="console-plan-chip-meta">
+        {quota.remaining.toLocaleString("en-IN")} of {quota.limit.toLocaleString("en-IN")} QR left
+        {isPro ? ` · ${left} day${left === 1 ? "" : "s"}` : " · no expiry"}
+      </span>
+    </a>
   );
 }

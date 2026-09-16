@@ -30,7 +30,7 @@ export function useQrQuota() {
   return useQuery({
     queryKey: ["qr-quota"],
     queryFn: fetchQrQuota,
-    refetchInterval: 15000,
+    refetchInterval: 8000,
     refetchOnWindowFocus: true,
   });
 }

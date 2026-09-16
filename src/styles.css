@@ -777,3 +777,35 @@ section[id]{scroll-margin-top:var(--header-height)}
 .admin-side-foot .admin-signout { width: 100%; justify-content: center; gap: .4rem; background: var(--soft-green); color: var(--hero-deep); font-weight: 800; border: 0; }
 .admin-side-foot .admin-signout:hover { background: color-mix(in oklab, var(--soft-green) 85%, #fff); color: var(--hero-deep); }
 .admin-side-foot .admin-signout svg { width: .95rem; color: var(--hero-deep); }
+
+/* Live plan badge in the console sidebar */
+.console-plan-chip {
+  display: block;
+  margin: 1rem .35rem .2rem;
+  padding: .6rem .7rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(255, 255, 255, .12);
+  text-decoration: none;
+  transition: background-color .25s ease, border-color .25s ease;
+}
+.console-plan-chip:hover { background: rgba(255, 255, 255, .12); }
+.console-plan-chip.is-pro { border-color: var(--soft-green); background: rgba(190, 242, 100, .12); }
+.console-plan-chip-top { display: flex; align-items: center; gap: .4rem; }
+.console-plan-chip-top svg { width: 15px; height: 15px; color: var(--soft-green); }
+.console-plan-chip-top strong { font-size: .84rem; color: #fff; font-weight: 700; }
+.console-plan-chip-top em {
+  margin-left: auto; font-style: normal; font-size: .6rem; font-weight: 800;
+  letter-spacing: .06em; text-transform: uppercase;
+  padding: .12rem .4rem; border-radius: 999px;
+  background: var(--soft-green); color: var(--hero-deep);
+}
+.console-plan-chip-meta { display: block; margin-top: .3rem; font-size: .72rem; color: rgba(255, 255, 255, .7); }
+
+.console-plan { position: relative; }
+.console-plan-badge {
+  position: absolute; top: .8rem; right: .8rem;
+  font-size: .62rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+  padding: .2rem .5rem; border-radius: 999px;
+  background: var(--hero-deep); color: var(--soft-green);
+}
