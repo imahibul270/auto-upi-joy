@@ -315,6 +315,7 @@ export type Database = {
           expires_at: string | null
           id: string
           plan: Database["public"]["Enums"]["plan_tier"]
+          qr_limit: number | null
           reference: string | null
           started_at: string | null
           updated_at: string
@@ -326,6 +327,7 @@ export type Database = {
           expires_at?: string | null
           id?: string
           plan?: Database["public"]["Enums"]["plan_tier"]
+          qr_limit?: number | null
           reference?: string | null
           started_at?: string | null
           updated_at?: string
@@ -337,6 +339,7 @@ export type Database = {
           expires_at?: string | null
           id?: string
           plan?: Database["public"]["Enums"]["plan_tier"]
+          qr_limit?: number | null
           reference?: string | null
           started_at?: string | null
           updated_at?: string
@@ -357,6 +360,7 @@ export type Database = {
           expires_at: string | null
           id: string
           plan: Database["public"]["Enums"]["plan_tier"]
+          qr_limit: number | null
           reference: string | null
           started_at: string | null
           updated_at: string
@@ -368,6 +372,19 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      admin_list_users: { Args: never; Returns: Json }
+      admin_overview: { Args: never; Returns: Json }
+      admin_set_plan: {
+        Args: {
+          _amount?: number
+          _days?: number
+          _plan: string
+          _qr_limit?: number
+          _reset_usage?: boolean
+          _user: string
+        }
+        Returns: Json
       }
       api_create_payment_link: {
         Args: {
@@ -403,6 +420,7 @@ export type Database = {
       }
       get_public_payment_link: { Args: { _slug: string }; Returns: Json }
       get_qr_quota: { Args: never; Returns: Json }
+      is_platform_admin: { Args: never; Returns: boolean }
       issue_api_key: { Args: { _label?: string }; Returns: Json }
       list_merchant_accounts: { Args: never; Returns: Json }
       new_payment_slug: { Args: never; Returns: string }
