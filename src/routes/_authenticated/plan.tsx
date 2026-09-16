@@ -26,6 +26,14 @@ function PlanPage() {
   const { user } = Route.useRouteContext();
   const name = useConsoleName(user);
   const { data: quota } = useQrQuota();
+  const queryClient = useQueryClient();
+  const start = useServerFn(startProUpgrade);
+  const check = useServerFn(checkProUpgrade);
+  const [paying, setPaying] = useState(false);
+  const timers = useRef<number[]>([]);
+
+  useEffect(() => () => timers.current.forEach((id) => window.clearInterval(id)), []);
+
 
   const isPro = quota?.plan === "pro";
   const used = quota?.used ?? 0;
