@@ -80,7 +80,7 @@ function PlanPage() {
 
       void Swal.fire({
         title: "Waiting for payment…",
-        html: `Order <b>${order.order_id}</b> · pay <b>₹${order.payable_amount.toFixed(2)}</b> in the payment window.<br/>Pro activates automatically the moment the payment is received.`,
+        html: `<b>${order.order_id}</b>`,
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
