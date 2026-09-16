@@ -74,22 +74,24 @@ function PlanPage() {
 
       <section className="console-plan-grid">
         <article className={`console-card console-plan${!isPro ? " is-active" : ""} reveal-delay-1`} data-reveal>
+          {!isPro ? <span className="console-plan-badge">Current plan</span> : null}
           <h3>Free</h3>
           <strong>₹0</strong>
-          <small>{!isPro ? "Current plan" : "Basic"}</small>
+          <small>{!isPro ? `${remaining.toLocaleString("en-IN")} of ${limit.toLocaleString("en-IN")} QR left` : "Basic"}</small>
           <ul>
-            <li><Check />{FREE_QR_LIMIT} QR codes in total</li>
+            <li><Check />{(!isPro ? limit : FREE_QR_LIMIT).toLocaleString("en-IN")} QR codes in total</li>
             <li><Check />Basic analytics</li>
             <li><Check />Email support</li>
           </ul>
         </article>
 
         <article className={`console-card console-plan${isPro ? " is-active" : ""} reveal-delay-2`} data-reveal>
+          {isPro ? <span className="console-plan-badge">Current plan</span> : null}
           <h3>Pro</h3>
           <strong><IndianRupee className="inline-rupee" />{PRO_PRICE_INR}</strong>
-          <small>{isPro ? `Active · ${left} day${left === 1 ? "" : "s"} left` : "per 30 days"}</small>
+          <small>{isPro ? `${left} day${left === 1 ? "" : "s"} left · ${remaining.toLocaleString("en-IN")} QR left` : "per 30 days"}</small>
           <ul>
-            <li><Check />{PRO_QR_LIMIT.toLocaleString("en-IN")} QR codes in 30 days</li>
+            <li><Check />{(isPro ? limit : PRO_QR_LIMIT).toLocaleString("en-IN")} QR codes in 30 days</li>
             <li><Check />Instant activation on payment</li>
             <li><Check />Priority support</li>
           </ul>
