@@ -6,7 +6,11 @@ Everything the app needs on the database side lives in this folder.
 database/
   setup.sql    <- run this once, that's it
   reset.sql    <- optional: wipes app tables (destructive)
+  GUIDE.md     <- full self-hosting guide (admin, payments, API, plans)
 ```
+
+For the complete step-by-step manual (admin panel, payment detection, plans,
+API and webhooks), read **[GUIDE.md](./GUIDE.md)**.
 
 ## 1. Create a Supabase project
 
