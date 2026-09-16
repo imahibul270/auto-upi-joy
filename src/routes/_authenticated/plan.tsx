@@ -180,7 +180,7 @@ function PlanPage() {
           </ul>
           {!isPro ? (
             <Button className="console-plan-cta" onClick={() => void upgrade()} disabled={paying}>
-              {paying ? "Opening payment…" : `Upgrade for ₹${PRO_PRICE_INR}`}
+              {paying ? "Opening payment…" : `Upgrade for ₹${proPrice.toLocaleString("en-IN")}`}
             </Button>
           ) : null}
         </article>
