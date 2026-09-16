@@ -1,5 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import { Check, IndianRupee, Phone } from "lucide-react";
+import { checkProUpgrade, startProUpgrade } from "@/lib/upgrade.functions";
 import { ConsoleLayout } from "@/components/console/ConsoleLayout";
 import { useConsoleName } from "@/components/console/useConsoleName";
 import { Button } from "@/components/ui/button";

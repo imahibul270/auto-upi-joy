@@ -25,6 +25,7 @@ import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/p
 import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
 import { Route as AuthenticatedTransactionsRouteImport } from './routes/_authenticated/transactions'
 import { Route as PaySlugRouteImport } from './routes/pay.$slug'
+import { Route as ApiPublicPlanWebhookRouteImport } from './routes/api/public/plan-webhook'
 import { Route as ApiPublicPaymentsPollRouteImport } from './routes/api/public/payments/poll'
 import { Route as ApiPublicV1CreateOrderRouteImport } from './routes/api/public/v1/create-order'
 import { Route as ApiPublicV1OrderStatusRouteImport } from './routes/api/public/v1/order-status'
@@ -111,6 +112,11 @@ const PaySlugRoute = PaySlugRouteImport.update({
   path: '/pay/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPlanWebhookRoute = ApiPublicPlanWebhookRouteImport.update({
+  id: '/api/public/plan-webhook',
+  path: '/api/public/plan-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPaymentsPollRoute = ApiPublicPaymentsPollRouteImport.update({
   id: '/api/public/payments/poll',
   path: '/api/public/payments/poll',
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/support': typeof AuthenticatedSupportRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
   '/pay/$slug': typeof PaySlugRoute
+  '/api/public/plan-webhook': typeof ApiPublicPlanWebhookRoute
   '/api/public/payments/poll': typeof ApiPublicPaymentsPollRoute
   '/api/public/v1/create-order': typeof ApiPublicV1CreateOrderRoute
   '/api/public/v1/order-status': typeof ApiPublicV1OrderStatusRoute
@@ -163,6 +170,7 @@ export interface FileRoutesByTo {
   '/support': typeof AuthenticatedSupportRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
   '/pay/$slug': typeof PaySlugRoute
+  '/api/public/plan-webhook': typeof ApiPublicPlanWebhookRoute
   '/api/public/payments/poll': typeof ApiPublicPaymentsPollRoute
   '/api/public/v1/create-order': typeof ApiPublicV1CreateOrderRoute
   '/api/public/v1/order-status': typeof ApiPublicV1OrderStatusRoute
@@ -185,6 +193,7 @@ export interface FileRoutesById {
   '/_authenticated/support': typeof AuthenticatedSupportRoute
   '/_authenticated/transactions': typeof AuthenticatedTransactionsRoute
   '/pay/$slug': typeof PaySlugRoute
+  '/api/public/plan-webhook': typeof ApiPublicPlanWebhookRoute
   '/api/public/payments/poll': typeof ApiPublicPaymentsPollRoute
   '/api/public/v1/create-order': typeof ApiPublicV1CreateOrderRoute
   '/api/public/v1/order-status': typeof ApiPublicV1OrderStatusRoute
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/transactions'
     | '/pay/$slug'
+    | '/api/public/plan-webhook'
     | '/api/public/payments/poll'
     | '/api/public/v1/create-order'
     | '/api/public/v1/order-status'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/transactions'
     | '/pay/$slug'
+    | '/api/public/plan-webhook'
     | '/api/public/payments/poll'
     | '/api/public/v1/create-order'
     | '/api/public/v1/order-status'
@@ -248,6 +259,7 @@ export interface FileRouteTypes {
     | '/_authenticated/support'
     | '/_authenticated/transactions'
     | '/pay/$slug'
+    | '/api/public/plan-webhook'
     | '/api/public/payments/poll'
     | '/api/public/v1/create-order'
     | '/api/public/v1/order-status'
@@ -263,6 +275,7 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   PaySlugRoute: typeof PaySlugRoute
+  ApiPublicPlanWebhookRoute: typeof ApiPublicPlanWebhookRoute
   ApiPublicPaymentsPollRoute: typeof ApiPublicPaymentsPollRoute
   ApiPublicV1CreateOrderRoute: typeof ApiPublicV1CreateOrderRoute
   ApiPublicV1OrderStatusRoute: typeof ApiPublicV1OrderStatusRoute
@@ -382,6 +395,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PaySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/plan-webhook': {
+      id: '/api/public/plan-webhook'
+      path: '/api/public/plan-webhook'
+      fullPath: '/api/public/plan-webhook'
+      preLoaderRoute: typeof ApiPublicPlanWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/poll': {
       id: '/api/public/payments/poll'
       path: '/api/public/payments/poll'
@@ -439,6 +459,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   PaySlugRoute: PaySlugRoute,
+  ApiPublicPlanWebhookRoute: ApiPublicPlanWebhookRoute,
   ApiPublicPaymentsPollRoute: ApiPublicPaymentsPollRoute,
   ApiPublicV1CreateOrderRoute: ApiPublicV1CreateOrderRoute,
   ApiPublicV1OrderStatusRoute: ApiPublicV1OrderStatusRoute,
