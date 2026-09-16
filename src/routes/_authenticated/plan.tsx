@@ -1,5 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import { Check, IndianRupee, Phone } from "lucide-react";
+import { checkProUpgrade, startProUpgrade } from "@/lib/upgrade.functions";
 import { ConsoleLayout } from "@/components/console/ConsoleLayout";
 import { useConsoleName } from "@/components/console/useConsoleName";
 import { Button } from "@/components/ui/button";
@@ -22,6 +26,14 @@ function PlanPage() {
   const { user } = Route.useRouteContext();
   const name = useConsoleName(user);
   const { data: quota } = useQrQuota();
+  const queryClient = useQueryClient();
+  const start = useServerFn(startProUpgrade);
+  const check = useServerFn(checkProUpgrade);
+  const [paying, setPaying] = useState(false);
+  const timers = useRef<number[]>([]);
+
+  useEffect(() => () => timers.current.forEach((id) => window.clearInterval(id)), []);
+
 
   const isPro = quota?.plan === "pro";
   const used = quota?.used ?? 0;
@@ -30,13 +42,62 @@ function PlanPage() {
   const pct = limit > 0 ? Math.min(Math.round((used / limit) * 100), 100) : 0;
   const left = daysLeft(quota?.period_end ?? null);
 
-  function upgrade() {
-    void Swal.fire({
-      icon: "info",
-      title: `Pro plan — ₹${PRO_PRICE_INR}`,
-      html: `30 days validity · ${PRO_QR_LIMIT.toLocaleString("en-IN")} QR codes.<br/>Online payment is being set up. To activate now, message us on WhatsApp <b>${SALES_CONTACT_PHONE}</b>.`,
-      confirmButtonText: "OK",
-    });
+  async function upgrade() {
+    if (paying) return;
+    setPaying(true);
+    const tab = window.open("", "_blank");
+    try {
+      const order = await start({ data: { origin: window.location.origin } });
+      if (tab) tab.location.href = order.payment_url;
+      else window.location.href = order.payment_url;
+
+      void Swal.fire({
+        title: "Waiting for payment…",
+        html: `Order <b>${order.order_id}</b> · pay <b>₹${order.payable_amount.toFixed(2)}</b> in the payment window.<br/>Pro activates automatically the moment the payment is received.`,
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      const started = Date.now();
+      const id = window.setInterval(() => {
+        void (async () => {
+          if (Date.now() - started > 6 * 60 * 1000) {
+            window.clearInterval(id);
+            setPaying(false);
+            Swal.close();
+            void Swal.fire({ icon: "info", title: "Payment window closed", text: "If you paid, your plan will update shortly." });
+            return;
+          }
+          const result = await check({ data: { order_id: order.order_id } }).catch(() => null);
+          if (result?.status === "paid") {
+            window.clearInterval(id);
+            setPaying(false);
+            await queryClient.invalidateQueries({ queryKey: ["qr-quota"] });
+            Swal.close();
+            void Swal.fire({
+              icon: "success",
+              title: "Pro plan activated",
+              html: `30 days validity · ${PRO_QR_LIMIT.toLocaleString("en-IN")} QR codes are live now.`,
+            });
+          } else if (result?.status === "expired") {
+            window.clearInterval(id);
+            setPaying(false);
+            Swal.close();
+            void Swal.fire({ icon: "error", title: "Payment link expired", text: "Please start the upgrade again." });
+          }
+        })();
+      }, 3000);
+      timers.current.push(id);
+    } catch (error) {
+      tab?.close();
+      setPaying(false);
+      Swal.close();
+      void Swal.fire({
+        icon: "error",
+        title: "Could not start payment",
+        html: `${error instanceof Error ? error.message : String(error)}<br/>Need help? WhatsApp <b>${SALES_CONTACT_PHONE}</b>.`,
+      });
+    }
   }
 
   function contactSales() {
@@ -91,7 +152,9 @@ function PlanPage() {
             <li><Check />Priority support</li>
           </ul>
           {!isPro ? (
-            <Button className="console-plan-cta" onClick={upgrade}>Upgrade for ₹{PRO_PRICE_INR}</Button>
+            <Button className="console-plan-cta" onClick={() => void upgrade()} disabled={paying}>
+              {paying ? "Opening payment…" : `Upgrade for ₹${PRO_PRICE_INR}`}
+            </Button>
           ) : null}
         </article>
 
