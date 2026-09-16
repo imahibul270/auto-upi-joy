@@ -257,6 +257,8 @@ function AdminConsole({ user }: { user: User }) {
         </header>
 
         <main className="console-body">
+          {tab === "overview" ? <ProPriceCard /> : null}
+
           {tab === "overview" ? (
             <section className="admin-stat-grid">
               {[
@@ -446,5 +448,58 @@ function ManageUserDialog({ row, onClose, onSaved }: { row: AdminUser; onClose: 
         </footer>
       </div>
     </div>
+  );
+}
+
+/** Live Pro plan price control. Saving updates the price everywhere instantly. */
+function ProPriceCard() {
+  const priceQuery = useQuery({
+    queryKey: ["admin-pro-price"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_pro_price" as never);
+      if (error) throw error;
+      return Number(data ?? 299);
+    },
+    refetchInterval: 15000,
+  });
+  const [value, setValue] = useState("");
+  const [busy, setBusy] = useState(false);
+  const current = priceQuery.data ?? 299;
+
+  useEffect(() => {
+    if (priceQuery.data != null) setValue(String(priceQuery.data));
+  }, [priceQuery.data]);
+
+  async function save() {
+    const price = Number(value);
+    if (!Number.isFinite(price) || price < 1) {
+      void Swal.fire({ icon: "error", title: "Enter a valid price", confirmButtonText: "OK" });
+      return;
+    }
+    setBusy(true);
+    const { error } = await supabase.rpc("admin_set_pro_price" as never, { _price: price } as never);
+    setBusy(false);
+    if (error) {
+      void Swal.fire({ icon: "error", title: "Could not update price", text: error.message, confirmButtonText: "OK" });
+      return;
+    }
+    await priceQuery.refetch();
+    void Swal.fire({ icon: "success", title: `Pro price set to ₹${price}`, timer: 1300, showConfirmButton: false });
+  }
+
+  return (
+    <section className="console-card admin-price-card reveal-delay-1" data-reveal>
+      <div className="console-card-head">
+        <h3>Pro plan price</h3>
+        <span className="console-live"><i />Live · {inr(current)}</span>
+      </div>
+      <div className="admin-price-row">
+        <label className="console-field">Price (₹ per 30 days)
+          <Input type="number" min={1} value={value} onChange={(e) => setValue(e.target.value)} />
+        </label>
+        <Button onClick={() => void save()} disabled={busy}>{busy ? "Saving…" : "Update price"}</Button>
+      </div>
+      <small>New price applies instantly on the landing page, Plan page and every upgrade payment.</small>
+    </section>
   );
 }

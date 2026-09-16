@@ -9,8 +9,35 @@ import { useConsoleName } from "@/components/console/useConsoleName";
 import { Button } from "@/components/ui/button";
 import { Swal } from "@/lib/swal";
 import {
-  FREE_QR_LIMIT, PRO_PRICE_INR, PRO_QR_LIMIT, SALES_CONTACT_PHONE, SALES_WHATSAPP_URL, daysLeft, useQrQuota,
+  FREE_QR_LIMIT, PRO_QR_LIMIT, SALES_CONTACT_PHONE, SALES_WHATSAPP_URL, daysLeft, useProPrice, useQrQuota,
 } from "@/lib/quota";
+
+/** Shows a result popup with a live "redirecting" countdown, then reloads the Plan page. */
+function resultThenRedirect(options: { icon: "success" | "error" | "info"; title: string; html?: string; seconds?: number }) {
+  const total = (options.seconds ?? 5) * 1000;
+  return Swal.fire({
+    icon: options.icon,
+    title: options.title,
+    html: `${options.html ? `${options.html}<br/>` : ""}<b class="swal-countdown">Redirecting in ${Math.round(total / 1000)}s…</b>`,
+    timer: total,
+    timerProgressBar: true,
+    showConfirmButton: false,
+    allowOutsideClick: false,
+    didOpen: () => {
+      const node = Swal.getHtmlContainer()?.querySelector(".swal-countdown");
+      const id = window.setInterval(() => {
+        const left = Math.ceil((Swal.getTimerLeft() ?? 0) / 1000);
+        if (node) node.textContent = `Redirecting in ${Math.max(left, 0)}s…`;
+      }, 250);
+      (Swal as unknown as { __countdown?: number }).__countdown = id;
+    },
+    willClose: () => {
+      window.clearInterval((Swal as unknown as { __countdown?: number }).__countdown);
+    },
+  }).then(() => {
+    window.location.href = "/plan";
+  });
+}
 
 export const Route = createFileRoute("/_authenticated/plan")({
   head: () => ({ meta: [
@@ -26,6 +53,7 @@ function PlanPage() {
   const { user } = Route.useRouteContext();
   const name = useConsoleName(user);
   const { data: quota } = useQrQuota();
+  const { data: proPrice = 299 } = useProPrice();
   const queryClient = useQueryClient();
   const start = useServerFn(startProUpgrade);
   const check = useServerFn(checkProUpgrade);
@@ -53,7 +81,7 @@ function PlanPage() {
 
       void Swal.fire({
         title: "Waiting for payment…",
-        html: `Order <b>${order.order_id}</b> · pay <b>₹${order.payable_amount.toFixed(2)}</b> in the payment window.<br/>Pro activates automatically the moment the payment is received.`,
+        html: `<b>${order.order_id}</b>`,
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -65,7 +93,7 @@ function PlanPage() {
             window.clearInterval(id);
             setPaying(false);
             Swal.close();
-            void Swal.fire({ icon: "info", title: "Payment window closed", text: "If you paid, your plan will update shortly." });
+            void resultThenRedirect({ icon: "info", title: "Payment window closed" });
             return;
           }
           const result = await check({ data: { order_id: order.order_id } }).catch(() => null);
@@ -74,16 +102,16 @@ function PlanPage() {
             setPaying(false);
             await queryClient.invalidateQueries({ queryKey: ["qr-quota"] });
             Swal.close();
-            void Swal.fire({
+            void resultThenRedirect({
               icon: "success",
-              title: "Pro plan activated",
-              html: `30 days validity · ${PRO_QR_LIMIT.toLocaleString("en-IN")} QR codes are live now.`,
+              title: "Payment successful",
+              html: `Pro is active · ${PRO_QR_LIMIT.toLocaleString("en-IN")} QR codes for 30 days.`,
             });
           } else if (result?.status === "expired") {
             window.clearInterval(id);
             setPaying(false);
             Swal.close();
-            void Swal.fire({ icon: "error", title: "Payment link expired", text: "Please start the upgrade again." });
+            void resultThenRedirect({ icon: "error", title: "Payment failed", html: "The payment link expired." });
           }
         })();
       }, 3000);
@@ -144,7 +172,7 @@ function PlanPage() {
         <article className={`console-card console-plan${isPro ? " is-active" : ""} reveal-delay-2`} data-reveal>
           {isPro ? <span className="console-plan-badge">Current plan</span> : null}
           <h3>Pro</h3>
-          <strong><IndianRupee className="inline-rupee" />{PRO_PRICE_INR}</strong>
+          <strong><IndianRupee className="inline-rupee" />{proPrice.toLocaleString("en-IN")}</strong>
           <small>{isPro ? `${left} day${left === 1 ? "" : "s"} left · ${remaining.toLocaleString("en-IN")} QR left` : "per 30 days"}</small>
           <ul>
             <li><Check />{(isPro ? limit : PRO_QR_LIMIT).toLocaleString("en-IN")} QR codes in 30 days</li>
@@ -153,7 +181,7 @@ function PlanPage() {
           </ul>
           {!isPro ? (
             <Button className="console-plan-cta" onClick={() => void upgrade()} disabled={paying}>
-              {paying ? "Opening payment…" : `Upgrade for ₹${PRO_PRICE_INR}`}
+              {paying ? "Opening payment…" : `Upgrade for ₹${proPrice.toLocaleString("en-IN")}`}
             </Button>
           ) : null}
         </article>
