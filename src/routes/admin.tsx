@@ -258,6 +258,8 @@ function AdminConsole({ user }: { user: User }) {
 
         <main className="console-body">
           {tab === "overview" ? <ProPriceCard /> : null}
+          {tab === "overview" ? <FreePlanCard /> : null}
+
 
           {tab === "overview" ? (
             <section className="admin-stat-grid">
@@ -451,8 +453,63 @@ function ManageUserDialog({ row, onClose, onSaved }: { row: AdminUser; onClose: 
   );
 }
 
+/** Free plan on/off switch. When off, only paid Pro accounts can work. */
+function FreePlanCard() {
+  const stateQuery = useQuery({
+    queryKey: ["admin-free-plan"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("is_free_plan_enabled" as never);
+      if (error) throw error;
+      return Boolean(data);
+    },
+    refetchInterval: 15000,
+  });
+  const [busy, setBusy] = useState(false);
+  const enabled = stateQuery.data ?? true;
+
+  async function toggle(next: boolean) {
+    setBusy(true);
+    const { error } = await supabase.rpc("admin_set_free_plan_enabled" as never, { _enabled: next } as never);
+    setBusy(false);
+    if (error) {
+      void Swal.fire({ icon: "error", title: "Could not update", text: error.message, confirmButtonText: "OK" });
+      return;
+    }
+    await stateQuery.refetch();
+    void Swal.fire({
+      icon: "success",
+      title: next ? "Free plan enabled" : "Free plan disabled",
+      text: next ? "Free users get 3 QR codes again." : "Only paid Pro users can create QR codes now.",
+      timer: 1600,
+      showConfirmButton: false,
+    });
+  }
+
+  return (
+    <section className="console-card admin-price-card reveal-delay-1" data-reveal>
+      <div className="console-card-head">
+        <h3>Free plan</h3>
+        <span className="console-live"><i />{enabled ? "Enabled" : "Disabled"}</span>
+      </div>
+      <div className="admin-price-row">
+        <label className="admin-check">
+          <input
+            type="checkbox"
+            checked={enabled}
+            disabled={busy || stateQuery.isPending}
+            onChange={(e) => void toggle(e.target.checked)}
+          />
+          Allow the free plan (3 QR codes)
+        </label>
+      </div>
+      <small>Turn this off to make Auto Upi paid-only — free accounts cannot create any QR code until they upgrade.</small>
+    </section>
+  );
+}
+
 /** Live Pro plan price control. Saving updates the price everywhere instantly. */
 function ProPriceCard() {
+
   const priceQuery = useQuery({
     queryKey: ["admin-pro-price"],
     queryFn: async () => {
