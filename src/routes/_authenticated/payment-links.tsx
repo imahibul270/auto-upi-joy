@@ -122,7 +122,10 @@ function PaymentLinksPage() {
       </section>
 
       <section className="console-card reveal-delay-1" data-reveal>
-        <div className="console-card-head"><h3>Generate link</h3><small>{hasUpi ? "Uses your saved UPI ID" : "Save a UPI ID first"}</small></div>
+        <div className="console-card-head">
+          <h3>Generate link</h3>
+          <small>{quotaOver ? "QR limit finished — upgrade to Pro" : quota ? `${quota.remaining} of ${quota.limit} QR left` : hasUpi ? "Uses your saved UPI ID" : "Save a UPI ID first"}</small>
+        </div>
         <form className="console-link-form" onSubmit={generate}>
           <label className="console-field">
             Amount (₹)
