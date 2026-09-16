@@ -89,35 +89,52 @@ function PlanPage() {
       });
 
       const started = Date.now();
-      const id = window.setInterval(() => {
-        void (async () => {
-          if (Date.now() - started > 6 * 60 * 1000) {
-            window.clearInterval(id);
-            setPaying(false);
-            Swal.close();
-            void resultThenRedirect({ icon: "info", title: "Payment window closed" });
-            return;
-          }
-          const result = await check({ data: { order_id: order.order_id } }).catch(() => null);
-          if (result?.status === "paid") {
-            window.clearInterval(id);
-            setPaying(false);
-            await queryClient.invalidateQueries({ queryKey: ["qr-quota"] });
-            Swal.close();
+      let done = false;
+      let onMessage: ((event: MessageEvent) => void) | null = null;
+
+      const finish = (run: () => void) => {
+        if (done) return;
+        done = true;
+        window.clearInterval(id);
+        if (onMessage) window.removeEventListener("message", onMessage);
+        setPaying(false);
+        Swal.close();
+        run();
+      };
+
+      const tick = async () => {
+        if (done) return;
+        if (Date.now() - started > 6 * 60 * 1000) {
+          finish(() => void resultThenRedirect({ icon: "info", title: "Payment window closed" }));
+          return;
+        }
+        const result = await check({ data: { order_id: order.order_id } }).catch(() => null);
+        if (result?.status === "paid") {
+          await queryClient.invalidateQueries({ queryKey: ["qr-quota"] });
+          finish(() =>
             void resultThenRedirect({
               icon: "success",
               title: "Payment successful",
               html: `Pro is active · ${PRO_QR_LIMIT.toLocaleString("en-IN")} QR codes for 30 days.`,
-            });
-          } else if (result?.status === "expired") {
-            window.clearInterval(id);
-            setPaying(false);
-            Swal.close();
-            void resultThenRedirect({ icon: "error", title: "Payment failed", html: "The payment link expired." });
-          }
-        })();
-      }, 3000);
+            }),
+          );
+        } else if (result?.status === "expired") {
+          finish(() => void resultThenRedirect({ icon: "error", title: "Payment failed", html: "The payment link expired." }));
+        }
+      };
+
+      const id = window.setInterval(() => void tick(), 3000);
       timers.current.push(id);
+
+      // The payment tab tells us the moment it finishes, so we don't wait for the next poll.
+      onMessage = (event: MessageEvent) => {
+        if (event.origin !== window.location.origin) return;
+        const data = event.data as { type?: string; order_id?: string } | null;
+        if (!data || data.order_id !== order.order_id) return;
+        if (data.type === "autoupi:paid" || data.type === "autoupi:expired") void tick();
+      };
+      window.addEventListener("message", onMessage);
+
     } catch (error) {
       tab?.close();
       setPaying(false);
