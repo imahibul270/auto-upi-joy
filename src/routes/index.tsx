@@ -63,6 +63,12 @@ const plans = [
   { name: "Custom", price: "Talk to us", suffix: "for higher volume", items: ["Custom QR limits", "Dedicated settlements", "Account manager"] },
 ];
 
+/** Sales / support WhatsApp with a pre-filled message. */
+const SUPPORT_WHATSAPP_URL =
+  "https://wa.me/918472028929?text=" +
+  encodeURIComponent("Hello Auto Upi, I want to know about a custom plan.");
+
+
 function BrandMark() {
   return <BrandLogo />;
 }
