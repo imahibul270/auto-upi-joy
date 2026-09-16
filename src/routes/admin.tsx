@@ -341,7 +341,7 @@ function AdminConsole({ user }: { user: User }) {
                       <td>
                         <div className="admin-user-cell">
                           <strong>{row.full_name || row.email.split("@")[0]}</strong>
-                          <small>{row.email}</small>
+                          <small>{row.mobile || "—"}</small>
                         </div>
                       </td>
                       <td><span className={`console-pill ${row.plan === "pro" ? "is-paid" : "is-muted"}`}>{row.plan.toUpperCase()}</span></td>
