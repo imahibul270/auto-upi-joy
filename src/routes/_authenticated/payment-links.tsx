@@ -33,21 +33,36 @@ const LINK_ERRORS: Record<string, string> = {
   UPI_NOT_CONFIGURED: "Save a UPI ID on Connect Accounts first.",
   INVALID_AMOUNT: "Enter an amount between ₹1 and ₹10,00,000.",
   ALL_PAYMENT_SLOTS_BUSY: "Too many open links for this amount. Try again in a moment.",
-  QUOTA_EXCEEDED: "Your QR limit is finished. Upgrade to Pro (₹299 / 30 days) from the Plan page to keep generating links.",
 };
 
 function PaymentLinksPage() {
   const { user } = Route.useRouteContext();
   const name = useConsoleName(user);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   usePaymentDetection();
   const { rows: links } = useActiveLinks();
   const { data: accounts = [] } = useMerchantAccounts();
+  const { data: quota } = useQrQuota();
   const [amount, setAmount] = useState("");
   const [customer, setCustomer] = useState("");
   const [creating, setCreating] = useState(false);
 
   const hasUpi = accounts.some((item) => item.upi_id);
+  const quotaOver = quota ? !quota.can_generate : false;
+
+  function showUpgrade() {
+    void Swal.fire({
+      icon: "warning",
+      title: "QR limit finished",
+      text: `Upgrade to Pro for ₹${PRO_PRICE_INR} to keep generating payment links for 30 days.`,
+      showCancelButton: true,
+      confirmButtonText: "Upgrade to Pro",
+      cancelButtonText: "Not now",
+    }).then((result) => {
+      if (result.isConfirmed) void navigate({ to: "/plan" });
+    });
+  }
 
   async function copyLink(slug: string) {
     try {
