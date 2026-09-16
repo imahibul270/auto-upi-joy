@@ -332,9 +332,11 @@ function AdminConsole({ user }: { user: User }) {
                       <td><Button size="sm" variant="outline" onClick={() => setEditing(row)}>Manage</Button></td>
                     </tr>
                   ))}
-                  {filtered.length === 0 ? (
+                  {usersLoading ? <SkeletonRows rows={5} cols={7} /> : null}
+                  {!usersLoading && filtered.length === 0 ? (
                     <tr><td colSpan={7}><div className="console-empty"><p>No users found</p></div></td></tr>
                   ) : null}
+
                 </tbody>
               </table>
             </div>
