@@ -135,7 +135,11 @@ function PaymentLinksPage() {
             Customer name
             <Input value={customer} onChange={(event) => setCustomer(event.target.value)} placeholder="Aminul" />
           </label>
-          <Button type="submit" disabled={creating || !hasUpi}><Sparkles />{creating ? "Generating…" : "Generate link"}</Button>
+          {quotaOver ? (
+            <Button type="button" onClick={showUpgrade}><Sparkles />Upgrade to Pro</Button>
+          ) : (
+            <Button type="submit" disabled={creating || !hasUpi}><Sparkles />{creating ? "Generating…" : "Generate link"}</Button>
+          )}
         </form>
       </section>
 
