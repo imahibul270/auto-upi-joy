@@ -493,7 +493,7 @@ echo "ok";`}
                   <li><Check /> 3 payment QR codes total</li>
                   <li><Check /> 1 merchant account</li>
                   <li><Check /> Full REST API access</li>
-                  <li><Check /> Email payment detection</li>
+                  <li><Check /> Automatic payment confirmation</li>
                 </ul>
                 <Link className="docs-btn" to="/register">Create account</Link>
               </div>
