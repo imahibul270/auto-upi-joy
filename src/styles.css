@@ -761,3 +761,8 @@ section[id]{scroll-margin-top:var(--header-height)}
 .admin-modal-meta { display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; font-size: .72rem; color: var(--muted-foreground); }
 .admin-modal footer { display: flex; justify-content: end; gap: .6rem; }
 @media (max-width: 620px) { .admin-modal-grid { grid-template-columns: 1fr; } }
+
+/* Admin sidebar sign-out stays clearly visible on the dark green rail. */
+.admin-side-foot .admin-signout { width: 100%; justify-content: center; gap: .4rem; background: var(--soft-green); color: var(--hero-deep); font-weight: 800; border: 0; }
+.admin-side-foot .admin-signout:hover { background: color-mix(in oklab, var(--soft-green) 85%, #fff); color: var(--hero-deep); }
+.admin-side-foot .admin-signout svg { width: .95rem; color: var(--hero-deep); }
