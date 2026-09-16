@@ -4,6 +4,14 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const PRO_PRICE = 299;
 
+/** Reads the live Pro price set from the admin panel. */
+async function proPrice(): Promise<number> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data } = await (supabaseAdmin as any).rpc("get_pro_price");
+  const price = Number(data);
+  return Number.isFinite(price) && price > 0 ? price : PRO_PRICE;
+}
+
 function safeOrigin(origin: string): string | null {
   try {
     const url = new URL(origin);
