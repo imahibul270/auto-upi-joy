@@ -171,7 +171,7 @@ function PlanPage() {
         <article className={`console-card console-plan${isPro ? " is-active" : ""} reveal-delay-2`} data-reveal>
           {isPro ? <span className="console-plan-badge">Current plan</span> : null}
           <h3>Pro</h3>
-          <strong><IndianRupee className="inline-rupee" />{PRO_PRICE_INR}</strong>
+          <strong><IndianRupee className="inline-rupee" />{proPrice.toLocaleString("en-IN")}</strong>
           <small>{isPro ? `${left} day${left === 1 ? "" : "s"} left · ${remaining.toLocaleString("en-IN")} QR left` : "per 30 days"}</small>
           <ul>
             <li><Check />{(isPro ? limit : PRO_QR_LIMIT).toLocaleString("en-IN")} QR codes in 30 days</li>
