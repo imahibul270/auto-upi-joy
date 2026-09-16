@@ -524,6 +524,17 @@ section[id]{scroll-margin-top:var(--header-height)}
 }
 .console-table td { padding: .75rem .7rem; border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent); vertical-align: middle; }
 .console-table tr:last-child td { border-bottom: 0; }
+.console-table tbody tr { transition: background-color .25s ease, box-shadow .25s ease, transform .25s ease; }
+.console-table tbody tr:hover {
+  background: color-mix(in oklab, oklch(.6 .17 145) 8%, transparent);
+  box-shadow: inset 3px 0 0 oklch(.6 .17 145);
+  transform: translateY(-1px);
+}
+@media (prefers-reduced-motion: reduce) { .console-table tbody tr { transition: none; } .console-table tbody tr:hover { transform: none; } }
+.console-search { display: flex; align-items: center; gap: .4rem; padding: .35rem .65rem; border: 1px solid var(--border); border-radius: .6rem; background: var(--background); }
+.console-search svg { width: .9rem; color: var(--muted-foreground); }
+.console-search input { border: 0; outline: 0; background: transparent; font-size: .78rem; width: min(230px, 40vw); }
+.console-support-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .9rem; }
 .console-cell-customer { color: oklch(.55 .12 55); font-weight: 600; }
 .console-paid-count { color: oklch(.5 .14 152); }
 .console-secret { display: inline-flex; align-items: center; gap: .4rem; }
