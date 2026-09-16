@@ -55,12 +55,12 @@ function TransactionsPage() {
             <table className="console-table">
               <thead>
                 <tr>
-                  <th>ORDER ID</th><th>CUSTOMER</th><th>PAYER</th><th>AMOUNT</th>
+                  <th>ORDER ID</th><th>CUSTOMER</th><th>AMOUNT</th>
                   <th>STATUS</th><th>DETECTED IN</th><th>TIME</th>
                 </tr>
               </thead>
               <tbody>
-                {rows.map((row) => {
+                {filtered.map((row) => {
                   const seconds = detectionSeconds(row);
                   return (
                     <tr key={row.id}>
