@@ -47,8 +47,8 @@ function TransactionsPage() {
         {filtered.length === 0 ? (
           <div className="console-empty console-empty-row">
             <Receipt />
-            <p>No transactions yet</p>
-            <small>Once a payment is detected or a link expires, it appears here.</small>
+            <p>{search.trim() ? "No matching transaction" : "No transactions yet"}</p>
+            <small>{search.trim() ? "Check the order ID and try again." : "Once a payment is detected or a link expires, it appears here."}</small>
           </div>
         ) : (
           <div className="console-table-wrap">
