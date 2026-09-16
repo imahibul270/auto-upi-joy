@@ -39,11 +39,13 @@ export const startProUpgrade = createServerFn({ method: "POST" })
     const apiKey = process.env["AUTOUPI_PLATFORM_API_KEY"];
     if (!apiKey) throw new Error("Payment gateway is not configured yet.");
 
+    const price = await proPrice();
+
     const response = await fetch(`${origin}/api/public/v1/create-order`, {
       method: "POST",
       headers: { "content-type": "application/json", "x-api-key": apiKey },
       body: JSON.stringify({
-        amount: PRO_PRICE,
+        amount: price,
         customer_name: (context.claims as { email?: string } | null)?.email ?? "Auto Upi user",
         link_type: "one_time",
         webhook_url: `${origin}/api/public/plan-webhook`,
