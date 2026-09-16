@@ -497,6 +497,10 @@ export type Database = {
       issue_api_key: { Args: { _label?: string }; Returns: Json }
       list_merchant_accounts: { Args: never; Returns: Json }
       new_payment_slug: { Args: never; Returns: string }
+      quota_window_start: {
+        Args: { s: Database["public"]["Tables"]["subscriptions"]["Row"] }
+        Returns: string
+      }
       record_detected_payment: {
         Args: {
           _amount: number

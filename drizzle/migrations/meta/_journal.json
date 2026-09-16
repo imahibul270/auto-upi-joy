@@ -148,6 +148,13 @@
       "when": 1789533829290,
       "tag": "0020_platform_plan_price_setting",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1789534262989,
+      "tag": "0021_fix_qr_quota_enforcement",
+      "breakpoints": true
     }
   ]
 }
