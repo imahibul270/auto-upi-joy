@@ -836,3 +836,8 @@ section[id]{scroll-margin-top:var(--header-height)}
 .admin-skel-row td:nth-child(2n) .admin-skel { width: 70% }
 @keyframes admin-skel-shimmer { 0% { background-position: 100% 50% } 100% { background-position: 0 50% } }
 @media (prefers-reduced-motion: reduce) { .admin-skel { animation: none } }
+
+/* Admin: Pro plan price control */
+.admin-price-card { margin-bottom: 18px; }
+.admin-price-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+.admin-price-row .console-field { max-width: 240px; flex: 1 1 200px; }
