@@ -116,6 +116,26 @@ function PayPage() {
 
   const status = processing ? "active" : shownStatus ?? link?.status ?? "active";
 
+  // Tabs opened by our own upgrade flow tell the opener and then close themselves.
+  const [closeBlocked, setCloseBlocked] = useState(false);
+  useEffect(() => {
+    if (!link || (status !== "paid" && status !== "expired")) return;
+    const opener = typeof window !== "undefined" ? window.opener : null;
+    if (!opener) return;
+    try {
+      opener.postMessage(
+        { type: status === "paid" ? "autoupi:paid" : "autoupi:expired", order_id: link.order_id },
+        window.location.origin,
+      );
+    } catch { /* opener gone */ }
+    const id = window.setTimeout(() => {
+      window.close();
+      window.setTimeout(() => setCloseBlocked(true), 400);
+    }, 2000);
+    return () => window.clearTimeout(id);
+  }, [link, status]);
+
+
   const copyOrder = async () => {
     if (!link) return;
     try {
