@@ -152,7 +152,9 @@ function PlanPage() {
             <li><Check />Priority support</li>
           </ul>
           {!isPro ? (
-            <Button className="console-plan-cta" onClick={upgrade}>Upgrade for ₹{PRO_PRICE_INR}</Button>
+            <Button className="console-plan-cta" onClick={() => void upgrade()} disabled={paying}>
+              {paying ? "Opening payment…" : `Upgrade for ₹${PRO_PRICE_INR}`}
+            </Button>
           ) : null}
         </article>
 
