@@ -128,8 +128,8 @@ function DocsPage() {
             <h1>Auto Upi API documentation</h1>
             <p>
               Auto Upi is a self-serve UPI collection gateway. Create an order from your server, send the customer to the
-              hosted checkout page, and the payment is confirmed automatically from your own bank alert email — no
-              commission, no reconciliation, money straight into your UPI account.
+              hosted checkout page, and the order is confirmed automatically — no commission, no reconciliation, money
+              straight into your UPI account.
             </p>
             <div className="docs-quick">
               <a href="#quickstart">Quickstart</a>
