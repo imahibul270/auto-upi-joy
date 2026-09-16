@@ -92,7 +92,7 @@ function PlanPage() {
             window.clearInterval(id);
             setPaying(false);
             Swal.close();
-            void Swal.fire({ icon: "info", title: "Payment window closed", text: "If you paid, your plan will update shortly." });
+            void resultThenRedirect({ icon: "info", title: "Payment window closed" });
             return;
           }
           const result = await check({ data: { order_id: order.order_id } }).catch(() => null);
