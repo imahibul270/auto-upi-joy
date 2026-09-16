@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
-import { CheckCircle2, ChevronDown, Link2Off, Mail, Plug, Wallet } from "lucide-react";
+import { CheckCircle2, ChevronDown, Link2Off, Mail, Plug, PlayCircle, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ConsoleLayout } from "@/components/console/ConsoleLayout";
@@ -210,6 +210,13 @@ function ConnectAccountsPage() {
               {connected ? (
                 <Button type="button" variant="outline" onClick={removeConnection}><Link2Off />Disconnect</Button>
               ) : null}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => window.open("https://youtu.be/PkpJO2-bS98", "_blank", "noopener,noreferrer")}
+              >
+                <PlayCircle />Watch
+              </Button>
             </div>
 
           </form>
