@@ -9,6 +9,7 @@ import type { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { ProfileSettings } from "@/components/console/ProfileSettings";
 import { supabase } from "@/integrations/supabase/client";
+import { daysLeft, useQrQuota } from "@/lib/quota";
 
 export const CONSOLE_MENU = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutGrid },
