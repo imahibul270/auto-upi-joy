@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { PRO_PRICE_INR, useQrQuota } from "@/lib/quota";
+import { useProPrice, useQrQuota } from "@/lib/quota";
 import { useState, type FormEvent } from "react";
 import { Copy, Link2, Sparkles, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -44,6 +44,7 @@ function PaymentLinksPage() {
   const { rows: links } = useActiveLinks();
   const { data: accounts = [] } = useMerchantAccounts();
   const { data: quota } = useQrQuota();
+  const { data: proPrice = 299 } = useProPrice();
   const [amount, setAmount] = useState("");
   const [customer, setCustomer] = useState("");
   const [creating, setCreating] = useState(false);
@@ -55,7 +56,7 @@ function PaymentLinksPage() {
     void Swal.fire({
       icon: "warning",
       title: "QR limit finished",
-      text: `Upgrade to Pro for ₹${PRO_PRICE_INR} to keep generating payment links for 30 days.`,
+      text: `Upgrade to Pro for ₹${proPrice.toLocaleString("en-IN")} to keep generating payment links for 30 days.`,
       showCancelButton: true,
       confirmButtonText: "Upgrade to Pro",
       cancelButtonText: "Not now",
