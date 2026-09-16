@@ -4,6 +4,7 @@ import QRCode from "qrcode";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Check, Copy, Store } from "lucide-react";
+import { brandLogoUrl } from "@/components/BrandLogo";
 import bhimUpiLogo from "@/assets/bhim-upi-logo.png.asset.json";
 import upiAppsRow from "@/assets/upi-apps-row.png.asset.json";
 
@@ -208,6 +209,7 @@ function PayPage() {
             <section className="pay-code-area">
               <div className="pay-qr-wrap">
                 {qr ? <img className="pay-qr" src={qr} alt="UPI QR code" width={250} height={250} /> : <div className="pay-qr pay-skeleton" />}
+                {qr ? <span className="pay-qr-logo"><img src={brandLogoUrl} alt="" /></span> : null}
                 {processing && (
                   <div className="pay-processing">
                     <span className="pay-spinner" />

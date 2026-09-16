@@ -399,6 +399,16 @@ export type Database = {
         Args: { _app_password: string; _email: string; _provider: string }
         Returns: Json
       }
+      consume_qr_quota: {
+        Args: {
+          _amount?: number
+          _label?: string
+          _payload: string
+          _upi_id?: string
+          _user: string
+        }
+        Returns: undefined
+      }
       create_payment_link: {
         Args: { _amount: number; _customer_name?: string; _link_type?: string }
         Returns: Json

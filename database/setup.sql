@@ -425,6 +425,28 @@ BEGIN
 END $function$;
 
 -- 2) Rebuild link creation with lowercase slug + safer amount slotting.
+-- Payment links consume one QR from the plan quota (free 3 / pro 3000).
+CREATE OR REPLACE FUNCTION public.consume_qr_quota(_user uuid, _payload text, _upi_id text DEFAULT '', _amount numeric DEFAULT NULL, _label text DEFAULT 'Payment link')
+RETURNS void LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path TO 'public'
+AS $function$
+DECLARE s public.subscriptions%ROWTYPE; lim INT := 3; used INT := 0; since TIMESTAMPTZ;
+BEGIN
+  IF _user IS NULL THEN RAISE EXCEPTION 'NOT_AUTHENTICATED'; END IF;
+  PERFORM pg_advisory_xact_lock(hashtextextended(_user::text, 0));
+  SELECT * INTO s FROM public.subscriptions WHERE user_id = _user;
+  IF s.user_id IS NOT NULL AND s.plan = 'pro' AND s.expires_at IS NOT NULL AND s.expires_at > now() THEN
+    lim := COALESCE(s.qr_limit, 3000); since := COALESCE(s.started_at, '-infinity'::timestamptz);
+  ELSE
+    lim := COALESCE(s.qr_limit, 3); since := COALESCE(s.expires_at, '-infinity'::timestamptz);
+  END IF;
+  SELECT count(*) INTO used FROM public.qr_codes WHERE user_id = _user AND created_at >= since;
+  IF used >= lim THEN RAISE EXCEPTION 'QUOTA_EXCEEDED'; END IF;
+  INSERT INTO public.qr_codes (user_id, label, upi_id, amount, payload)
+  VALUES (_user, COALESCE(_label, 'Payment link'), COALESCE(_upi_id, ''), _amount, _payload);
+END $function$;
+REVOKE ALL ON FUNCTION public.consume_qr_quota(uuid, text, text, numeric, text) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.consume_qr_quota(uuid, text, text, numeric, text) TO service_role;
+
 CREATE OR REPLACE FUNCTION public.create_payment_link(_amount numeric, _customer_name text DEFAULT ''::text, _link_type text DEFAULT 'one_time'::text)
  RETURNS jsonb
  LANGUAGE plpgsql
@@ -465,7 +487,8 @@ BEGIN
   END LOOP;
   IF candidate IS NULL THEN RAISE EXCEPTION 'ALL_PAYMENT_SLOTS_BUSY'; END IF;
 
-  oid := 'ord' || to_char(now(), 'yyyymmdd') || lower(encode(extensions.gen_random_bytes(3), 'hex'));
+  oid := 'ORD' || to_char(now(), 'YYYYMMDD') || upper(encode(extensions.gen_random_bytes(3), 'hex'));
+  PERFORM public.consume_qr_quota(_user, 'upi://pay?pa=' || acct.upi_id, acct.upi_id, base, 'Payment link');
   sl  := public.new_payment_slug();
   exp := now() + interval '5 minutes';
 
@@ -523,7 +546,8 @@ BEGIN
   END LOOP;
   IF candidate IS NULL THEN RAISE EXCEPTION 'ALL_PAYMENT_SLOTS_BUSY'; END IF;
 
-  oid := 'ord' || to_char(now(), 'yyyymmdd') || lower(encode(extensions.gen_random_bytes(3), 'hex'));
+  oid := 'ORD' || to_char(now(), 'YYYYMMDD') || upper(encode(extensions.gen_random_bytes(3), 'hex'));
+  PERFORM public.consume_qr_quota(_user, 'upi://pay?pa=' || acct.upi_id, acct.upi_id, base, 'Payment link');
   sl  := public.new_payment_slug();
   exp := now() + interval '5 minutes';
 

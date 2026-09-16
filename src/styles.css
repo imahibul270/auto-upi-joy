@@ -567,6 +567,9 @@ section[id]{scroll-margin-top:var(--header-height)}
 .pay-qr-wrap { position: relative; display: grid; place-items: center; }
 .pay-qr { width: min(180px, 58vw, 32vh); height: auto; aspect-ratio: 1; border-radius: .3rem; }
 .pay-qr-skeleton { background: var(--muted); }
+.pay-qr-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 42px; height: 42px; padding: 4px; border-radius: .55rem; background: oklch(1 0 0); box-shadow: 0 2px 8px rgb(0 0 0 / .12); display: grid; place-items: center; }
+.pay-qr-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: .38rem; }
+.pay-qr-wrap:has(.pay-processing) .pay-qr-logo { filter: blur(3px); opacity: .6; }
 .pay-skeleton { display: block; border-radius: .4rem; background: linear-gradient(90deg, color-mix(in oklab, var(--muted) 85%, transparent) 25%, color-mix(in oklab, var(--muted) 45%, var(--card)) 37%, color-mix(in oklab, var(--muted) 85%, transparent) 63%); background-size: 400% 100%; animation: pay-shimmer 1.3s ease-in-out infinite; }
 .pay-skeleton-title { width: 60%; height: 1.1rem; margin-top: .25rem; }
 .pay-skeleton-line { width: 40%; height: .7rem; margin-top: .45rem; }
@@ -584,7 +587,7 @@ section[id]{scroll-margin-top:var(--header-height)}
 .pay-done { width: min(340px, 100%); border-radius: 1.1rem; overflow: hidden; background: var(--card); box-shadow: 0 18px 46px rgb(0 0 0 / .12); animation: pay-done-in .45s cubic-bezier(.2,.8,.3,1); }
 .pay-done-top { padding: 2rem 1.5rem 3.4rem; text-align: center; background: oklch(.44 .11 152); color: oklch(.99 0 0); }
 .pay-done-tick { width: 84px; height: 84px; margin: 0 auto 1.1rem; border-radius: 50%; background: oklch(.99 0 0); color: oklch(.4 .11 152); display: grid; place-items: center; animation: pay-tick-pop .5s cubic-bezier(.2,1.5,.4,1) both; }
-.pay-done-tick svg { width: 40px; height: 40px; stroke-dasharray: 48; stroke-dashoffset: 48; animation: pay-tick-draw .5s .25s ease-out forwards; }
+.pay-done-tick svg { width: 40px; height: 40px; animation: pay-tick-in .4s .18s cubic-bezier(.2,1.4,.4,1) both; }
 .pay-done-top h1 { margin: 0; font-size: 1.5rem; font-weight: 800; }
 .pay-done-top p { margin: .5rem 0 0; font-size: .92rem; opacity: .9; }
 .pay-done-row { position: relative; margin: -2.4rem 1rem 0; padding: .85rem 1rem; display: flex; align-items: center; gap: .85rem; border-radius: .9rem; background: var(--card); box-shadow: 0 10px 26px rgb(0 0 0 / .12); animation: pay-rise .45s .12s ease-out both; }
@@ -600,7 +603,7 @@ section[id]{scroll-margin-top:var(--header-height)}
 .pay-done-order button svg { width: 18px; height: 18px; }
 @keyframes pay-done-in { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
 @keyframes pay-tick-pop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: scale(1); } }
-@keyframes pay-tick-draw { to { stroke-dashoffset: 0; } }
+@keyframes pay-tick-in { from { opacity: 0; transform: scale(.3); } to { opacity: 1; transform: scale(1); } }
 @keyframes pay-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 @keyframes pay-spin { to { transform: rotate(360deg); } }
 .pay-apps { width: min(230px, 88%); height: 30px; object-fit: contain; margin-top: .6rem; }
