@@ -5,7 +5,7 @@ import { useConsoleName } from "@/components/console/useConsoleName";
 import { Button } from "@/components/ui/button";
 import { Swal } from "@/lib/swal";
 import {
-  FREE_QR_LIMIT, PRO_PRICE_INR, PRO_QR_LIMIT, SALES_CONTACT_PHONE, daysLeft, useQrQuota,
+  FREE_QR_LIMIT, PRO_PRICE_INR, PRO_QR_LIMIT, SALES_CONTACT_PHONE, SALES_WHATSAPP_URL, daysLeft, useQrQuota,
 } from "@/lib/quota";
 
 export const Route = createFileRoute("/_authenticated/plan")({
@@ -34,18 +34,13 @@ function PlanPage() {
     void Swal.fire({
       icon: "info",
       title: `Pro plan — ₹${PRO_PRICE_INR}`,
-      html: `30 days validity · ${PRO_QR_LIMIT.toLocaleString("en-IN")} QR codes.<br/>Online payment is being set up. To activate now, contact us at <b>${SALES_CONTACT_PHONE}</b>.`,
+      html: `30 days validity · ${PRO_QR_LIMIT.toLocaleString("en-IN")} QR codes.<br/>Online payment is being set up. To activate now, message us on WhatsApp <b>${SALES_CONTACT_PHONE}</b>.`,
       confirmButtonText: "OK",
     });
   }
 
   function contactSales() {
-    void Swal.fire({
-      icon: "info",
-      title: "Custom plan",
-      html: `For a custom plan please contact us at <b>${SALES_CONTACT_PHONE}</b>.`,
-      confirmButtonText: "OK",
-    });
+    window.open(SALES_WHATSAPP_URL, "_blank", "noopener,noreferrer");
   }
 
   return (
