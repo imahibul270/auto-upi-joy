@@ -43,6 +43,7 @@ function PayPage() {
   // Countdown comes from the server-side expiry, so a refresh never restarts it.
   const [expiryMs, setExpiryMs] = useState<number | null>(null);
   const [skewMs, setSkewMs] = useState(0);
+  const [copied, setCopied] = useState(false);
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
