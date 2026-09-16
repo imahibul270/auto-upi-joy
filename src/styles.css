@@ -645,15 +645,28 @@ section[id]{scroll-margin-top:var(--header-height)}
 
 /* ---------- Public API documentation page ---------- */
 .docs-page { min-height: 100dvh; background: var(--background); color: var(--foreground); }
-.docs-header { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .85rem clamp(1rem, 4vw, 2.6rem); background: var(--hero); color: var(--hero-foreground); }
-.docs-logo { display: flex; align-items: baseline; gap: .45rem; color: var(--hero-foreground); text-decoration: none; }
-.docs-logo strong { font-size: 1.05rem; letter-spacing: -.01em; }
-.docs-logo em { font-style: normal; font-size: .62rem; font-weight: 800; letter-spacing: .12em; padding: .18rem .4rem; border-radius: .35rem; background: color-mix(in oklab, var(--hero-foreground) 14%, transparent); }
-.docs-header nav { display: flex; align-items: center; gap: 1.1rem; font-size: .78rem; font-weight: 600; color: color-mix(in oklab, var(--hero-foreground) 72%, transparent); }
-.docs-header nav a { color: inherit; text-decoration: none; }
-.docs-header nav a:hover { color: var(--hero-foreground); }
-.docs-cta { display: inline-flex; align-items: center; gap: .35rem; padding: .5rem .85rem; border-radius: .6rem; background: oklch(0.78 0.18 125); color: oklch(0.2 0.05 150) !important; }
+.docs-header { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .7rem clamp(1rem, 4vw, 2.6rem); background: color-mix(in oklab, var(--background) 86%, transparent); backdrop-filter: blur(14px); border-bottom: 1px solid color-mix(in oklab, var(--foreground) 9%, transparent); }
+.docs-logo { display: flex; align-items: center; gap: .5rem; color: var(--foreground); text-decoration: none; }
+.docs-logo strong { font-size: 1.02rem; letter-spacing: -.01em; }
+.docs-logo em { font-style: normal; font-size: .6rem; font-weight: 800; letter-spacing: .12em; padding: .2rem .4rem; border-radius: .35rem; background: color-mix(in oklab, var(--hero) 9%, transparent); color: var(--hero); }
+.docs-header nav { display: flex; align-items: center; gap: 1.1rem; font-size: .82rem; font-weight: 600; color: var(--muted-foreground); }
+.docs-header nav a { color: inherit; text-decoration: none; transition: color .18s ease; }
+.docs-header nav a:hover { color: var(--foreground); }
+.docs-cta { display: inline-flex; align-items: center; gap: .35rem; padding: .5rem .9rem; border-radius: .6rem; background: var(--hero); color: var(--hero-foreground) !important; transition: transform .18s ease, opacity .18s ease; }
+.docs-cta:hover { transform: translateY(-1px); opacity: .92; }
 .docs-cta svg { width: 14px; height: 14px; }
+
+.docs-hero { padding: 2.2rem 0 1.4rem; }
+.docs-hero h1 { font-size: clamp(2rem, 3.6vw, 2.7rem); line-height: 1.1; margin: .5rem 0 .7rem; }
+.docs-hero p { max-width: 60ch; }
+.docs-quick { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+.docs-quick a { font-size: .78rem; font-weight: 600; text-decoration: none; padding: .4rem .8rem; border-radius: 999px; border: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent); color: var(--foreground); transition: background .18s ease, transform .18s ease; }
+.docs-quick a:hover { background: color-mix(in oklab, var(--hero) 7%, transparent); transform: translateY(-1px); }
+
+.docs-tabs { display: flex; gap: .3rem; margin-bottom: .6rem; }
+.docs-tabs button { font: inherit; font-size: .76rem; font-weight: 700; padding: .35rem .8rem; border-radius: .5rem; border: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent); background: transparent; color: var(--muted-foreground); cursor: pointer; transition: all .18s ease; }
+.docs-tabs button.is-active { background: var(--hero); color: var(--hero-foreground); border-color: transparent; }
+
 
 .docs-shell { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: clamp(1.4rem, 4vw, 3.2rem); max-width: 1180px; margin: 0 auto; padding: 2.2rem clamp(1rem, 4vw, 2.6rem) 4rem; }
 .docs-side { position: sticky; top: 76px; align-self: start; display: grid; gap: .1rem; max-height: calc(100dvh - 100px); overflow: auto; }
