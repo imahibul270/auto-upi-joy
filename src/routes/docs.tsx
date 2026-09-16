@@ -148,7 +148,7 @@ function DocsPage() {
             <h2>Quickstart</h2>
             <ol className="docs-steps">
               <li><strong>Create an account</strong> and sign in to the merchant console.</li>
-              <li><strong>Connect an account</strong> — pick PhonePe or Paytm, save your UPI ID, then connect your payment-alert mailbox with an email address and app password.</li>
+              <li><strong>Connect an account</strong> — pick PhonePe or Paytm and complete the setup on the Connect Accounts page.</li>
               <li><strong>Generate an API key</strong> on the API Keys page. Copy it once; regenerating replaces the old key.</li>
               <li><strong>Create an order</strong> from your server and redirect the customer to the returned <code>payment_url</code>.</li>
               <li><strong>Confirm</strong> the payment through the status endpoint or your webhook, then fulfil the order.</li>
