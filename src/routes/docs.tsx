@@ -21,7 +21,7 @@ export const Route = createFileRoute("/docs")({
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "/docs" }],
+    links: [{ rel: "canonical", href: "https://autoupi.in/docs" }],
   }),
 });
 
