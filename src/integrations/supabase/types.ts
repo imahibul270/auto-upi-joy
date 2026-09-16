@@ -375,6 +375,10 @@ export type Database = {
       }
       admin_list_users: { Args: never; Returns: Json }
       admin_overview: { Args: never; Returns: Json }
+      admin_payment_logs: {
+        Args: { _limit?: number; _search?: string }
+        Returns: Json
+      }
       admin_set_plan: {
         Args: {
           _amount?: number
