@@ -33,7 +33,7 @@ const NAV = [
   ["order-status", "Order status"],
   ["webhooks", "Webhooks"],
   ["php", "PHP integration"],
-  ["detection", "Payment detection"],
+  
   ["errors", "Errors"],
   ["pricing", "Pricing"],
   ["faq", "FAQ"],
