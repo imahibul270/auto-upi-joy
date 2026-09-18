@@ -18,6 +18,11 @@ export type QrQuota = {
   remaining: number;
   period_start: string | null;
   period_end: string | null;
+  /** Whole days remaining in the paid plan, computed on the server. */
+  days_left?: number;
+  /** Seconds remaining in the paid plan, computed on the server. */
+  seconds_left?: number;
+  server_now?: string;
   price_inr: number;
   can_generate: boolean;
 };
