@@ -881,10 +881,23 @@ section[id]{scroll-margin-top:var(--header-height)}
 .notif-list { padding: .8rem; overflow-y: auto; display: grid; gap: .7rem }
 .notif-empty { color: rgba(15, 60, 40, .55); font-size: .85rem; text-align: center; padding: 2rem 0 }
 .notif-item {
-  display: flex; gap: .7rem; padding: .85rem; border-radius: 14px;
+  position: relative;
+  display: flex; gap: .7rem; padding: .85rem 2rem .85rem .85rem; border-radius: 14px;
   background: rgba(15, 60, 40, .05); border: 1px solid rgba(15, 60, 40, .08);
   animation: notif-slide .32s ease both;
 }
+.notif-item.is-leaving { animation: notif-leave .28s ease forwards }
+@keyframes notif-leave {
+  to { transform: translateX(40px); opacity: 0; max-height: 0; padding-block: 0; margin-bottom: -.7rem; border-width: 0 }
+}
+.notif-dismiss {
+  position: absolute; top: .45rem; right: .45rem; width: 20px; height: 20px;
+  display: grid; place-items: center; border: 0; border-radius: 50%; cursor: pointer;
+  background: rgba(15, 60, 40, .08); color: rgba(15, 60, 40, .6);
+  transition: background .18s ease, color .18s ease, transform .18s ease;
+}
+.notif-dismiss:hover { background: #b3261e; color: #fff; transform: scale(1.08) }
+.notif-dismiss svg { width: 12px; height: 12px }
 @keyframes notif-slide { from { transform: translateX(14px); opacity: 0 } to { transform: translateX(0); opacity: 1 } }
 .notif-item strong { display: block; font-size: .88rem; color: var(--hero-deep, #06301f) }
 .notif-item p { margin: .25rem 0 .5rem; font-size: .8rem; line-height: 1.45; color: rgba(15, 60, 40, .75) }
