@@ -9,7 +9,7 @@ import { useConsoleName } from "@/components/console/useConsoleName";
 import { Button } from "@/components/ui/button";
 import { Swal } from "@/lib/swal";
 import {
-  FREE_QR_LIMIT, PRO_QR_LIMIT, SALES_CONTACT_PHONE, SALES_WHATSAPP_URL, planTimeLeft, useProPrice, useQrQuota,
+  FREE_QR_LIMIT, PRO_QR_LIMIT, SALES_CONTACT_PHONE, SALES_WHATSAPP_URL, planNeedsRenewal, planTimeLeft, useProPrice, useQrQuota,
 } from "@/lib/quota";
 
 /** Shows a result popup with a live "redirecting" countdown, then goes to the dashboard. */
@@ -71,6 +71,7 @@ function PlanPage() {
   const remaining = quota?.remaining ?? 0;
   const pct = limit > 0 ? Math.min(Math.round((used / limit) * 100), 100) : 0;
   const left = planTimeLeft(quota);
+  const { expiringSoon } = planNeedsRenewal(quota);
 
   async function upgrade() {
     if (paying) return;

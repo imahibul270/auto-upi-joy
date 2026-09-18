@@ -1,8 +1,9 @@
 import { useRouterState } from "@tanstack/react-router";
 import { BrandLogo } from "@/components/BrandLogo";
 import {
-  ArrowLeftRight, Bell, BookOpen, CreditCard, KeyRound, LayoutGrid, LifeBuoy, Link2, Menu, Sparkles, X,
+  ArrowLeftRight, BookOpen, CreditCard, KeyRound, LayoutGrid, LifeBuoy, Link2, Menu, Sparkles, X,
 } from "lucide-react";
+import { NotificationBell } from "@/components/console/NotificationBell";
 import { useState, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import type { User } from "@supabase/supabase-js";
@@ -82,7 +83,7 @@ export function ConsoleLayout({
           <h1>{title}</h1>
           <div className="console-top-right">
             <span className="console-live"><i />Live</span>
-            <button type="button" className="console-icon-btn" aria-label="Notifications"><Bell /></button>
+            <NotificationBell user={user} />
           </div>
         </header>
         <main className="console-body">{children}</main>
