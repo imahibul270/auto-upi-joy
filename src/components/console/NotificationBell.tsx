@@ -126,7 +126,18 @@ export function NotificationBell({ user }: { user: User }) {
             <p className="notif-empty">You are all caught up.</p>
           ) : (
             items.map((item) => (
-              <article key={item.id} className={`notif-item notif-${item.kind}`}>
+              <article
+                key={item.id}
+                className={`notif-item notif-${item.kind}${leaving.includes(item.id) ? " is-leaving" : ""}`}
+              >
+                <button
+                  type="button"
+                  className="notif-dismiss"
+                  aria-label="Delete notification"
+                  onClick={() => dismiss(item.id)}
+                >
+                  <X />
+                </button>
                 <span className="notif-icon"><Sparkles /></span>
                 <div>
                   <strong>{item.title}</strong>
