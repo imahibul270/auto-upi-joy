@@ -96,11 +96,11 @@ export function planTimeLeft(quota?: QrQuota | null) {
     typeof quota.seconds_left === "number"
       ? quota.seconds_left
       : Math.max(Math.floor((new Date(quota.period_end ?? 0).getTime() - Date.now()) / 1000), 0);
-  const days = typeof quota.days_left === "number" ? quota.days_left : Math.ceil(seconds / 86400);
+  const days = typeof quota.days_left === "number" ? quota.days_left : Math.floor(seconds / 86400);
 
   let label: string;
   if (seconds <= 0) label = "Expired";
-  else if (days > 1) label = `${days} days left`;
+  else if (days >= 1) label = `${days} ${days === 1 ? "day" : "days"} left`;
   else if (seconds >= 3600) label = `${Math.floor(seconds / 3600)} hr left`;
   else label = `${Math.max(Math.floor(seconds / 60), 1)} min left`;
 
