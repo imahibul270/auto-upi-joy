@@ -9,7 +9,7 @@ import { useConsoleName } from "@/components/console/useConsoleName";
 import { Button } from "@/components/ui/button";
 import { Swal } from "@/lib/swal";
 import {
-  FREE_QR_LIMIT, PRO_QR_LIMIT, SALES_CONTACT_PHONE, SALES_WHATSAPP_URL, daysLeft, useProPrice, useQrQuota,
+  FREE_QR_LIMIT, PRO_QR_LIMIT, SALES_CONTACT_PHONE, SALES_WHATSAPP_URL, planTimeLeft, useProPrice, useQrQuota,
 } from "@/lib/quota";
 
 /** Shows a result popup with a live "redirecting" countdown, then goes to the dashboard. */
@@ -70,7 +70,7 @@ function PlanPage() {
   const limit = quota?.limit ?? FREE_QR_LIMIT;
   const remaining = quota?.remaining ?? 0;
   const pct = limit > 0 ? Math.min(Math.round((used / limit) * 100), 100) : 0;
-  const left = daysLeft(quota?.period_end ?? null);
+  const left = planTimeLeft(quota);
 
   async function upgrade() {
     if (paying) return;
@@ -192,7 +192,7 @@ function PlanPage() {
           {isPro ? <span className="console-plan-badge">Current plan</span> : null}
           <h3>Pro</h3>
           <strong><IndianRupee className="inline-rupee" />{proPrice.toLocaleString("en-IN")}</strong>
-          <small>{isPro ? `${left} day${left === 1 ? "" : "s"} left · ${remaining.toLocaleString("en-IN")} QR left` : "per 30 days"}</small>
+          <small>{isPro ? `${left.label} · ${remaining.toLocaleString("en-IN")} QR left` : "per 30 days"}</small>
           <ul>
             <li><Check />{(isPro ? limit : PRO_QR_LIMIT).toLocaleString("en-IN")} QR codes in 30 days</li>
             <li><Check />Instant activation on payment</li>

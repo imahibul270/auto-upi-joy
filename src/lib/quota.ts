@@ -18,6 +18,11 @@ export type QrQuota = {
   remaining: number;
   period_start: string | null;
   period_end: string | null;
+  /** Whole days remaining in the paid plan, computed on the server. */
+  days_left?: number;
+  /** Seconds remaining in the paid plan, computed on the server. */
+  seconds_left?: number;
+  server_now?: string;
   price_inr: number;
   can_generate: boolean;
 };
@@ -79,4 +84,25 @@ export function daysLeft(periodEnd: string | null) {
   if (!periodEnd) return 0;
   const ms = new Date(periodEnd).getTime() - Date.now();
   return Math.max(Math.ceil(ms / 86400000), 0);
+}
+
+/**
+ * Validity left for a paid plan. Prefers the server countdown so a wrong
+ * device clock can never keep showing the same number of days.
+ */
+export function planTimeLeft(quota?: QrQuota | null) {
+  if (!quota || quota.plan !== "pro") return { days: 0, seconds: 0, label: "" };
+  const seconds =
+    typeof quota.seconds_left === "number"
+      ? quota.seconds_left
+      : Math.max(Math.floor((new Date(quota.period_end ?? 0).getTime() - Date.now()) / 1000), 0);
+  const days = typeof quota.days_left === "number" ? quota.days_left : Math.ceil(seconds / 86400);
+
+  let label: string;
+  if (seconds <= 0) label = "Expired";
+  else if (days > 1) label = `${days} days left`;
+  else if (seconds >= 3600) label = `${Math.floor(seconds / 3600)} hr left`;
+  else label = `${Math.max(Math.floor(seconds / 60), 1)} min left`;
+
+  return { days, seconds, label };
 }

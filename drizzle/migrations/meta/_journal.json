@@ -162,6 +162,13 @@
       "when": 1789563636548,
       "tag": "0022_free_plan_toggle",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1789697914104,
+      "tag": "0023_plan_days_countdown_fix",
+      "breakpoints": true
     }
   ]
 }
