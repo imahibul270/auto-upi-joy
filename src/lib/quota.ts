@@ -108,3 +108,14 @@ export function planTimeLeft(quota?: QrQuota | null) {
 
   return { days, seconds, label };
 }
+
+/** True when the paid plan is inside the renew window or already over. */
+export function planNeedsRenewal(quota?: QrQuota | null) {
+  if (!quota) return { expiringSoon: false, expired: false };
+  if (quota.plan !== "pro") return { expiringSoon: false, expired: false };
+  const left = planTimeLeft(quota);
+  return {
+    expiringSoon: left.seconds > 0 && left.days <= RENEW_WINDOW_DAYS,
+    expired: left.seconds <= 0,
+  };
+}
