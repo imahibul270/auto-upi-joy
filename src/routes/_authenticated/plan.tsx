@@ -199,10 +199,15 @@ function PlanPage() {
             <li><Check />Instant activation on payment</li>
             <li><Check />Priority support</li>
           </ul>
-          {!isPro ? (
+          {!isPro || expiringSoon ? (
             <Button className="console-plan-cta" onClick={() => void upgrade()} disabled={paying}>
-              {paying ? "Opening payment…" : `Upgrade for ₹${proPrice.toLocaleString("en-IN")}`}
+              {paying
+                ? "Opening payment…"
+                : `${isPro ? "Renew Pro for" : "Upgrade for"} ₹${proPrice.toLocaleString("en-IN")}`}
             </Button>
+          ) : null}
+          {isPro && expiringSoon ? (
+            <small className="console-plan-note">Renew now — the new 30 days start after your current plan ends.</small>
           ) : null}
         </article>
 
