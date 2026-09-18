@@ -176,6 +176,13 @@
       "when": 1789698355146,
       "tag": "0024_plan_days_left_floor",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1789727370471,
+      "tag": "0025_plan_calendar_day_expiry_ist",
+      "breakpoints": true
     }
   ]
 }
