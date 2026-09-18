@@ -10,6 +10,8 @@ export const SALES_WHATSAPP_URL =
 export const PRO_PRICE_INR = 299;
 export const FREE_QR_LIMIT = 3;
 export const PRO_QR_LIMIT = 3000;
+/** Renew reminders and the renew button start this many days before expiry. */
+export const RENEW_WINDOW_DAYS = 3;
 
 export type QrQuota = {
   plan: "free" | "pro";
@@ -105,4 +107,15 @@ export function planTimeLeft(quota?: QrQuota | null) {
   else label = `${Math.max(Math.floor(seconds / 60), 1)} min left`;
 
   return { days, seconds, label };
+}
+
+/** True when the paid plan is inside the renew window or already over. */
+export function planNeedsRenewal(quota?: QrQuota | null) {
+  if (!quota) return { expiringSoon: false, expired: false };
+  if (quota.plan !== "pro") return { expiringSoon: false, expired: false };
+  const left = planTimeLeft(quota);
+  return {
+    expiringSoon: left.seconds > 0 && left.days <= RENEW_WINDOW_DAYS,
+    expired: left.seconds <= 0,
+  };
 }

@@ -9,7 +9,7 @@ import { useConsoleName } from "@/components/console/useConsoleName";
 import { Button } from "@/components/ui/button";
 import { Swal } from "@/lib/swal";
 import {
-  FREE_QR_LIMIT, PRO_QR_LIMIT, SALES_CONTACT_PHONE, SALES_WHATSAPP_URL, planTimeLeft, useProPrice, useQrQuota,
+  FREE_QR_LIMIT, PRO_QR_LIMIT, SALES_CONTACT_PHONE, SALES_WHATSAPP_URL, planNeedsRenewal, planTimeLeft, useProPrice, useQrQuota,
 } from "@/lib/quota";
 
 /** Shows a result popup with a live "redirecting" countdown, then goes to the dashboard. */
@@ -71,6 +71,7 @@ function PlanPage() {
   const remaining = quota?.remaining ?? 0;
   const pct = limit > 0 ? Math.min(Math.round((used / limit) * 100), 100) : 0;
   const left = planTimeLeft(quota);
+  const { expiringSoon } = planNeedsRenewal(quota);
 
   async function upgrade() {
     if (paying) return;
@@ -198,10 +199,15 @@ function PlanPage() {
             <li><Check />Instant activation on payment</li>
             <li><Check />Priority support</li>
           </ul>
-          {!isPro ? (
+          {!isPro || expiringSoon ? (
             <Button className="console-plan-cta" onClick={() => void upgrade()} disabled={paying}>
-              {paying ? "Opening payment…" : `Upgrade for ₹${proPrice.toLocaleString("en-IN")}`}
+              {paying
+                ? "Opening payment…"
+                : `${isPro ? "Renew Pro for" : "Upgrade for"} ₹${proPrice.toLocaleString("en-IN")}`}
             </Button>
+          ) : null}
+          {isPro && expiringSoon ? (
+            <small className="console-plan-note">Renew now — the new 30 days start after your current plan ends.</small>
           ) : null}
         </article>
 

@@ -843,3 +843,63 @@ section[id]{scroll-margin-top:var(--header-height)}
 .admin-price-card { margin-bottom: 18px; }
 .admin-price-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
 .admin-price-row .console-field { max-width: 240px; flex: 1 1 200px; }
+
+/* Notifications: bell badge + slide-in panel */
+.notif-btn { position: relative }
+.notif-btn.has-unread { animation: notif-ring 2.2s ease-in-out infinite }
+.notif-count {
+  position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px;
+  display: grid; place-items: center; border-radius: 999px;
+  background: var(--soft-green, #c6f34b); color: var(--hero-deep, #06301f);
+  font-size: .66rem; font-weight: 800; line-height: 1;
+  box-shadow: 0 0 0 0 rgba(198, 243, 75, .6);
+  animation: notif-pop .3s ease, notif-pulse 1.8s ease-out infinite;
+}
+@keyframes notif-pop { from { transform: scale(.4); opacity: 0 } to { transform: scale(1); opacity: 1 } }
+@keyframes notif-pulse { 0% { box-shadow: 0 0 0 0 rgba(198, 243, 75, .55) } 70%, 100% { box-shadow: 0 0 0 8px rgba(198, 243, 75, 0) } }
+@keyframes notif-ring { 0%, 84%, 100% { transform: rotate(0) } 88% { transform: rotate(-12deg) } 92% { transform: rotate(10deg) } 96% { transform: rotate(-6deg) } }
+
+.notif-scrim { position: fixed; inset: 0; background: rgba(4, 22, 15, .35); border: 0; z-index: 60; animation: notif-fade .2s ease }
+@keyframes notif-fade { from { opacity: 0 } to { opacity: 1 } }
+
+.notif-panel {
+  position: fixed; top: 0; right: 0; height: 100dvh; width: min(380px, 92vw);
+  background: #fff; z-index: 61; display: flex; flex-direction: column;
+  box-shadow: -18px 0 40px rgba(4, 22, 15, .18);
+  transform: translateX(105%); opacity: 0; pointer-events: none;
+  transition: transform .34s cubic-bezier(.22, 1, .36, 1), opacity .24s ease;
+}
+.notif-panel.is-open { transform: translateX(0); opacity: 1; pointer-events: auto }
+.notif-panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1.1rem; border-bottom: 1px solid rgba(15, 60, 40, .1);
+}
+.notif-panel-head strong { font-size: 1rem; color: var(--hero-deep, #06301f) }
+.notif-close { border: 0; background: transparent; cursor: pointer; color: rgba(15, 60, 40, .6); display: grid; place-items: center }
+.notif-close svg { width: 18px; height: 18px }
+.notif-list { padding: .8rem; overflow-y: auto; display: grid; gap: .7rem }
+.notif-empty { color: rgba(15, 60, 40, .55); font-size: .85rem; text-align: center; padding: 2rem 0 }
+.notif-item {
+  display: flex; gap: .7rem; padding: .85rem; border-radius: 14px;
+  background: rgba(15, 60, 40, .05); border: 1px solid rgba(15, 60, 40, .08);
+  animation: notif-slide .32s ease both;
+}
+@keyframes notif-slide { from { transform: translateX(14px); opacity: 0 } to { transform: translateX(0); opacity: 1 } }
+.notif-item strong { display: block; font-size: .88rem; color: var(--hero-deep, #06301f) }
+.notif-item p { margin: .25rem 0 .5rem; font-size: .8rem; line-height: 1.45; color: rgba(15, 60, 40, .75) }
+.notif-icon { display: grid; place-items: center; width: 32px; height: 32px; flex: none; border-radius: 10px; background: var(--hero-deep, #06301f); color: var(--soft-green, #c6f34b) }
+.notif-icon svg { width: 16px; height: 16px }
+.notif-item-foot { display: flex; align-items: center; gap: .6rem }
+.notif-item-foot em { font-style: normal; font-size: .7rem; color: rgba(15, 60, 40, .5) }
+.notif-action {
+  display: inline-block; padding: .35rem .8rem; border-radius: 999px; font-size: .75rem; font-weight: 700;
+  background: var(--hero-deep, #06301f); color: var(--soft-green, #c6f34b); text-decoration: none;
+  transition: transform .18s ease, filter .18s ease;
+}
+.notif-action:hover { transform: translateY(-1px); filter: brightness(1.08) }
+.notif-expired .notif-icon { background: #b3261e; color: #fff }
+.console-plan-note { display: block; margin-top: .5rem; font-size: .72rem; color: rgba(15, 60, 40, .6) }
+@media (prefers-reduced-motion: reduce) {
+  .notif-btn.has-unread, .notif-count, .notif-item { animation: none }
+  .notif-panel { transition: none }
+}
