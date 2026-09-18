@@ -32,8 +32,13 @@ export function NotificationBell({ user }: { user: User }) {
   const [open, setOpen] = useState(false);
   const [seen, setSeen] = useState<string[]>([]);
   const [now, setNow] = useState(() => new Date());
+  const [hidden, setHidden] = useState<string[]>([]);
+  const [leaving, setLeaving] = useState<string[]>([]);
 
-  useEffect(() => setSeen(readSeen(user.id)), [user.id]);
+  useEffect(() => {
+    setSeen(readSeen(user.id));
+    setHidden(readList(hiddenKey(user.id)));
+  }, [user.id]);
 
   // Keeps slots (8:00 / 12:00 / 17:00) appearing without a page reload.
   useEffect(() => {
