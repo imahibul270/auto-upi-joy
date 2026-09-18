@@ -82,6 +82,17 @@ export async function generateQr(input: { payload: string; label?: string; upiId
   return data as unknown as { id: string; payload: string; used: number; limit: number; remaining: number };
 }
 
+/**
+ * Calendar days left in India time: a day ends at midnight, not at the
+ * clock time the plan was bought.
+ */
+function calendarDaysLeft(periodEnd: string | null) {
+  if (!periodEnd) return 0;
+  const istDay = (value: Date) =>
+    Math.floor((value.getTime() + 5.5 * 3600000) / 86400000);
+  return Math.max(istDay(new Date(periodEnd)) - istDay(new Date()), 0);
+}
+
 export function daysLeft(periodEnd: string | null) {
   if (!periodEnd) return 0;
   const ms = new Date(periodEnd).getTime() - Date.now();
@@ -98,7 +109,8 @@ export function planTimeLeft(quota?: QrQuota | null) {
     typeof quota.seconds_left === "number"
       ? quota.seconds_left
       : Math.max(Math.floor((new Date(quota.period_end ?? 0).getTime() - Date.now()) / 1000), 0);
-  const days = typeof quota.days_left === "number" ? quota.days_left : Math.floor(seconds / 86400);
+  const days =
+    typeof quota.days_left === "number" ? quota.days_left : calendarDaysLeft(quota.period_end);
 
   let label: string;
   if (seconds <= 0) label = "Expired";
