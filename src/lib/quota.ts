@@ -10,6 +10,8 @@ export const SALES_WHATSAPP_URL =
 export const PRO_PRICE_INR = 299;
 export const FREE_QR_LIMIT = 3;
 export const PRO_QR_LIMIT = 3000;
+/** Renew reminders and the renew button start this many days before expiry. */
+export const RENEW_WINDOW_DAYS = 3;
 
 export type QrQuota = {
   plan: "free" | "pro";
