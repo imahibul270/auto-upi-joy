@@ -8,14 +8,22 @@ function storageKey(userId: string) {
   return `autoupi:notif-read:${userId}`;
 }
 
-function readSeen(userId: string): string[] {
+function hiddenKey(userId: string) {
+  return `autoupi:notif-hidden:${userId}`;
+}
+
+function readList(key: string): string[] {
   try {
-    const raw = window.localStorage.getItem(storageKey(userId));
+    const raw = window.localStorage.getItem(key);
     const parsed = raw ? (JSON.parse(raw) as unknown) : [];
     return Array.isArray(parsed) ? (parsed as string[]) : [];
   } catch {
     return [];
   }
+}
+
+function readSeen(userId: string): string[] {
+  return readList(storageKey(userId));
 }
 
 /** Plan reminder bell: unread count, pulse animation and a slide-in panel. */
@@ -24,8 +32,13 @@ export function NotificationBell({ user }: { user: User }) {
   const [open, setOpen] = useState(false);
   const [seen, setSeen] = useState<string[]>([]);
   const [now, setNow] = useState(() => new Date());
+  const [hidden, setHidden] = useState<string[]>([]);
+  const [leaving, setLeaving] = useState<string[]>([]);
 
-  useEffect(() => setSeen(readSeen(user.id)), [user.id]);
+  useEffect(() => {
+    setSeen(readSeen(user.id));
+    setHidden(readList(hiddenKey(user.id)));
+  }, [user.id]);
 
   // Keeps slots (8:00 / 12:00 / 17:00) appearing without a page reload.
   useEffect(() => {
@@ -33,8 +46,31 @@ export function NotificationBell({ user }: { user: User }) {
     return () => window.clearInterval(id);
   }, []);
 
-  const items = useMemo(() => buildPlanNotifications(quota, now), [quota, now]);
+  const items = useMemo(
+    () => buildPlanNotifications(quota, now).filter((item) => !hidden.includes(item.id)),
+    [quota, now, hidden],
+  );
   const unread = items.filter((item) => !seen.includes(item.id));
+
+  /** Removes one reminder with a slide-out animation; it stays gone for this user. */
+  const dismiss = useCallback(
+    (id: string) => {
+      setLeaving((list) => (list.includes(id) ? list : [...list, id]));
+      window.setTimeout(() => {
+        setHidden((list) => {
+          const next = Array.from(new Set([...list, id])).slice(-80);
+          try {
+            window.localStorage.setItem(hiddenKey(user.id), JSON.stringify(next));
+          } catch {
+            /* storage unavailable — reminder returns next visit */
+          }
+          return next;
+        });
+        setLeaving((list) => list.filter((value) => value !== id));
+      }, 280);
+    },
+    [user.id],
+  );
 
   const markAllSeen = useCallback(() => {
     const ids = Array.from(new Set([...seen, ...items.map((item) => item.id)])).slice(-60);
@@ -90,7 +126,18 @@ export function NotificationBell({ user }: { user: User }) {
             <p className="notif-empty">You are all caught up.</p>
           ) : (
             items.map((item) => (
-              <article key={item.id} className={`notif-item notif-${item.kind}`}>
+              <article
+                key={item.id}
+                className={`notif-item notif-${item.kind}${leaving.includes(item.id) ? " is-leaving" : ""}`}
+              >
+                <button
+                  type="button"
+                  className="notif-dismiss"
+                  aria-label="Delete notification"
+                  onClick={() => dismiss(item.id)}
+                >
+                  <X />
+                </button>
                 <span className="notif-icon"><Sparkles /></span>
                 <div>
                   <strong>{item.title}</strong>

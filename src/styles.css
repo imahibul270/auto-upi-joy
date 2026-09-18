@@ -265,7 +265,7 @@ section[id]{scroll-margin-top:var(--header-height)}
 @media (max-width:520px){.auth-page{padding-inline:1rem}.auth-art{width:min(90%,290px)}.auth-visual>p{max-width:320px}.auth-field-grid{grid-template-columns:1fr}.auth-form{gap:1rem}.auth-form-row{align-items:flex-start}.account-content{padding-top:3rem}}
 
 /* Merchant console dashboard */
-.console{min-height:100vh;display:grid;grid-template-columns:272px 1fr;background:var(--background)}
+.console{height:100vh;overflow:hidden;display:grid;grid-template-columns:272px 1fr;background:var(--background)}
 .console-side{position:sticky;top:0;height:100vh;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:.35rem;padding:1.25rem 1rem;background:var(--hero);color:var(--hero-foreground);z-index:40}
 .console-brand{display:flex;align-items:center;gap:.6rem;padding:.35rem .35rem 1.35rem}
 .console-mark{display:grid;place-items:center;width:2.2rem;height:2.2rem;border-radius:.6rem;background:var(--primary);color:var(--primary-foreground);font-weight:800}
@@ -286,7 +286,7 @@ section[id]{scroll-margin-top:var(--header-height)}
 .console-user strong{display:block;font-size:.82rem}
 .console-user small{font-size:.58rem;color:color-mix(in oklab,var(--hero-foreground) 55%,transparent)}
 .console-scrim{position:fixed;inset:0;z-index:35;border:0;background:oklch(0 0 0/.45)}
-.console-main{min-width:0;display:flex;flex-direction:column}
+.console-main{min-width:0;min-height:0;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
 .console-top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:1rem;height:72px;padding:0 clamp(1rem,2.4vw,2rem);background:color-mix(in oklab,var(--card) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
 .console-top h1{font-size:1.12rem;font-weight:700}
 .console-burger{display:none;border:0;background:transparent;color:var(--foreground);cursor:pointer}
@@ -298,7 +298,8 @@ section[id]{scroll-margin-top:var(--header-height)}
 .console-icon-btn{display:grid;place-items:center;width:2.3rem;height:2.3rem;border-radius:.6rem;border:1px solid var(--border);background:var(--card);color:var(--muted-foreground);cursor:pointer;transition:background .2s ease,color .2s ease}
 .console-icon-btn:hover{background:var(--soft-green);color:var(--foreground)}
 .console-icon-btn svg{width:1.05rem}
-.console-body{padding:clamp(1.25rem,2.6vw,2.2rem);display:grid;gap:1.35rem;align-content:start}
+.console-body{padding:clamp(1.25rem,2.6vw,2.2rem);display:grid;gap:1.35rem;align-content:start;min-width:0;overflow-x:hidden}
+.console-body>*{min-width:0;max-width:100%}
 .console-welcome{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-between}
 .console-welcome h2{font-size:clamp(1.5rem,2.6vw,2.15rem);font-weight:700}
 .console-welcome p{color:var(--muted-foreground);font-size:.86rem;margin-top:.3rem}
@@ -880,10 +881,23 @@ section[id]{scroll-margin-top:var(--header-height)}
 .notif-list { padding: .8rem; overflow-y: auto; display: grid; gap: .7rem }
 .notif-empty { color: rgba(15, 60, 40, .55); font-size: .85rem; text-align: center; padding: 2rem 0 }
 .notif-item {
-  display: flex; gap: .7rem; padding: .85rem; border-radius: 14px;
+  position: relative;
+  display: flex; gap: .7rem; padding: .85rem 2rem .85rem .85rem; border-radius: 14px;
   background: rgba(15, 60, 40, .05); border: 1px solid rgba(15, 60, 40, .08);
   animation: notif-slide .32s ease both;
 }
+.notif-item.is-leaving { animation: notif-leave .28s ease forwards }
+@keyframes notif-leave {
+  to { transform: translateX(40px); opacity: 0; max-height: 0; padding-block: 0; margin-bottom: -.7rem; border-width: 0 }
+}
+.notif-dismiss {
+  position: absolute; top: .45rem; right: .45rem; width: 20px; height: 20px;
+  display: grid; place-items: center; border: 0; border-radius: 50%; cursor: pointer;
+  background: rgba(15, 60, 40, .08); color: rgba(15, 60, 40, .6);
+  transition: background .18s ease, color .18s ease, transform .18s ease;
+}
+.notif-dismiss:hover { background: #b3261e; color: #fff; transform: scale(1.08) }
+.notif-dismiss svg { width: 12px; height: 12px }
 @keyframes notif-slide { from { transform: translateX(14px); opacity: 0 } to { transform: translateX(0); opacity: 1 } }
 .notif-item strong { display: block; font-size: .88rem; color: var(--hero-deep, #06301f) }
 .notif-item p { margin: .25rem 0 .5rem; font-size: .8rem; line-height: 1.45; color: rgba(15, 60, 40, .75) }
