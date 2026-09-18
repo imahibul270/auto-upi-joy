@@ -8,14 +8,22 @@ function storageKey(userId: string) {
   return `autoupi:notif-read:${userId}`;
 }
 
-function readSeen(userId: string): string[] {
+function hiddenKey(userId: string) {
+  return `autoupi:notif-hidden:${userId}`;
+}
+
+function readList(key: string): string[] {
   try {
-    const raw = window.localStorage.getItem(storageKey(userId));
+    const raw = window.localStorage.getItem(key);
     const parsed = raw ? (JSON.parse(raw) as unknown) : [];
     return Array.isArray(parsed) ? (parsed as string[]) : [];
   } catch {
     return [];
   }
+}
+
+function readSeen(userId: string): string[] {
+  return readList(storageKey(userId));
 }
 
 /** Plan reminder bell: unread count, pulse animation and a slide-in panel. */
