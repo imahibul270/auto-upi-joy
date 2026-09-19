@@ -925,3 +925,21 @@ section[id]{scroll-margin-top:var(--header-height)}
   .notif-btn.has-unread, .notif-count, .notif-item { animation: none }
   .notif-panel { transition: none }
 }
+
+/* ---- Legal pages (refund / privacy) ---- */
+.legal-page { min-height: 100vh; background: var(--background); color: var(--foreground); display: flex; flex-direction: column; }
+.legal-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 24px; border-bottom: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent); flex-wrap: wrap; }
+.legal-brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; color: var(--foreground); text-decoration: none; }
+.legal-brand img { height: 28px; width: auto; border-radius: 8px; }
+.legal-nav { display: flex; gap: 18px; flex-wrap: wrap; }
+.legal-nav a { color: color-mix(in oklab, var(--foreground) 72%, transparent); text-decoration: none; font-size: 14px; }
+.legal-nav a:hover { color: var(--primary); }
+.legal-main { width: min(820px, 100%); margin: 0 auto; padding: 48px 24px 64px; flex: 1; }
+.legal-main h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 800; letter-spacing: -0.02em; }
+.legal-updated { margin-top: 8px; font-size: 14px; color: color-mix(in oklab, var(--foreground) 60%, transparent); }
+.legal-body { margin-top: 28px; display: flex; flex-direction: column; gap: 10px; }
+.legal-body h2 { margin-top: 22px; font-size: 18px; font-weight: 700; color: var(--primary); }
+.legal-body p, .legal-body li { font-size: 15px; line-height: 1.75; color: color-mix(in oklab, var(--foreground) 82%, transparent); }
+.legal-body ul { margin: 4px 0 0 18px; list-style: disc; display: flex; flex-direction: column; gap: 6px; }
+.legal-body a { color: var(--primary); text-decoration: underline; }
+.legal-foot { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 20px 24px; border-top: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent); font-size: 13px; color: color-mix(in oklab, var(--foreground) 60%, transparent); }

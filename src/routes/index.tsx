@@ -213,7 +213,7 @@ function Index() {
       </section>
 
        <section className="cta-section" data-reveal><div><span>READY FOR PRODUCTION</span><h2>Turn every payment into a clear,<br /> trackable workflow.</h2><p>Set up your merchant workspace and create your first payment link.</p><Link className="button button-primary" to="/register">Create free account <ArrowRight /></Link></div></section>
-      <footer data-reveal><div><Logo /><p>Payment infrastructure built for ambitious Indian businesses.</p></div><div><a href="#product">Product</a><a href="#developers">Developers</a><Link to="/docs">API Docs</Link><a href="#pricing">Pricing</a></div><span>© 2026 Auto Upi. All rights reserved.</span></footer>
+      <footer data-reveal><div><Logo /><p>Payment infrastructure built for ambitious Indian businesses.</p></div><div><a href="#product">Product</a><a href="#developers">Developers</a><Link to="/docs">API Docs</Link><a href="#pricing">Pricing</a><Link to="/refund-policy">Refund Policy</Link><Link to="/privacy-policy">Privacy Policy</Link></div><span>© 2026 Auto Upi. All rights reserved.</span></footer>
     </main>
   );
 }
