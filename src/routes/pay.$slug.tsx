@@ -109,11 +109,36 @@ function PayPage() {
     return () => { active = false; clearInterval(timer); clearInterval(poller); };
   }, [slug]);
 
+  const upiParams = link
+    ? `pa=${encodeURIComponent(link.upi_id)}&pn=${encodeURIComponent(link.payee_name || "Auto Upi")}&am=${link.payable_amount.toFixed(2)}&cu=INR&tn=${encodeURIComponent(link.order_id)}`
+    : "";
+
   useEffect(() => {
     if (!link || link.status !== "active") return;
-    const uri = `upi://pay?pa=${encodeURIComponent(link.upi_id)}&pn=${encodeURIComponent(link.payee_name || "Auto Upi")}&am=${link.payable_amount.toFixed(2)}&cu=INR&tn=${encodeURIComponent(link.order_id)}`;
-    void QRCode.toDataURL(uri, { width: 640, margin: 1, errorCorrectionLevel: "H" }).then(setQr);
-  }, [link]);
+    void QRCode.toDataURL(`upi://pay?${upiParams}`, { width: 640, margin: 1, errorCorrectionLevel: "H" })
+      .then(setQr);
+  }, [link, upiParams]);
+
+  /** Hand the same QR payload straight to Paytm so the payer lands on the pay screen. */
+  const openPaytm = () => {
+    if (!link || !upiParams) return;
+    const targets = [
+      `paytmmp://pay?${upiParams}`,
+      `paytmmp://upi/pay?${upiParams}`,
+      `intent://pay?${upiParams}#Intent;scheme=upi;package=net.one97.paytm;end`,
+      `upi://pay?${upiParams}`,
+    ];
+    let index = 0;
+    const tryNext = () => {
+      const target = targets[index++];
+      if (!target) return;
+      window.location.href = target;
+      if (index < targets.length) window.setTimeout(() => {
+        if (!document.hidden) tryNext();
+      }, 900);
+    };
+    tryNext();
+  };
 
   const status = processing ? "active" : shownStatus ?? link?.status ?? "active";
 
