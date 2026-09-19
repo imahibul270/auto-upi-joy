@@ -119,25 +119,26 @@ function PayPage() {
       .then(setQr);
   }, [link, upiParams]);
 
-  /** Hand the same QR payload straight to Paytm so the payer lands on the pay screen. */
-  const openPaytm = () => {
-    if (!link || !upiParams) return;
-    const targets = [
-      `paytmmp://pay?${upiParams}`,
-      `paytmmp://upi/pay?${upiParams}`,
-      `intent://pay?${upiParams}#Intent;scheme=upi;package=net.one97.paytm;end`,
-      `upi://pay?${upiParams}`,
-    ];
-    let index = 0;
-    const tryNext = () => {
-      const target = targets[index++];
-      if (!target) return;
-      window.location.href = target;
-      if (index < targets.length) window.setTimeout(() => {
-        if (!document.hidden) tryNext();
-      }, 900);
-    };
-    tryNext();
+  /** Share the QR image itself — Paytm reads a shared QR and opens its pay screen. */
+  const openPaytm = async () => {
+    if (!link || !qr) return;
+    try {
+      const blob = await (await fetch(qr)).blob();
+      const file = new File([blob], `${link.order_id}.png`, { type: "image/png" });
+      const share = navigator.share as ((data: ShareData) => Promise<void>) | undefined;
+      const canShareFiles = navigator.canShare?.({ files: [file] }) ?? false;
+      if (share && canShareFiles) {
+        await navigator.share({ files: [file] });
+        return;
+      }
+      // No share sheet (desktop / old browser): save the QR so it can be uploaded in Paytm.
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = file.name;
+      a.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 2000);
+    } catch { /* payer dismissed the share sheet */ }
   };
 
   const status = processing ? "active" : shownStatus ?? link?.status ?? "active";
