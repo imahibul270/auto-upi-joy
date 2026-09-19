@@ -7,6 +7,7 @@ import { Check, Copy, Store } from "lucide-react";
 import { brandLogoUrl } from "@/components/BrandLogo";
 import bhimUpiLogo from "@/assets/bhim-upi-logo.png.asset.json";
 import upiAppsRow from "@/assets/upi-apps-row.png.asset.json";
+import paytmLogo from "@/assets/paytm-logo.png.asset.json";
 
 export const Route = createFileRoute("/pay/$slug")({
   head: () => ({ meta: [
