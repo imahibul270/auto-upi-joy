@@ -265,6 +265,9 @@ function PayPage() {
                   </div>
                 )}
               </div>
+              <button type="button" className="pay-paytm" onClick={openPaytm} aria-label="Pay with Paytm">
+                <img src={paytmLogo.url} alt="Paytm" />
+              </button>
               <img className="pay-apps" src={upiAppsRow.url} alt="Supported UPI payment apps" />
             </section>
             <footer className="pay-footer">
