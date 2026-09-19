@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Check, Copy, Store } from "lucide-react";
 import { brandLogoUrl } from "@/components/BrandLogo";
 import bhimUpiLogo from "@/assets/bhim-upi-logo.png.asset.json";
-import upiAppsRow from "@/assets/upi-apps-row.png.asset.json";
 import paytmLogo from "@/assets/paytm-logo.png.asset.json";
 
 export const Route = createFileRoute("/pay/$slug")({
@@ -269,7 +268,6 @@ function PayPage() {
               <button type="button" className="pay-paytm" onClick={() => void openPaytm()} aria-label="Pay with Paytm">
                 <img src={paytmLogo.url} alt="Paytm" />
               </button>
-              <img className="pay-apps" src={upiAppsRow.url} alt="Supported UPI payment apps" />
             </section>
             <footer className="pay-footer">
               <p>Expire in <strong>{Math.floor(secondsLeft / 60).toString().padStart(2, "0")}:{(secondsLeft % 60).toString().padStart(2, "0")}</strong></p>
