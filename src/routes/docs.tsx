@@ -151,6 +151,7 @@ function DocsPage() {
               <li><strong>Connect an account</strong> — pick PhonePe or Paytm and complete the setup on the Connect Accounts page.</li>
               <li><strong>Generate an API key</strong> on the API Keys page. Copy it once; regenerating replaces the old key.</li>
               <li><strong>Create an order</strong> from your server and redirect the customer to the returned <code>payment_url</code>.</li>
+              <li><strong>Set your URLs</strong> on the Config page — success redirect, failed redirect and the default webhook URL.</li>
               <li><strong>Confirm</strong> the payment through the status endpoint or your webhook, then fulfil the order.</li>
             </ol>
           </section>
@@ -302,7 +303,15 @@ if (($order["status"] ?? "") === "paid") {
             <p>
               Each API key ships with a webhook secret (<code>whsec_…</code>) shown on the API Keys page. Pass a
               <code>webhook_url</code> when creating an order and we POST a signed <code>payment.paid</code> event the
-              moment the order is confirmed as paid.
+              moment the order is confirmed as paid. You can also save one default webhook URL on the
+              <strong> Config</strong> page in your dashboard — it is used for every order of your account when the
+              create order call does not send its own <code>webhook_url</code>.
+            </p>
+            <p>
+              The same Config page holds your <strong>success</strong> and <strong>failed</strong> redirect URLs. After
+              the checkout result screen the payer is sent to your URL with <code>?order_id=…&amp;status=paid</code> or
+              <code>?order_id=…&amp;status=failed</code>. Redirects are per account, so only your own orders use them.
+              Always confirm the final state with the webhook or the order status endpoint before you fulfil.
             </p>
             <CodeBlock
               title="payload"

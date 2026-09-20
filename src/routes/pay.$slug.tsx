@@ -28,6 +28,8 @@ type PublicLink = {
   payee_name: string;
   customer_name: string;
   expires_at: string;
+  success_url?: string | null;
+  failure_url?: string | null;
   server_now: string;
 };
 
@@ -144,6 +146,21 @@ function PayPage() {
 
   // Tabs opened by our own upgrade flow tell the opener and then close themselves.
   const [closeBlocked, setCloseBlocked] = useState(false);
+
+  // Merchant redirect: send the payer back to the merchant's own result page.
+  useEffect(() => {
+    if (!link || (status !== "paid" && status !== "expired")) return;
+    if (typeof window !== "undefined" && window.opener) return; // upgrade tab closes itself
+    const target = status === "paid" ? link.success_url : link.failure_url;
+    if (!target || !/^https?:\/\//i.test(target)) return;
+    const id = window.setTimeout(() => {
+      const url = new URL(target);
+      url.searchParams.set("order_id", link.order_id);
+      url.searchParams.set("status", status === "paid" ? "paid" : "failed");
+      window.location.replace(url.toString());
+    }, 3000);
+    return () => window.clearTimeout(id);
+  }, [link, status]);
   useEffect(() => {
     if (!link || (status !== "paid" && status !== "expired")) return;
     const opener = typeof window !== "undefined" ? window.opener : null;

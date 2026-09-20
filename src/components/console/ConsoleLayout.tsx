@@ -1,7 +1,7 @@
 import { useRouterState } from "@tanstack/react-router";
 import { BrandLogo } from "@/components/BrandLogo";
 import {
-  ArrowLeftRight, BookOpen, CreditCard, KeyRound, LayoutGrid, LifeBuoy, Link2, Menu, Sparkles, X,
+  ArrowLeftRight, BookOpen, CreditCard, KeyRound, LayoutGrid, LifeBuoy, Link2, Menu, Settings2, Sparkles, X,
 } from "lucide-react";
 import { NotificationBell } from "@/components/console/NotificationBell";
 import { useState, type ReactNode } from "react";
@@ -20,6 +20,7 @@ export const CONSOLE_MENU = [
   { label: "Connect Accounts", href: "/connect-accounts", icon: CreditCard },
   { label: "Plan", href: "/plan", icon: Sparkles },
   { label: "API Keys", href: "/api-keys", icon: KeyRound },
+  { label: "Config", href: "/config", icon: Settings2 },
   { label: "Support", href: "/support", icon: LifeBuoy },
   { label: "Docs", href: "/docs", icon: BookOpen },
 ];

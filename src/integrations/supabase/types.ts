@@ -194,6 +194,30 @@ export type Database = {
         }
         Relationships: []
       }
+      merchant_config: {
+        Row: {
+          failure_url: string | null
+          success_url: string | null
+          updated_at: string
+          user_id: string
+          webhook_url: string | null
+        }
+        Insert: {
+          failure_url?: string | null
+          success_url?: string | null
+          updated_at?: string
+          user_id: string
+          webhook_url?: string | null
+        }
+        Update: {
+          failure_url?: string | null
+          success_url?: string | null
+          updated_at?: string
+          user_id?: string
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
       payment_links: {
         Row: {
           amount: number
@@ -618,6 +642,14 @@ export type Database = {
       revoke_api_key: { Args: { _id: string }; Returns: Json }
       save_merchant_account: {
         Args: { _payee_name?: string; _provider: string; _upi_id: string }
+        Returns: Json
+      }
+      save_merchant_config: {
+        Args: {
+          _failure_url: string
+          _success_url: string
+          _webhook_url: string
+        }
         Returns: Json
       }
       try_claim_mail_poll: {
