@@ -48,6 +48,7 @@ function PayPage() {
   const [skewMs, setSkewMs] = useState(0);
   const [copied, setCopied] = useState(false);
   const [now, setNow] = useState(() => Date.now());
+  const [redirectSeconds, setRedirectSeconds] = useState(3);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
@@ -143,26 +144,38 @@ function PayPage() {
   };
 
   const status = processing ? "active" : shownStatus ?? link?.status ?? "active";
+  const redirectTarget = status === "paid" ? link?.success_url : status === "expired" ? link?.failure_url : null;
+  const autoCloseUpgrade =
+    typeof window !== "undefined" && new URLSearchParams(window.location.search).get("autoclose") === "1";
 
   // Tabs opened by our own upgrade flow tell the opener and then close themselves.
   const [closeBlocked, setCloseBlocked] = useState(false);
 
   // Merchant redirect: send the payer back to the merchant's own result page.
   useEffect(() => {
-    if (!link || (status !== "paid" && status !== "expired")) return;
-    if (typeof window !== "undefined" && window.opener) return; // upgrade tab closes itself
-    const target = status === "paid" ? link.success_url : link.failure_url;
-    if (!target || !/^https?:\/\//i.test(target)) return;
-    const id = window.setTimeout(() => {
-      const url = new URL(target);
-      url.searchParams.set("order_id", link.order_id);
-      url.searchParams.set("status", status === "paid" ? "paid" : "failed");
-      window.location.replace(url.toString());
+    if (!link?.order_id || (status !== "paid" && status !== "expired")) return;
+    if (autoCloseUpgrade || !redirectTarget || !/^https?:\/\//i.test(redirectTarget)) return;
+
+    setRedirectSeconds(3);
+    const destination = new URL(redirectTarget);
+    destination.searchParams.set("order_id", link.order_id);
+    destination.searchParams.set("status", status === "paid" ? "paid" : "failed");
+
+    const countdown = window.setInterval(() => {
+      setRedirectSeconds((current) => Math.max(1, current - 1));
+    }, 1000);
+    const redirect = window.setTimeout(() => {
+      window.clearInterval(countdown);
+      window.location.replace(destination.toString());
     }, 3000);
-    return () => window.clearTimeout(id);
-  }, [link, status]);
+
+    return () => {
+      window.clearInterval(countdown);
+      window.clearTimeout(redirect);
+    };
+  }, [autoCloseUpgrade, link?.order_id, redirectTarget, status]);
   useEffect(() => {
-    if (!link || (status !== "paid" && status !== "expired")) return;
+    if (!autoCloseUpgrade || !link || (status !== "paid" && status !== "expired")) return;
     const opener = typeof window !== "undefined" ? window.opener : null;
     if (!opener) return;
     try {
@@ -176,7 +189,7 @@ function PayPage() {
       window.setTimeout(() => setCloseBlocked(true), 400);
     }, 2000);
     return () => window.clearTimeout(id);
-  }, [link, status]);
+  }, [autoCloseUpgrade, link?.order_id, status]);
 
 
   const copyOrder = async () => {
@@ -196,7 +209,9 @@ function PayPage() {
           <div className="pay-done-top">
             <div className="pay-done-tick">{failed ? <X strokeWidth={4} /> : <Check strokeWidth={4} />}</div>
             <h1>{failed ? "Payment failed" : "Payment successful!"}</h1>
-            <p>Redirecting back to merchant&apos;s website...</p>
+            {redirectTarget && !autoCloseUpgrade ? (
+              <p>Redirecting back to merchant&apos;s website... {redirectSeconds}s</p>
+            ) : null}
           </div>
           <div className="pay-done-row">
             <span className="pay-done-avatar"><Store strokeWidth={2.4} /></span>
