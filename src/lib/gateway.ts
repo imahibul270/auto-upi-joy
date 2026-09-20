@@ -46,13 +46,8 @@ export async function saveMerchantAccount(input: { provider: Provider; upiId: st
 }
 
 export async function connectMerchantAccount(input: { provider: Provider; email: string; appPassword: string }) {
-  const { data, error } = await supabase.rpc("connect_merchant_account", {
-    _provider: input.provider,
-    _email: input.email,
-    _app_password: input.appPassword,
-  });
-  if (error) throw error;
-  return data as unknown as MerchantAccount;
+  // Verified on the server: the mailbox must actually sign in before it is saved.
+  return connectMailbox({ data: input });
 }
 
 export async function disconnectMerchantAccount(provider: Provider) {
