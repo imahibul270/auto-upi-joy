@@ -44,6 +44,11 @@ function RegisterPage() {
       void Swal.fire({ icon: "error", title: "Passwords do not match", text: "Please enter the same password in both fields." });
       return;
     }
+    if (form.mobile.replace(/\D/g, "").length !== 10) {
+      setNote("Please enter a valid 10 digit mobile number.");
+      void Swal.fire({ icon: "error", title: "Invalid mobile number", text: "Enter your 10 digit mobile number without +91." });
+      return;
+    }
     if (!agreed) {
       setNote("Please accept the terms and privacy policy.");
       void Swal.fire({ icon: "warning", title: "Terms not accepted", text: "Please accept the terms and privacy policy to continue." });
@@ -88,7 +93,7 @@ function RegisterPage() {
           code: code.trim(),
           password: form.password,
           name: form.name.trim(),
-          mobile: form.mobile.trim(),
+          mobile: `+91${form.mobile.replace(/\D/g, "").slice(-10)}`,
         },
       });
       const [result] = await Promise.all([task, hold]);
