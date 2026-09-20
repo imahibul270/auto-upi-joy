@@ -205,3 +205,28 @@ export function usePaymentDetection(enabled = true) {
     },
   });
 }
+
+export type MerchantConfig = {
+  success_url: string | null;
+  failure_url: string | null;
+  webhook_url: string | null;
+};
+
+/** Per-user redirect + webhook settings (Config page). */
+export async function fetchMerchantConfig(): Promise<MerchantConfig> {
+  const { data, error } = await supabase
+    .from("merchant_config")
+    .select("success_url,failure_url,webhook_url")
+    .maybeSingle();
+  if (error) throw error;
+  return (data as MerchantConfig | null) ?? { success_url: null, failure_url: null, webhook_url: null };
+}
+
+export async function saveMerchantConfig(input: { successUrl: string; failureUrl: string; webhookUrl: string }) {
+  const { error } = await supabase.rpc("save_merchant_config", {
+    _success_url: input.successUrl,
+    _failure_url: input.failureUrl,
+    _webhook_url: input.webhookUrl,
+  });
+  if (error) throw error;
+}

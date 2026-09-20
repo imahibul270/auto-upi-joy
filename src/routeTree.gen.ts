@@ -20,6 +20,7 @@ import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedApiKeysRouteImport } from './routes/_authenticated/api-keys'
+import { Route as AuthenticatedConfigRouteImport } from './routes/_authenticated/config'
 import { Route as AuthenticatedConnectAccountsRouteImport } from './routes/_authenticated/connect-accounts'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedPaymentLinksRouteImport } from './routes/_authenticated/payment-links'
@@ -84,6 +85,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const AuthenticatedApiKeysRoute = AuthenticatedApiKeysRouteImport.update({
   id: '/api-keys',
   path: '/api-keys',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedConfigRoute = AuthenticatedConfigRouteImport.update({
+  id: '/config',
+  path: '/config',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedConnectAccountsRoute =
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/api-keys': typeof AuthenticatedApiKeysRoute
+  '/config': typeof AuthenticatedConfigRoute
   '/connect-accounts': typeof AuthenticatedConnectAccountsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/payment-links': typeof AuthenticatedPaymentLinksRoute
@@ -179,6 +186,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/api-keys': typeof AuthenticatedApiKeysRoute
+  '/config': typeof AuthenticatedConfigRoute
   '/connect-accounts': typeof AuthenticatedConnectAccountsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/payment-links': typeof AuthenticatedPaymentLinksRoute
@@ -204,6 +212,7 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/api-keys': typeof AuthenticatedApiKeysRoute
+  '/_authenticated/config': typeof AuthenticatedConfigRoute
   '/_authenticated/connect-accounts': typeof AuthenticatedConnectAccountsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/payment-links': typeof AuthenticatedPaymentLinksRoute
@@ -229,6 +238,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/api-keys'
+    | '/config'
     | '/connect-accounts'
     | '/dashboard'
     | '/payment-links'
@@ -252,6 +262,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/api-keys'
+    | '/config'
     | '/connect-accounts'
     | '/dashboard'
     | '/payment-links'
@@ -276,6 +287,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/_authenticated/api-keys'
+    | '/_authenticated/config'
     | '/_authenticated/connect-accounts'
     | '/_authenticated/dashboard'
     | '/_authenticated/payment-links'
@@ -386,6 +398,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedApiKeysRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/config': {
+      id: '/_authenticated/config'
+      path: '/config'
+      fullPath: '/config'
+      preLoaderRoute: typeof AuthenticatedConfigRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/connect-accounts': {
       id: '/_authenticated/connect-accounts'
       path: '/connect-accounts'
@@ -468,6 +487,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedApiKeysRoute: typeof AuthenticatedApiKeysRoute
+  AuthenticatedConfigRoute: typeof AuthenticatedConfigRoute
   AuthenticatedConnectAccountsRoute: typeof AuthenticatedConnectAccountsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedPaymentLinksRoute: typeof AuthenticatedPaymentLinksRoute
@@ -478,6 +498,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedApiKeysRoute: AuthenticatedApiKeysRoute,
+  AuthenticatedConfigRoute: AuthenticatedConfigRoute,
   AuthenticatedConnectAccountsRoute: AuthenticatedConnectAccountsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedPaymentLinksRoute: AuthenticatedPaymentLinksRoute,
