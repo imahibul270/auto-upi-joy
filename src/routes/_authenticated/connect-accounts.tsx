@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
-import { CheckCircle2, ChevronDown, Link2Off, Mail, Plug, PlayCircle, Wallet } from "lucide-react";
+import { AlertTriangle, CheckCircle2, ChevronDown, Link2Off, Mail, Plug, PlayCircle, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ConsoleLayout } from "@/components/console/ConsoleLayout";
@@ -236,9 +236,11 @@ function ConnectAccountsPage() {
               <div key={item.value} className="console-conn-row">
                 <span className="console-conn-name"><CheckCircle2 />{item.label}</span>
                 <span className="console-conn-upi">{account?.upi_id || "No UPI ID saved"}</span>
-                <span className="console-conn-mail">{account?.connected ? "Connected" : "Disconnected"}</span>
-                <span className={`console-conn-badge${account?.connected ? " is-on" : ""}`}>
-                  <i />{account?.connected ? "Connected" : "Disconnected"}
+                <span className="console-conn-mail">
+                  {account?.connected ? (account.mail_error ? "Needs attention" : "Connected") : "Disconnected"}
+                </span>
+                <span className={`console-conn-badge${account?.connected && !account.mail_error ? " is-on" : ""}`}>
+                  <i />{account?.connected ? (account.mail_error ? "Needs attention" : "Connected") : "Disconnected"}
                 </span>
               </div>
             );
