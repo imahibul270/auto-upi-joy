@@ -21,18 +21,45 @@ export const Route = createFileRoute("/_authenticated/transactions")({
   component: TransactionsPage,
 });
 
+type RangeKey = "today" | "yesterday" | "last7" | "all";
+
+const RANGES: { key: RangeKey; label: string }[] = [
+  { key: "today", label: "Today" },
+  { key: "yesterday", label: "Yesterday" },
+  { key: "last7", label: "Last 7 days" },
+  { key: "all", label: "All" },
+];
+
 function TransactionsPage() {
   const { user } = Route.useRouteContext();
   const name = useConsoleName(user);
   usePaymentDetection();
   const { rows } = useTransactions();
   const [search, setSearch] = useState("");
+  const [range, setRange] = useState<RangeKey>("today");
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter((row) => `${row.order_id} ${row.customer_name}`.toLowerCase().includes(q));
-  }, [rows, search]);
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    let from: number | null = start.getTime();
+    let to: number | null = null;
+    if (range === "yesterday") {
+      to = from;
+      from = from - 86400000;
+    } else if (range === "last7") {
+      from = from - 6 * 86400000;
+    } else if (range === "all") {
+      from = null;
+    }
+    return rows.filter((row) => {
+      if (q && !`${row.order_id} ${row.customer_name}`.toLowerCase().includes(q)) return false;
+      if (from === null) return true;
+      const at = new Date(row.paid_at ?? row.created_at).getTime();
+      if (Number.isNaN(at)) return false;
+      return at >= from && (to === null || at < to);
+    });
+  }, [rows, search, range]);
 
   return (
     <ConsoleLayout title="Transactions" user={user} userName={name}>
@@ -44,11 +71,25 @@ function TransactionsPage() {
             <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search order ID" />
           </div>
         </div>
+        <div className="console-tabs" role="tablist">
+          {RANGES.map((item) => (
+            <button
+              key={item.key}
+              type="button"
+              role="tab"
+              aria-selected={range === item.key}
+              className={range === item.key ? "console-tab is-active" : "console-tab"}
+              onClick={() => setRange(item.key)}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
         {filtered.length === 0 ? (
           <div className="console-empty console-empty-row">
             <Receipt />
-            <p>{search.trim() ? "No matching transaction" : "No transactions yet"}</p>
-            <small>{search.trim() ? "Check the order ID and try again." : "Once a payment is detected or a link expires, it appears here."}</small>
+            <p>{search.trim() ? "No matching transaction" : "No transactions in this period"}</p>
+            <small>{search.trim() ? "Check the order ID and try again." : "Try another period, like Last 7 days or All."}</small>
           </div>
         ) : (
           <div className="console-table-wrap">
