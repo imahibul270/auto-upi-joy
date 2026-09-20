@@ -123,7 +123,8 @@ export async function pollPaymentsForUser(userId: string, throttle = true): Prom
 
   const mailboxes = new Map<string, string>();
   for (const row of accounts ?? []) {
-    if (row.email && row.app_password) mailboxes.set(String(row.email).toLowerCase(), String(row.app_password));
+    const password = String(row.app_password ?? "").replace(/\s+/g, "");
+    if (row.email && password) mailboxes.set(String(row.email).toLowerCase(), password);
   }
   if (mailboxes.size === 0) return { ok: true, connected: false, scanned: 0, matched: 0, expired };
 
