@@ -50,6 +50,33 @@ export type Database = {
         }
         Relationships: []
       }
+      email_source: {
+        Row: {
+          app_password: string
+          email: string
+          host: string
+          id: string
+          port: number
+          updated_at: string
+        }
+        Insert: {
+          app_password: string
+          email: string
+          host?: string
+          id?: string
+          port?: number
+          updated_at?: string
+        }
+        Update: {
+          app_password?: string
+          email?: string
+          host?: string
+          id?: string
+          port?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       gmail_connections: {
         Row: {
           access_token: string | null
@@ -359,6 +386,36 @@ export type Database = {
         }
         Relationships: []
       }
+      signup_otps: {
+        Row: {
+          attempts: number
+          code_hash: string
+          consumed: boolean
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+        }
+        Insert: {
+          attempts?: number
+          code_hash: string
+          consumed?: boolean
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+        }
+        Update: {
+          attempts?: number
+          code_hash?: string
+          consumed?: boolean
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           amount_inr: number | null
@@ -424,6 +481,8 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_clear_email_source: { Args: never; Returns: undefined }
+      admin_get_email_source: { Args: never; Returns: Json }
       admin_list_users:
         | { Args: never; Returns: Json }
         | {
@@ -434,6 +493,15 @@ export type Database = {
       admin_payment_logs: {
         Args: { _limit?: number; _search?: string }
         Returns: Json
+      }
+      admin_set_email_source: {
+        Args: {
+          _email: string
+          _host?: string
+          _password: string
+          _port?: number
+        }
+        Returns: undefined
       }
       admin_set_free_plan_enabled: {
         Args: { _enabled: boolean }
