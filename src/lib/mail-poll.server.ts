@@ -15,6 +15,17 @@ const NAME_PATTERNS: RegExp[] = [
   /by\s+([A-Za-z][A-Za-z .'\-]{1,60}?)(?=\s+(?:on|via|to|using|at|through|-|–|—|$))/i,
 ];
 
+/** Turns a raw mail error into a message a merchant can act on. */
+export function mailboxProblem(raw: string): string {
+  if (/AUTHENTICATIONFAILED|Invalid credentials|LOGIN_FAILED/i.test(raw)) {
+    return "Mailbox sign in failed. The app password is wrong, expired or IMAP is off. Reconnect the mailbox with a fresh app password.";
+  }
+  if (/TIMEOUT|CONNECTION_CLOSED|ECONN|ENOTFOUND|network/i.test(raw)) {
+    return "Could not reach the mail server just now. It will retry automatically.";
+  }
+  return "Could not read the payment alert mailbox. Please reconnect it.";
+}
+
 export type PollResult = {
   ok: boolean;
   connected: boolean;
