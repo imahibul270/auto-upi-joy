@@ -103,6 +103,8 @@ export async function fetchRecentMessages(options: {
   sinceDays?: number;
   limit?: number;
   timeoutMs?: number;
+  /** Optional sender keyword, e.g. "phonepe" — alerts are found even in a busy inbox. */
+  fromFilter?: string;
 }): Promise<ImapMessage[]> {
   const { host, user, password } = options;
   const port = options.port ?? 993;
