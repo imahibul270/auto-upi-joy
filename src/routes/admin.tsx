@@ -184,7 +184,7 @@ function AdminConsole({ user }: { user: User }) {
       if (error) throw error;
       return (data as unknown as AdminUser[]) ?? [];
     },
-    enabled: tab !== "logs",
+    enabled: tab !== "logs" && tab !== "email",
     placeholderData: (previous) => previous,
     staleTime: 20000,
     refetchInterval: 30000,
@@ -215,7 +215,7 @@ function AdminConsole({ user }: { user: User }) {
   });
 
   const filtered = useMemo(() => usersQuery.data ?? [], [usersQuery.data]);
-  const usersLoading = usersQuery.isPending && tab !== "logs";
+  const usersLoading = usersQuery.isPending && tab !== "logs" && tab !== "email";
   const logsLoading = logsQuery.isPending && tab === "logs";
 
 
@@ -281,7 +281,9 @@ function AdminConsole({ user }: { user: User }) {
             </section>
           ) : null}
 
-          {tab === "logs" ? (
+          {tab === "email" ? (
+            <EmailSourceCard />
+          ) : tab === "logs" ? (
             <section className="console-card reveal-delay-1" data-reveal>
               <div className="console-card-head">
                 <h3>Payment logs</h3>
