@@ -327,6 +327,10 @@ section[id]{scroll-margin-top:var(--header-height)}
 .console-card-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem}
 .console-card-head h3{font-size:1rem;font-weight:700}
 .console-card-head small{font-size:.68rem;color:var(--muted-foreground)}
+.console-tabs{display:flex;flex-wrap:wrap;gap:.4rem;margin:0 0 1rem}
+.console-tab{padding:.38rem .85rem;border-radius:999px;font-size:.78rem;font-weight:600;color:var(--muted-foreground);background:color-mix(in oklab,var(--hero) 6%,transparent);border:1px solid transparent;cursor:pointer;transition:background .18s ease,color .18s ease,transform .18s ease}
+.console-tab:hover{background:color-mix(in oklab,var(--hero) 12%,transparent);color:var(--hero)}
+.console-tab.is-active{background:var(--hero);color:var(--card);transform:translateY(-1px)}
 .console-chart{height:300px}
 .console-chart-sm{height:210px}
 .console-empty{display:grid;justify-items:center;gap:.35rem;padding:2.4rem 1rem;text-align:center;color:var(--muted-foreground)}
