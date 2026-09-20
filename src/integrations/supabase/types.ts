@@ -149,6 +149,9 @@ export type Database = {
           email: string
           id: string
           last_polled_at: string | null
+          mail_error: string | null
+          mail_error_at: string | null
+          mail_ok_at: string | null
           payee_name: string
           provider: Database["public"]["Enums"]["upi_provider"]
           updated_at: string
@@ -163,6 +166,9 @@ export type Database = {
           email?: string
           id?: string
           last_polled_at?: string | null
+          mail_error?: string | null
+          mail_error_at?: string | null
+          mail_ok_at?: string | null
           payee_name?: string
           provider: Database["public"]["Enums"]["upi_provider"]
           updated_at?: string
@@ -177,6 +183,9 @@ export type Database = {
           email?: string
           id?: string
           last_polled_at?: string | null
+          mail_error?: string | null
+          mail_error_at?: string | null
+          mail_ok_at?: string | null
           payee_name?: string
           provider?: Database["public"]["Enums"]["upi_provider"]
           updated_at?: string
