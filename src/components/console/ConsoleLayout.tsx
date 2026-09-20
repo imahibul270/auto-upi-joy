@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { ProfileSettings } from "@/components/console/ProfileSettings";
 import { supabase } from "@/integrations/supabase/client";
 import { planTimeLeft, useQrQuota } from "@/lib/quota";
+import { VerifyEmailGate } from "@/components/console/VerifyEmailGate";
 
 export const CONSOLE_MENU = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutGrid },
@@ -46,6 +47,7 @@ export function ConsoleLayout({
 
   return (
     <div className="console">
+      <VerifyEmailGate />
       <aside className={`console-side${menuOpen ? " side-open" : ""}`}>
         <div className="console-brand">
           <BrandLogo />

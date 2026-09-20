@@ -965,3 +965,16 @@ section[id]{scroll-margin-top:var(--header-height)}
 .auth-spinner{display:inline-block;width:1rem;height:1rem;margin-right:.5rem;border-radius:50%;border:2px solid color-mix(in oklab,currentColor 35%,transparent);border-top-color:currentColor;animation:auth-spin .7s linear infinite;vertical-align:-2px}
 @keyframes auth-spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.auth-spinner{animation-duration:2s}}
+
+/* One time email verification gate for accounts created before OTP signup. */
+.verify-gate{position:fixed;inset:0;z-index:120;display:grid;place-items:center;padding:1.25rem;background:color-mix(in oklab,oklch(.18 .04 160) 88%,transparent);backdrop-filter:blur(6px)}
+.verify-card{width:min(420px,100%);display:flex;flex-direction:column;gap:.85rem;padding:1.6rem;border-radius:1.25rem;background:var(--card);color:var(--card-foreground);box-shadow:0 30px 70px rgb(0 0 0/.35);text-align:center;animation:verify-pop .32s ease}
+.verify-icon{display:grid;place-items:center;width:3rem;height:3rem;margin:0 auto;border-radius:50%;background:color-mix(in oklab,oklch(.46 .14 164) 16%,transparent);color:oklch(.42 .13 164)}
+.verify-icon svg{width:1.5rem;height:1.5rem}
+.verify-card h2{margin:0;font-size:1.25rem;font-weight:700}
+.verify-card p{margin:0;font-size:.86rem;color:var(--muted-foreground)}
+.verify-form{display:flex;flex-direction:column;gap:.7rem;text-align:left}
+.verify-btn{width:100%;font-weight:700;letter-spacing:.03em}
+.verify-resend{align-self:center;background:none;border:0;font-size:.8rem;color:oklch(.42 .13 164);cursor:pointer}
+@keyframes verify-pop{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.verify-card{animation:none}}

@@ -77,6 +77,21 @@ export type Database = {
         }
         Relationships: []
       }
+      email_verifications: {
+        Row: {
+          user_id: string
+          verified_at: string
+        }
+        Insert: {
+          user_id: string
+          verified_at?: string
+        }
+        Update: {
+          user_id?: string
+          verified_at?: string
+        }
+        Relationships: []
+      }
       gmail_connections: {
         Row: {
           access_token: string | null
