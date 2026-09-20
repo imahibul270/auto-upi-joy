@@ -134,7 +134,7 @@ function RegisterPage() {
           <p className="auth-otp-hint"><MailCheck /> Can&apos;t find the email? Please <strong>check your spam folder</strong> too.</p>
           {note && <p className="auth-message auth-error" role="alert">{note}</p>}
           <Button className="auth-submit" type="submit" disabled={verifying || code.length !== 6}>
-            {verifying ? <><span className="auth-spinner" /> Verifying OTP…</> : "VERIFY &amp; CREATE ACCOUNT"}
+            {verifying ? <><span className="auth-spinner" /> Verifying OTP…</> : "VERIFY AND CREATE ACCOUNT"}
           </Button>
           <div className="auth-otp-actions">
             <button type="button" onClick={() => setStep("details")} disabled={verifying}>Change details</button>
