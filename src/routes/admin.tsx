@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { User } from "@supabase/supabase-js";
 import {
-  Activity, IndianRupee, LayoutGrid, Lock, LogOut, QrCode, Search, ShieldCheck, Sparkles, Users, X,
+  Activity, IndianRupee, LayoutGrid, Lock, LogOut, Mail, QrCode, Search, ShieldCheck, Sparkles, Users, X,
 } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { Button } from "@/components/ui/button";
@@ -150,6 +150,7 @@ const ADMIN_MENU = [
   { key: "users", label: "Users", icon: Users },
   { key: "subscriptions", label: "Subscriptions", icon: Sparkles },
   { key: "logs", label: "Logs", icon: Activity },
+  { key: "email", label: "Email source", icon: Mail },
 ] as const;
 
 type Tab = (typeof ADMIN_MENU)[number]["key"];
