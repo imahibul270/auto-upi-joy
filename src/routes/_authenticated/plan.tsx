@@ -79,8 +79,10 @@ function PlanPage() {
     const tab = window.open("", "_blank");
     try {
       const order = await start({ data: { origin: window.location.origin } });
-      if (tab) tab.location.href = order.payment_url;
-      else window.location.href = order.payment_url;
+      const upgradePaymentUrl = new URL(order.payment_url, window.location.origin);
+      upgradePaymentUrl.searchParams.set("autoclose", "1");
+      if (tab) tab.location.href = upgradePaymentUrl.toString();
+      else window.location.href = upgradePaymentUrl.toString();
 
       void Swal.fire({
         title: "Waiting for payment…",
