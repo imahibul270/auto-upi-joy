@@ -656,3 +656,240 @@ function EmailSourceCard() {
     </section>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* Issue Config: type a mobile number, get the user's full story in    */
+/* Hinglish with a plain-language fix for every problem found.          */
+/* ------------------------------------------------------------------ */
+
+type Diagnostics = {
+  found: boolean;
+  reason?: string;
+  now?: string;
+  user?: {
+    user_id: string; email: string; created_at: string; last_sign_in_at: string | null;
+    full_name: string; mobile: string; email_verified: boolean;
+  };
+  plan?: { plan: string; started_at: string | null; expires_at: string | null; qr_limit: number | null; amount_inr: number | null } | null;
+  quota?: { qr_used: number; free_plan_enabled: boolean };
+  mailbox?: {
+    connected: boolean; email: string; upi_id: string; payee_name: string; has_password: boolean;
+    connected_at: string | null; last_polled_at: string | null;
+    mail_error: string | null; mail_error_at: string | null; mail_ok_at: string | null;
+  } | null;
+  config?: { success_url: string | null; failure_url: string | null; webhook_url: string | null } | null;
+  api_key?: { active: boolean; last_used_at: string | null; created_at: string } | null;
+  links?: {
+    total: number; paid: number; expired: number; active: number; no_click_expired: number;
+    last_paid_at: string | null; last_created_at: string | null; webhook_failed: number;
+  };
+  recent?: {
+    order_id: string; amount: number; payable_amount: number; status: string; clicks: number;
+    created_at: string; paid_at: string | null; expires_at: string; payer_name: string | null;
+    webhook_last_error: string | null;
+  }[];
+  mail_seen?: number;
+};
+
+type Finding = { level: "bad" | "warn" | "ok"; title: string; detail: string };
+
+/** Turns raw account data into Hinglish problems + fixes. */
+function buildFindings(d: Diagnostics): Finding[] {
+  const out: Finding[] = [];
+  const mb = d.mailbox;
+  const links = d.links;
+  const plan = d.plan;
+  const now = d.now ? Date.parse(d.now) : Date.now();
+
+  if (!d.user?.email_verified) {
+    out.push({
+      level: "bad",
+      title: "Email verify nahi hua hai",
+      detail: "User ne abhi tak email OTP verify nahi kiya, isliye dashboard band hai. Solution: user ko bolein dashboard kholte hi GET OTP dabaye, mail (spam folder bhi) check kare aur 6 digit code daale.",
+    });
+  }
+
+  if (!mb) {
+    out.push({
+      level: "bad",
+      title: "Mailbox connect hi nahi kiya",
+      detail: "Payment alert padhne wala mailbox jodna baaki hai, isliye koi payment capture nahi hoga. Solution: Connect Accounts page par UPI ID, Gmail address aur Gmail app password daalkar connect karayein.",
+    });
+  } else {
+    if (!mb.has_password || !mb.connected) {
+      out.push({
+        level: "bad",
+        title: "Mailbox saved hai par active nahi",
+        detail: "App password missing ya connection adhura hai. Solution: naya Gmail app password banwa kar dobara connect karayein.",
+      });
+    }
+    if (mb.mail_error) {
+      const wrongPass = /sign in|password|auth/i.test(mb.mail_error);
+      out.push({
+        level: "bad",
+        title: wrongPass ? "Gmail app password galat / expire hai" : "Mailbox padhne me dikkat",
+        detail: `Gateway ka message: "${mb.mail_error}". ${wrongPass
+          ? "Yeh hamare gateway ka issue nahi hai — Gmail login reject kar raha hai. Solution: user Gmail > Security > App passwords se naya 16 character ka password banaye, IMAP on rakhe, phir Connect Accounts par Reconnect kare."
+          : "Solution: thodi der baad apne aap retry hota hai; na sudhre to mailbox dobara connect karayein."}`,
+      });
+    } else if (mb.mail_ok_at) {
+      out.push({ level: "ok", title: "Mailbox theek chal raha hai", detail: `Last successful mail read: ${stamp(mb.mail_ok_at)}. Payment detection is taraf se clear hai.` });
+    }
+    if (!mb.upi_id) {
+      out.push({ level: "bad", title: "UPI ID set nahi hai", detail: "QR me paisa kahan jayega yeh pata hi nahi. Solution: Connect Accounts par sahi UPI ID save karayein." });
+    }
+    if (mb.last_polled_at && now - Date.parse(mb.last_polled_at) > 24 * 3600_000) {
+      out.push({ level: "warn", title: "Kai ghanton se mailbox scan nahi hua", detail: `Last scan ${stamp(mb.last_polled_at)}. Scan tab hota hai jab koi payment page khula ho. Solution: user se ek test link banwa kar pay page kholne ko kahein.` });
+    }
+  }
+
+  if (plan?.plan === "pro" && plan.expires_at && Date.parse(plan.expires_at) < now) {
+    out.push({ level: "bad", title: "Pro plan expire ho chuka hai", detail: `Plan ${day(plan.expires_at)} ko khatam hua. Solution: user renew kare, ya aap Users page > Manage se plan aur din set kar dein.` });
+  }
+  const used = d.quota?.qr_used ?? 0;
+  const limit = plan?.qr_limit ?? (plan?.plan === "pro" ? 3000 : 3);
+  if (used >= limit) {
+    out.push({ level: "bad", title: "QR limit khatam ho gayi", detail: `${used} / ${limit} QR ban chuke hain, isliye naya QR nahi banega. Solution: user Pro le ya aap Manage se QR limit badha dein / usage reset karein.` });
+  } else if (limit - used <= 3) {
+    out.push({ level: "warn", title: "QR limit khatam hone wali hai", detail: `Sirf ${limit - used} QR bache hain. Solution: user ko renew ya upgrade ka reminder dein.` });
+  }
+  if (d.quota && !d.quota.free_plan_enabled && plan?.plan !== "pro") {
+    out.push({ level: "bad", title: "Free plan band hai", detail: "Admin ne free plan off kiya hua hai, isliye is free user ka QR nahi banega. Solution: ya to Overview se free plan on karein, ya user ko paid plan dein." });
+  }
+
+  if (links) {
+    if (links.total === 0) {
+      out.push({ level: "warn", title: "Abhi tak ek bhi QR nahi banaya", detail: "User ne koi payment link create hi nahi kiya. Solution: Payment Links page se ek chhoti amount ka test link banwayein." });
+    } else if (links.paid === 0 && links.expired > 0) {
+      out.push({ level: "bad", title: "Link bante hain par payment capture nahi hota", detail: "Sab link expire ho rahe hain. 90% cases me wajah mailbox login fail, galat UPI ID, ya payer ne paise bheje hi nahi. Solution: upar mailbox wala status dekhein, UPI ID verify karein, aur ek khud ka ₹1 test payment karke check karein." });
+    }
+    if (links.no_click_expired > 0 && links.paid === 0) {
+      out.push({ level: "warn", title: "Kuch link kabhi khole hi nahi gaye", detail: `${links.no_click_expired} link par ek bhi click nahi. Iska matlab payer tak link pahuncha hi nahi (user ka network/browser ya link share na karna). Yeh gateway ka issue nahi hai.` });
+    }
+    if (links.webhook_failed > 0) {
+      out.push({ level: "warn", title: "Webhook deliver nahi ho paya", detail: `${links.webhook_failed} order par webhook fail hua — matlab user ka apna server jawab nahi de raha ya URL galat hai. Solution: Config page par https webhook URL sahi karwayein.` });
+    }
+  }
+
+  if (!d.config?.webhook_url && !d.config?.success_url) {
+    out.push({ level: "warn", title: "Redirect / webhook URL set nahi hai", detail: "Payment ke baad payer ko kahin bhejna ya server ko batana set nahi hai. Solution: Config page par success, failed aur webhook URL bharwayein (agar user ko zarurat ho)." });
+  }
+  if (d.api_key && !d.api_key.last_used_at) {
+    out.push({ level: "warn", title: "API key bani hai par kabhi use nahi hui", detail: "Integration abhi live nahi hai. Solution: docs ke hisaab se x-api-key header ke saath create-order call karwayein." });
+  }
+  if (!d.user?.last_sign_in_at) {
+    out.push({ level: "warn", title: "User ne kabhi login hi nahi kiya", detail: "Account bana par sign in nahi hua. Solution: login karne ko kahein, password bhool gaye to forgot password use karayein." });
+  }
+
+  if (out.length === 0 || out.every((f) => f.level === "ok")) {
+    out.push({ level: "ok", title: "Koi technical issue nahi mila", detail: "Account, plan, mailbox aur links sab theek hain. Agar phir bhi shikayat hai to user ke internet/browser ya payer ki side ka issue ho sakta hai — usse page refresh aur doosre browser me try karne ko kahein." });
+  }
+  return out;
+}
+
+function IssueConfigCard() {
+  const [number, setNumber] = useState("");
+  const [query, setQuery] = useState("");
+
+  const diag = useQuery({
+    queryKey: ["admin-diagnostics", query],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_user_diagnostics" as never, { _mobile: query } as never);
+      if (error) throw error;
+      return data as unknown as Diagnostics;
+    },
+    enabled: query.length === 10,
+    refetchInterval: 10000,
+  });
+
+  const data = diag.data;
+  const findings = useMemo(() => (data?.found ? buildFindings(data) : []), [data]);
+
+  return (
+    <>
+      <section className="console-card reveal-delay-1" data-reveal>
+        <div className="console-card-head"><h3>Find user by mobile number</h3><span className="console-live"><i />Live</span></div>
+        <form
+          className="admin-issue-form"
+          onSubmit={(e) => { e.preventDefault(); setQuery(number.replace(/\D/g, "").slice(-10)); }}
+        >
+          <label className="console-field" style={{ flex: "1 1 220px" }}>Mobile number
+            <Input
+              value={number}
+              onChange={(e) => setNumber(e.target.value.replace(/\D/g, "").slice(0, 10))}
+              placeholder="10 digit mobile"
+              inputMode="numeric"
+              maxLength={10}
+            />
+          </label>
+          <Button type="submit" disabled={number.replace(/\D/g, "").length !== 10}>Check user</Button>
+        </form>
+        {query.length === 10 && diag.isPending ? <p className="console-empty">Checking…</p> : null}
+        {data && !data.found ? (
+          <p className="console-empty">{data.reason === "bad_number" ? "Poora 10 digit number daalein." : "Is number se koi account nahi mila."}</p>
+        ) : null}
+      </section>
+
+      {data?.found && data.user ? (
+        <>
+          <section className="console-card reveal-delay-2" data-reveal>
+            <div className="console-card-head"><h3>{data.user.full_name || data.user.email}</h3>
+              <span className={`console-pill ${data.plan?.plan === "pro" ? "is-paid" : "is-muted"}`}>{(data.plan?.plan ?? "free").toUpperCase()}</span>
+            </div>
+            <div className="admin-issue-facts">
+              <span>Mobile<b>{data.user.mobile || "—"}</b></span>
+              <span>Email<b>{data.user.email}</b></span>
+              <span>Email verified<b>{data.user.email_verified ? "Haan" : "Nahi"}</b></span>
+              <span>Joined<b>{day(data.user.created_at)}</b></span>
+              <span>Last login<b>{data.user.last_sign_in_at ? stamp(data.user.last_sign_in_at) : "Kabhi nahi"}</b></span>
+              <span>Plan expiry<b>{data.plan?.plan === "pro" ? day(data.plan.expires_at) : "No expiry"}</b></span>
+              <span>QR used<b>{data.quota?.qr_used ?? 0} / {data.plan?.qr_limit ?? (data.plan?.plan === "pro" ? 3000 : 3)}</b></span>
+              <span>Mailbox<b>{data.mailbox ? (data.mailbox.mail_error ? "Problem" : "Connected") : "Not connected"}</b></span>
+              <span>UPI ID<b>{data.mailbox?.upi_id || "—"}</b></span>
+              <span>Links paid<b>{data.links?.paid ?? 0} / {data.links?.total ?? 0}</b></span>
+              <span>Last payment<b>{data.links?.last_paid_at ? stamp(data.links.last_paid_at) : "—"}</b></span>
+              <span>Alert mails read<b>{data.mail_seen ?? 0}</b></span>
+            </div>
+          </section>
+
+          <section className="console-card reveal-delay-3" data-reveal>
+            <div className="console-card-head"><h3>Issue aur solution (Hinglish)</h3></div>
+            <div className="admin-issue-list">
+              {findings.map((f) => (
+                <article key={f.title} className={`admin-issue is-${f.level}`}>
+                  <strong>{f.level === "bad" ? "❌ " : f.level === "warn" ? "⚠️ " : "✅ "}{f.title}</strong>
+                  <small>{f.detail}</small>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="console-card reveal-delay-4" data-reveal>
+            <div className="console-card-head"><h3>Last 10 QR / payment activity</h3></div>
+            <div className="console-table-wrap">
+              <table className="console-table">
+                <thead><tr><th>ORDER ID</th><th>AMOUNT</th><th>CHARGED</th><th>STATUS</th><th>CLICKS</th><th>CREATED</th><th>PAID AT</th></tr></thead>
+                <tbody>
+                  {(data.recent ?? []).map((r) => (
+                    <tr key={r.order_id}>
+                      <td><strong>{r.order_id}</strong></td>
+                      <td>{inr(r.amount)}</td>
+                      <td>{inr(r.payable_amount)}</td>
+                      <td><span className={`console-pill ${r.status === "paid" ? "is-paid" : r.status === "active" ? "is-active" : "is-muted"}`}>{r.status === "paid" ? "Success" : r.status === "active" ? "Pending" : "Expired"}</span></td>
+                      <td>{r.clicks}</td>
+                      <td>{stamp(r.created_at)}</td>
+                      <td>{r.paid_at ? stamp(r.paid_at) : "—"}</td>
+                    </tr>
+                  ))}
+                  {(data.recent ?? []).length === 0 ? (
+                    <tr><td colSpan={7}><div className="console-empty"><p>Koi activity nahi</p></div></td></tr>
+                  ) : null}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </>
+      ) : null}
+    </>
+  );
+}
