@@ -47,6 +47,7 @@ export function ConsoleLayout({
 
   return (
     <div className="console">
+      <VerifyEmailGate />
       <aside className={`console-side${menuOpen ? " side-open" : ""}`}>
         <div className="console-brand">
           <BrandLogo />
