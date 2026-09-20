@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { User } from "@supabase/supabase-js";
 import {
-  Activity, IndianRupee, LayoutGrid, Lock, LogOut, QrCode, Search, ShieldCheck, Sparkles, Users, X,
+  Activity, IndianRupee, LayoutGrid, Lock, LogOut, Mail, QrCode, Search, ShieldCheck, Sparkles, Users, X,
 } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { Button } from "@/components/ui/button";
@@ -150,6 +150,7 @@ const ADMIN_MENU = [
   { key: "users", label: "Users", icon: Users },
   { key: "subscriptions", label: "Subscriptions", icon: Sparkles },
   { key: "logs", label: "Logs", icon: Activity },
+  { key: "email", label: "Email source", icon: Mail },
 ] as const;
 
 type Tab = (typeof ADMIN_MENU)[number]["key"];
@@ -183,7 +184,7 @@ function AdminConsole({ user }: { user: User }) {
       if (error) throw error;
       return (data as unknown as AdminUser[]) ?? [];
     },
-    enabled: tab !== "logs",
+    enabled: tab !== "logs" && tab !== "email",
     placeholderData: (previous) => previous,
     staleTime: 20000,
     refetchInterval: 30000,
@@ -214,7 +215,7 @@ function AdminConsole({ user }: { user: User }) {
   });
 
   const filtered = useMemo(() => usersQuery.data ?? [], [usersQuery.data]);
-  const usersLoading = usersQuery.isPending && tab !== "logs";
+  const usersLoading = usersQuery.isPending && tab !== "logs" && tab !== "email";
   const logsLoading = logsQuery.isPending && tab === "logs";
 
 
@@ -280,7 +281,9 @@ function AdminConsole({ user }: { user: User }) {
             </section>
           ) : null}
 
-          {tab === "logs" ? (
+          {tab === "email" ? (
+            <EmailSourceCard />
+          ) : tab === "logs" ? (
             <section className="console-card reveal-delay-1" data-reveal>
               <div className="console-card-head">
                 <h3>Payment logs</h3>
@@ -557,6 +560,96 @@ function ProPriceCard() {
         <Button onClick={() => void save()} disabled={busy}>{busy ? "Saving…" : "Update price"}</Button>
       </div>
       <small>New price applies instantly on the landing page, Plan page and every upgrade payment.</small>
+    </section>
+  );
+}
+
+/** Mailbox used to send signup verification codes (email + app password). */
+function EmailSourceCard() {
+  const sourceQuery = useQuery({
+    queryKey: ["admin-email-source"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_get_email_source" as never);
+      if (error) throw error;
+      return (data ?? { connected: false }) as { connected: boolean; email?: string; host?: string; port?: number; updated_at?: string };
+    },
+    refetchInterval: 20000,
+  });
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [host, setHost] = useState("smtp.gmail.com");
+  const [port, setPort] = useState("465");
+  const [busy, setBusy] = useState(false);
+  const source = sourceQuery.data;
+
+  useEffect(() => {
+    if (!source?.connected) return;
+    setEmail(source.email ?? "");
+    setHost(source.host ?? "smtp.gmail.com");
+    setPort(String(source.port ?? 465));
+  }, [source]);
+
+  async function save() {
+    if (!email.trim() || password.trim().length < 6) {
+      void Swal.fire({ icon: "error", title: "Enter email and app password", confirmButtonText: "OK" });
+      return;
+    }
+    setBusy(true);
+    const { error } = await supabase.rpc("admin_set_email_source" as never, {
+      _email: email.trim(),
+      _password: password.trim(),
+      _host: host.trim() || "smtp.gmail.com",
+      _port: Number(port) || 465,
+    } as never);
+    setBusy(false);
+    if (error) {
+      void Swal.fire({ icon: "error", title: "Could not save", text: error.message, confirmButtonText: "OK" });
+      return;
+    }
+    setPassword("");
+    await sourceQuery.refetch();
+    void Swal.fire({ icon: "success", title: "Email connected", timer: 1400, showConfirmButton: false });
+  }
+
+  async function disconnect() {
+    setBusy(true);
+    const { error } = await supabase.rpc("admin_clear_email_source" as never);
+    setBusy(false);
+    if (error) {
+      void Swal.fire({ icon: "error", title: "Could not disconnect", text: error.message, confirmButtonText: "OK" });
+      return;
+    }
+    setPassword("");
+    await sourceQuery.refetch();
+    void Swal.fire({ icon: "success", title: "Email disconnected", timer: 1400, showConfirmButton: false });
+  }
+
+  return (
+    <section className="console-card admin-price-card reveal-delay-1" data-reveal>
+      <div className="console-card-head">
+        <h3>Email source</h3>
+        <span className="console-live"><i />{source?.connected ? `Connected · ${source.email}` : "Not connected"}</span>
+      </div>
+      <div className="admin-modal-grid">
+        <label className="console-field">Email address
+          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="sender@gmail.com" autoComplete="off" />
+        </label>
+        <label className="console-field">App password
+          <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={source?.connected ? "Saved · enter to replace" : "16 character app password"} autoComplete="new-password" />
+        </label>
+        <label className="console-field">SMTP host
+          <Input value={host} onChange={(e) => setHost(e.target.value)} placeholder="smtp.gmail.com" />
+        </label>
+        <label className="console-field">SMTP port
+          <Input type="number" value={port} onChange={(e) => setPort(e.target.value)} placeholder="465" />
+        </label>
+      </div>
+      <div className="admin-price-row">
+        <Button onClick={() => void save()} disabled={busy}>{busy ? "Saving…" : source?.connected ? "Update email" : "Connect email"}</Button>
+        {source?.connected ? <Button variant="outline" onClick={() => void disconnect()} disabled={busy}>Disconnect</Button> : null}
+      </div>
+      <small>Signup one time passwords are sent from this mailbox. Use an app password, not the account password.</small>
     </section>
   );
 }
