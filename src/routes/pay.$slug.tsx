@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Check, Copy, Store } from "lucide-react";
+import { Check, Copy, Store, X } from "lucide-react";
 import { brandLogoUrl } from "@/components/BrandLogo";
 import bhimUpiLogo from "@/assets/bhim-upi-logo.png.asset.json";
 import paytmLogo from "@/assets/paytm-logo.png.asset.json";
@@ -171,13 +171,14 @@ function PayPage() {
     } catch { /* clipboard unavailable */ }
   };
 
-  if (!loading && link && status === "paid") {
+  if (!loading && link && (status === "paid" || status === "expired")) {
+    const failed = status === "expired";
     return (
       <div className="pay-screen">
-        <div className="pay-done">
+        <div className={failed ? "pay-done is-failed" : "pay-done"}>
           <div className="pay-done-top">
-            <div className="pay-done-tick"><Check strokeWidth={4} /></div>
-            <h1>Payment successful!</h1>
+            <div className="pay-done-tick">{failed ? <X strokeWidth={4} /> : <Check strokeWidth={4} />}</div>
+            <h1>{failed ? "Payment failed" : "Payment successful!"}</h1>
             <p>Redirecting back to merchant&apos;s website...</p>
           </div>
           <div className="pay-done-row">

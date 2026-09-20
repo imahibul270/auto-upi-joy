@@ -613,6 +613,12 @@ section[id]{scroll-margin-top:var(--header-height)}
 .pay-done-order button { flex: none; width: 36px; height: 36px; display: grid; place-items: center; border-radius: .6rem; color: var(--hero); background: color-mix(in oklab, var(--hero) 8%, var(--card)); transition: background .15s ease; }
 .pay-done-order button:hover { background: color-mix(in oklab, var(--hero) 15%, var(--card)); }
 .pay-done-note { padding: 0 1.4rem 1.2rem; text-align: center; font-size: .82rem; color: var(--muted-foreground); }
+/* Failed screen: same animation, black-and-white header with a red close mark */
+.pay-done.is-failed .pay-done-top { background: oklch(.16 0 0); color: oklch(.99 0 0); }
+.pay-done.is-failed .pay-done-tick { background: oklch(.99 0 0); color: oklch(.55 .22 27); }
+.pay-done.is-failed .pay-done-avatar { background: oklch(.28 0 0); color: oklch(.99 0 0); }
+.pay-done.is-failed .pay-done-order button { color: oklch(.25 0 0); background: oklch(.94 0 0); }
+.pay-done.is-failed .pay-done-order button:hover { background: oklch(.89 0 0); }
 
 .pay-done-order button svg { width: 18px; height: 18px; }
 @keyframes pay-done-in { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
