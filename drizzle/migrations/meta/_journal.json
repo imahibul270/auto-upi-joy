@@ -211,6 +211,13 @@
       "when": 1789904220629,
       "tag": "0029_mailbox_health_status",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1789907124951,
+      "tag": "0030_merchant_config_urls",
+      "breakpoints": true
     }
   ]
 }
