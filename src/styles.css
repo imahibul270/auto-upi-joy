@@ -994,3 +994,28 @@ section[id]{scroll-margin-top:var(--header-height)}
   line-height: 1.45;
 }
 .console-mail-warn svg { width: 18px; height: 18px; flex: none; margin-top: 1px; }
+
+/* Registration mobile field with a fixed +91 prefix. */
+.auth-phone-wrap { position: relative; display: block; }
+.auth-phone-wrap em {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  font-style: normal; font-weight: 600; opacity: .75; pointer-events: none;
+}
+.auth-phone-wrap input { padding-left: 52px; }
+
+/* Admin issue diagnostics */
+.admin-issue-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.admin-issue-list { display: grid; gap: 10px; margin-top: 14px; }
+.admin-issue {
+  border: 1px solid color-mix(in oklch, currentColor 14%, transparent);
+  border-radius: 14px; padding: 12px 14px; display: grid; gap: 4px;
+  animation: verify-pop .26s ease both;
+}
+.admin-issue strong { font-size: .95rem; }
+.admin-issue small { opacity: .85; line-height: 1.45; }
+.admin-issue.is-bad { border-color: color-mix(in oklch, red 45%, transparent); }
+.admin-issue.is-warn { border-color: color-mix(in oklch, orange 45%, transparent); }
+.admin-issue.is-ok { border-color: color-mix(in oklch, green 35%, transparent); }
+.admin-issue-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 12px; }
+.admin-issue-facts span { display: grid; gap: 2px; font-size: .85rem; opacity: .9; }
+.admin-issue-facts b { font-size: .95rem; }

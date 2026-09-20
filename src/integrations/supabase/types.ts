@@ -567,6 +567,7 @@ export type Database = {
         Returns: Json
       }
       admin_set_pro_price: { Args: { _price: number }; Returns: number }
+      admin_user_diagnostics: { Args: { _mobile: string }; Returns: Json }
       api_create_payment_link: {
         Args: {
           _amount: number
@@ -617,6 +618,7 @@ export type Database = {
       is_platform_admin: { Args: never; Returns: boolean }
       issue_api_key: { Args: { _label?: string }; Returns: Json }
       list_merchant_accounts: { Args: never; Returns: Json }
+      mobile_digits: { Args: { _value: string }; Returns: string }
       new_payment_slug: { Args: never; Returns: string }
       plan_expiry_at: {
         Args: { _base: string; _days: number }

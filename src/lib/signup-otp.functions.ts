@@ -103,10 +103,23 @@ export const verifySignupOtp = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data }) => {
-    await consumeOtp(data.email, data.code);
-
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const admin = supabaseAdmin as any;
+
+    // One account per mobile number.
+    const digits = data.mobile.replace(/\D/g, "").slice(-10);
+    if (digits.length !== 10) throw new Error("Please enter a valid 10 digit mobile number.");
+    const { data: taken } = await admin
+      .from("profiles")
+      .select("id")
+      .or(`mobile.eq.+91${digits},mobile.eq.${digits},mobile.eq.91${digits}`)
+      .limit(1);
+    if ((taken ?? []).length > 0) {
+      throw new Error("This mobile number is already registered. Please sign in with that account.");
+    }
+
+    await consumeOtp(data.email, data.code);
+
 
     const { data: created, error } = await admin.auth.admin.createUser({
       email: data.email,

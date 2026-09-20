@@ -44,6 +44,11 @@ function RegisterPage() {
       void Swal.fire({ icon: "error", title: "Passwords do not match", text: "Please enter the same password in both fields." });
       return;
     }
+    if (form.mobile.replace(/\D/g, "").length !== 10) {
+      setNote("Please enter a valid 10 digit mobile number.");
+      void Swal.fire({ icon: "error", title: "Invalid mobile number", text: "Enter your 10 digit mobile number without +91." });
+      return;
+    }
     if (!agreed) {
       setNote("Please accept the terms and privacy policy.");
       void Swal.fire({ icon: "warning", title: "Terms not accepted", text: "Please accept the terms and privacy policy to continue." });
@@ -88,7 +93,7 @@ function RegisterPage() {
           code: code.trim(),
           password: form.password,
           name: form.name.trim(),
-          mobile: form.mobile.trim(),
+          mobile: `+91${form.mobile.replace(/\D/g, "").slice(-10)}`,
         },
       });
       const [result] = await Promise.all([task, hold]);
@@ -149,7 +154,7 @@ function RegisterPage() {
     <AuthShell>
       <form className="auth-form auth-form-register" onSubmit={handleSubmit}>
         <div className="auth-form-heading"><span>JOIN AUTO UPI</span><h1>Register new account</h1><p>Create your secure merchant workspace.</p></div>
-        <div className="auth-field-grid"><label className="auth-field">Name<Input value={form.name} onChange={(event) => update("name", event.target.value)} placeholder="Enter your name" autoComplete="name" required /></label><label className="auth-field">Mobile number<Input type="tel" value={form.mobile} onChange={(event) => update("mobile", event.target.value)} placeholder="Enter mobile number" autoComplete="tel" pattern="[0-9+ -]{8,15}" required /></label></div>
+        <div className="auth-field-grid"><label className="auth-field">Name<Input value={form.name} onChange={(event) => update("name", event.target.value)} placeholder="Enter your name" autoComplete="name" required /></label><label className="auth-field">Mobile number<span className="auth-phone-wrap"><em>+91</em><Input type="tel" value={form.mobile} onChange={(event) => update("mobile", event.target.value.replace(/\D/g, "").slice(0, 10))} placeholder="10 digit number" autoComplete="tel" inputMode="numeric" pattern="[0-9]{10}" maxLength={10} required /></span></label></div>
         <label className="auth-field">Email address<Input type="email" value={form.email} onChange={(event) => update("email", event.target.value)} placeholder="Enter email address" autoComplete="email" required /></label>
         <label className="auth-field">Password<span className="auth-password-wrap"><Input type={showPassword ? "text" : "password"} value={form.password} onChange={(event) => update("password", event.target.value)} placeholder="Create a strong password" autoComplete="new-password" minLength={8} required /><Button type="button" variant="ghost" size="icon" aria-label={showPassword ? "Hide password" : "Show password"} onClick={() => setShowPassword((value) => !value)}>{showPassword ? <EyeOff /> : <Eye />}</Button></span></label>
         <label className="auth-field">Confirm password<Input type="password" value={form.confirm} onChange={(event) => update("confirm", event.target.value)} placeholder="Enter password again" autoComplete="new-password" minLength={8} required /></label>
