@@ -71,11 +71,25 @@ function TransactionsPage() {
             <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search order ID" />
           </div>
         </div>
+        <div className="console-tabs" role="tablist">
+          {RANGES.map((item) => (
+            <button
+              key={item.key}
+              type="button"
+              role="tab"
+              aria-selected={range === item.key}
+              className={range === item.key ? "console-tab is-active" : "console-tab"}
+              onClick={() => setRange(item.key)}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
         {filtered.length === 0 ? (
           <div className="console-empty console-empty-row">
             <Receipt />
-            <p>{search.trim() ? "No matching transaction" : "No transactions yet"}</p>
-            <small>{search.trim() ? "Check the order ID and try again." : "Once a payment is detected or a link expires, it appears here."}</small>
+            <p>{search.trim() ? "No matching transaction" : "No transactions in this period"}</p>
+            <small>{search.trim() ? "Check the order ID and try again." : "Try another period, like Last 7 days or All."}</small>
           </div>
         ) : (
           <div className="console-table-wrap">
