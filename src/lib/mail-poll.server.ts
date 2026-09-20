@@ -68,10 +68,21 @@ async function deliverWebhook(
   link: { id: string; order_id: string; amount: number; payable_amount: number; webhook_url?: string | null },
   payerName: string | null,
 ): Promise<void> {
-  const url = link.webhook_url;
+  const admin = supabaseAdmin as any;
+
+  // Per-order webhook wins; otherwise the merchant's saved Config webhook URL.
+  let url = link.webhook_url ?? null;
+  if (!url) {
+    const { data: config } = await admin
+      .from("merchant_config")
+      .select("webhook_url")
+      .eq("user_id", userId)
+      .maybeSingle();
+    url = config?.webhook_url ?? null;
+  }
   if (!url || !/^https:\/\//i.test(url)) return;
 
-  const admin = supabaseAdmin as any;
+
   const { data: key } = await admin
     .from("api_keys")
     .select("webhook_secret")
