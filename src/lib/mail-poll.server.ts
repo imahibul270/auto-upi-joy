@@ -202,8 +202,10 @@ export async function pollPaymentsForUser(userId: string, throttle = true): Prom
           .eq("payable_amount", exact)
           .lte("created_at", createdBefore);
 
-        if (!candidates || candidates.length !== 1) continue;
-        if (Number(candidates[0].payable_amount) !== exact) continue;
+        if (!candidates || candidates.length !== 1 || Number(candidates[0].payable_amount) !== exact) {
+          await release();
+          continue;
+        }
 
         const link = candidates[0];
         const { data: updated } = await admin
