@@ -225,14 +225,29 @@ export async function pollPaymentsForUser(userId: string, throttle = true): Prom
           .select("id")
           .maybeSingle();
 
-        if (!updated) continue;
+        if (!updated) {
+          await release();
+          continue;
+        }
 
         await admin.from("processed_emails").update({ link_id: link.id, amount }).eq("message_id", messageId);
         await deliverWebhook(userId, link, payerName);
         matched++;
       }
+
+      // Mailbox read fine — clear any earlier warning.
+      await admin
+        .from("merchant_accounts")
+        .update({ mail_error: null, mail_error_at: null, mail_ok_at: new Date().toISOString() })
+        .eq("user_id", userId)
+        .eq("email", email);
     } catch (error) {
       lastError = error instanceof Error ? error.message : "poll_failed";
+      await admin
+        .from("merchant_accounts")
+        .update({ mail_error: mailboxProblem(lastError), mail_error_at: new Date().toISOString() })
+        .eq("user_id", userId)
+        .eq("email", email);
     }
   }
 
