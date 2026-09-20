@@ -15,6 +15,17 @@ const NAME_PATTERNS: RegExp[] = [
   /by\s+([A-Za-z][A-Za-z .'\-]{1,60}?)(?=\s+(?:on|via|to|using|at|through|-|–|—|$))/i,
 ];
 
+/** Turns a raw mail error into a message a merchant can act on. */
+export function mailboxProblem(raw: string): string {
+  if (/AUTHENTICATIONFAILED|Invalid credentials|LOGIN_FAILED/i.test(raw)) {
+    return "Mailbox sign in failed. The app password is wrong, expired or IMAP is off. Reconnect the mailbox with a fresh app password.";
+  }
+  if (/TIMEOUT|CONNECTION_CLOSED|ECONN|ENOTFOUND|network/i.test(raw)) {
+    return "Could not reach the mail server just now. It will retry automatically.";
+  }
+  return "Could not read the payment alert mailbox. Please reconnect it.";
+}
+
 export type PollResult = {
   ok: boolean;
   connected: boolean;
@@ -123,7 +134,8 @@ export async function pollPaymentsForUser(userId: string, throttle = true): Prom
 
   const mailboxes = new Map<string, string>();
   for (const row of accounts ?? []) {
-    if (row.email && row.app_password) mailboxes.set(String(row.email).toLowerCase(), String(row.app_password));
+    const password = String(row.app_password ?? "").replace(/\s+/g, "");
+    if (row.email && password) mailboxes.set(String(row.email).toLowerCase(), password);
   }
   if (mailboxes.size === 0) return { ok: true, connected: false, scanned: 0, matched: 0, expired };
 
@@ -145,7 +157,8 @@ export async function pollPaymentsForUser(userId: string, throttle = true): Prom
         user: email,
         password,
         sinceDays: 1,
-        limit: 12,
+        limit: 20,
+        fromFilter: "phonepe",
       });
 
       for (const message of messages) {
@@ -161,11 +174,20 @@ export async function pollPaymentsForUser(userId: string, throttle = true): Prom
           .insert({ message_id: messageId, user_id: userId });
         if (claimError) continue;
 
+        // Nothing was credited from this email yet, so let a later scan retry it
+        // (the payment link may still be on its way when the alert lands).
+        const release = async () => {
+          await admin.from("processed_emails").delete().eq("message_id", messageId).is("link_id", null);
+        };
+
         scanned++;
 
         const haystack = `${headers["subject"] ?? ""} ${text}`.slice(0, 4000);
         const amount = extractAmount(haystack);
-        if (amount === null) continue;
+        if (amount === null) {
+          await release();
+          continue;
+        }
 
         const emailTime = new Date(headers["date"] ? Date.parse(headers["date"]) || Date.now() : Date.now()).toISOString();
         const payerName = extractName(haystack);
@@ -191,8 +213,10 @@ export async function pollPaymentsForUser(userId: string, throttle = true): Prom
           .eq("payable_amount", exact)
           .lte("created_at", createdBefore);
 
-        if (!candidates || candidates.length !== 1) continue;
-        if (Number(candidates[0].payable_amount) !== exact) continue;
+        if (!candidates || candidates.length !== 1 || Number(candidates[0].payable_amount) !== exact) {
+          await release();
+          continue;
+        }
 
         const link = candidates[0];
         const { data: updated } = await admin
@@ -212,14 +236,29 @@ export async function pollPaymentsForUser(userId: string, throttle = true): Prom
           .select("id")
           .maybeSingle();
 
-        if (!updated) continue;
+        if (!updated) {
+          await release();
+          continue;
+        }
 
         await admin.from("processed_emails").update({ link_id: link.id, amount }).eq("message_id", messageId);
         await deliverWebhook(userId, link, payerName);
         matched++;
       }
+
+      // Mailbox read fine — clear any earlier warning.
+      await admin
+        .from("merchant_accounts")
+        .update({ mail_error: null, mail_error_at: null, mail_ok_at: new Date().toISOString() })
+        .eq("user_id", userId)
+        .eq("email", email);
     } catch (error) {
       lastError = error instanceof Error ? error.message : "poll_failed";
+      await admin
+        .from("merchant_accounts")
+        .update({ mail_error: mailboxProblem(lastError), mail_error_at: new Date().toISOString() })
+        .eq("user_id", userId)
+        .eq("email", email);
     }
   }
 

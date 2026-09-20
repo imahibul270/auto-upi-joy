@@ -204,6 +204,13 @@
       "when": 1789880475708,
       "tag": "0028_backfill_recent_verified_users",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1789904220629,
+      "tag": "0029_mailbox_health_status",
+      "breakpoints": true
     }
   ]
 }

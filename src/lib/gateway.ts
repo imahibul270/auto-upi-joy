@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { pollMyPayments } from "@/lib/mailbox.functions";
+import { connectMailbox, pollMyPayments } from "@/lib/mailbox.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 export type Provider = "phonepe" | "paytm";
@@ -17,6 +17,9 @@ export type MerchantAccount = {
   email: string;
   connected: boolean;
   connected_at: string | null;
+  mail_error?: string | null;
+  mail_error_at?: string | null;
+  mail_ok_at?: string | null;
 };
 
 export async function fetchMerchantAccounts(): Promise<MerchantAccount[]> {
@@ -46,13 +49,8 @@ export async function saveMerchantAccount(input: { provider: Provider; upiId: st
 }
 
 export async function connectMerchantAccount(input: { provider: Provider; email: string; appPassword: string }) {
-  const { data, error } = await supabase.rpc("connect_merchant_account", {
-    _provider: input.provider,
-    _email: input.email,
-    _app_password: input.appPassword,
-  });
-  if (error) throw error;
-  return data as unknown as MerchantAccount;
+  // Verified on the server: the mailbox must actually sign in before it is saved.
+  return connectMailbox({ data: input });
 }
 
 export async function disconnectMerchantAccount(provider: Provider) {

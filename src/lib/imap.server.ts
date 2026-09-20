@@ -103,6 +103,8 @@ export async function fetchRecentMessages(options: {
   sinceDays?: number;
   limit?: number;
   timeoutMs?: number;
+  /** Optional sender keyword, e.g. "phonepe" — alerts are found even in a busy inbox. */
+  fromFilter?: string;
 }): Promise<ImapMessage[]> {
   const { host, user, password } = options;
   const port = options.port ?? 993;
@@ -157,10 +159,26 @@ export async function fetchRecentMessages(options: {
     const since = new Date(Date.now() - sinceDays * 86_400_000);
     const sinceStr = `${String(since.getUTCDate()).padStart(2, "0")}-${months[since.getUTCMonth()]}-${since.getUTCFullYear()}`;
 
-    const searchRes = await command(`UID SEARCH SINCE ${sinceStr}`);
-    const searchLine = searchRes.split(/\r?\n/).find((l) => l.toUpperCase().startsWith("* SEARCH")) ?? "";
-    const uids = searchLine.trim().split(/\s+/).slice(2).filter(Boolean);
-    const recent = uids.slice(-limit);
+    async function search(query: string): Promise<string[]> {
+      try {
+        const res = await command(query);
+        const line = res.split(/\r?\n/).find((l) => l.toUpperCase().startsWith("* SEARCH")) ?? "";
+        return line.trim().split(/\s+/).slice(2).filter((v) => /^\d+$/.test(v));
+      } catch {
+        return [];
+      }
+    }
+
+    // Targeted first: alert emails are found even when the inbox is busy.
+    const targeted = options.fromFilter
+      ? await search(`UID SEARCH SINCE ${sinceStr} FROM "${options.fromFilter.replace(/"/g, "")}"`)
+      : [];
+    const all = await search(`UID SEARCH SINCE ${sinceStr}`);
+    const merged: string[] = [];
+    for (const uid of [...targeted.slice(-limit), ...all.slice(-limit)]) {
+      if (!merged.includes(uid)) merged.push(uid);
+    }
+    const recent = merged.slice(0, limit * 2);
 
     const messages: ImapMessage[] = [];
     for (const uid of recent) {
