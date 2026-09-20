@@ -146,7 +146,8 @@ export async function pollPaymentsForUser(userId: string, throttle = true): Prom
         user: email,
         password,
         sinceDays: 1,
-        limit: 12,
+        limit: 20,
+        fromFilter: "phonepe",
       });
 
       for (const message of messages) {
@@ -162,11 +163,20 @@ export async function pollPaymentsForUser(userId: string, throttle = true): Prom
           .insert({ message_id: messageId, user_id: userId });
         if (claimError) continue;
 
+        // Nothing was credited from this email yet, so let a later scan retry it
+        // (the payment link may still be on its way when the alert lands).
+        const release = async () => {
+          await admin.from("processed_emails").delete().eq("message_id", messageId).is("link_id", null);
+        };
+
         scanned++;
 
         const haystack = `${headers["subject"] ?? ""} ${text}`.slice(0, 4000);
         const amount = extractAmount(haystack);
-        if (amount === null) continue;
+        if (amount === null) {
+          await release();
+          continue;
+        }
 
         const emailTime = new Date(headers["date"] ? Date.parse(headers["date"]) || Date.now() : Date.now()).toISOString();
         const payerName = extractName(haystack);
