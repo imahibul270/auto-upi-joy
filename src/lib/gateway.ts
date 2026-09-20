@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { pollMyPayments } from "@/lib/mailbox.functions";
+import { connectMailbox, pollMyPayments } from "@/lib/mailbox.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 export type Provider = "phonepe" | "paytm";
@@ -17,6 +17,9 @@ export type MerchantAccount = {
   email: string;
   connected: boolean;
   connected_at: string | null;
+  mail_error?: string | null;
+  mail_error_at?: string | null;
+  mail_ok_at?: string | null;
 };
 
 export async function fetchMerchantAccounts(): Promise<MerchantAccount[]> {

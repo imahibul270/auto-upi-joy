@@ -174,9 +174,13 @@ function ConnectAccountsPage() {
               </div>
             </div>
 
-            <span className={`console-conn-badge${connected ? " is-on" : ""}`}>
-              <i />{connected ? "Connected" : "Disconnected"}
+            <span className={`console-conn-badge${connected && !current?.mail_error ? " is-on" : ""}`}>
+              <i />{connected ? (current?.mail_error ? "Needs attention" : "Connected") : "Disconnected"}
             </span>
+
+            {current?.mail_error ? (
+              <p className="console-mail-warn" role="alert"><AlertTriangle />{current.mail_error}</p>
+            ) : null}
 
             <label className="console-field">
               Email address
