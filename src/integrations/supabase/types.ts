@@ -218,6 +218,54 @@ export type Database = {
         }
         Relationships: []
       }
+      merchant_upi_ids: {
+        Row: {
+          created_at: string
+          id: string
+          is_primary: boolean
+          payee_name: string
+          provider: Database["public"]["Enums"]["upi_provider"]
+          upi_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          payee_name?: string
+          provider?: Database["public"]["Enums"]["upi_provider"]
+          upi_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          payee_name?: string
+          provider?: Database["public"]["Enums"]["upi_provider"]
+          upi_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      merchant_upi_routing: {
+        Row: {
+          enabled: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          enabled?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       payment_links: {
         Row: {
           amount: number
@@ -529,6 +577,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      add_upi_id: {
+        Args: { _payee_name?: string; _provider?: string; _upi_id: string }
+        Returns: Json
+      }
       admin_clear_email_source: { Args: never; Returns: undefined }
       admin_get_email_source: { Args: never; Returns: Json }
       admin_list_users:
@@ -618,8 +670,27 @@ export type Database = {
       is_platform_admin: { Args: never; Returns: boolean }
       issue_api_key: { Args: { _label?: string }; Returns: Json }
       list_merchant_accounts: { Args: never; Returns: Json }
+      list_upi_ids: { Args: never; Returns: Json }
       mobile_digits: { Args: { _value: string }; Returns: string }
       new_payment_slug: { Args: never; Returns: string }
+      pick_merchant_upi: {
+        Args: { _user: string }
+        Returns: {
+          created_at: string
+          id: string
+          is_primary: boolean
+          payee_name: string
+          provider: Database["public"]["Enums"]["upi_provider"]
+          upi_id: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "merchant_upi_ids"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       plan_expiry_at: {
         Args: { _base: string; _days: number }
         Returns: string
@@ -641,6 +712,7 @@ export type Database = {
         Args: { _slug: string }
         Returns: undefined
       }
+      remove_upi_id: { Args: { _id: string }; Returns: undefined }
       revoke_api_key: { Args: { _id: string }; Returns: Json }
       save_merchant_account: {
         Args: { _payee_name?: string; _provider: string; _upi_id: string }
@@ -654,6 +726,8 @@ export type Database = {
         }
         Returns: Json
       }
+      set_primary_upi: { Args: { _id: string }; Returns: undefined }
+      set_upi_routing: { Args: { _enabled: boolean }; Returns: boolean }
       try_claim_mail_poll: {
         Args: { _min_gap_seconds?: number; _user: string }
         Returns: boolean
