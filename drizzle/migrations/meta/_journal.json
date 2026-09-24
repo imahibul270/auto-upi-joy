@@ -232,6 +232,13 @@
       "when": 1790251591866,
       "tag": "0032_multi_upi_routing",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1790265260780,
+      "tag": "0033_fix_add_upi_id_regex",
+      "breakpoints": true
     }
   ]
 }
