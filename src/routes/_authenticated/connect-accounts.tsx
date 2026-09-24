@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ConsoleLayout } from "@/components/console/ConsoleLayout";
 import { useConsoleName } from "@/components/console/useConsoleName";
+import { UpiRoutingCard } from "@/components/console/UpiRoutingCard";
 import { Swal } from "@/lib/swal";
 import {
   PROVIDERS,
@@ -226,6 +227,8 @@ function ConnectAccountsPage() {
           </form>
         </div>
       </section>
+
+      <UpiRoutingCard provider={provider} />
 
       <section className="console-card reveal-delay-3" data-reveal>
         <div className="console-card-head"><h3>Connection status</h3><small>Updates live</small></div>
