@@ -1019,3 +1019,15 @@ section[id]{scroll-margin-top:var(--header-height)}
 .admin-issue-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 12px; }
 .admin-issue-facts span { display: grid; gap: 2px; font-size: .85rem; opacity: .9; }
 .admin-issue-facts b { font-size: .95rem; }
+
+/* Multi UPI routing */
+.upi-route-toggle{display:flex;align-items:center;gap:.7rem;margin:.4rem 0 1rem;cursor:pointer;font-size:.9rem}
+.upi-route-toggle input{position:absolute;opacity:0;pointer-events:none}
+.upi-route-toggle svg{width:16px;height:16px;display:inline;vertical-align:-3px;margin-right:.25rem}
+.upi-route-switch{width:42px;height:24px;border-radius:999px;background:var(--muted);position:relative;transition:background .2s;flex-shrink:0}
+.upi-route-switch i{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--background);transition:transform .2s}
+.upi-route-toggle input:checked + .upi-route-switch{background:var(--primary)}
+.upi-route-toggle input:checked + .upi-route-switch i{transform:translateX(18px)}
+.upi-route-form{display:grid;grid-template-columns:1fr 1fr auto;gap:.6rem;margin-bottom:1rem}
+@media (max-width:700px){.upi-route-form{grid-template-columns:1fr}}
+.upi-route-empty{font-size:.85rem;opacity:.7;margin:0}
