@@ -1310,7 +1310,7 @@ SECURITY DEFINER
 SET search_path TO 'public'
 AS $$
   SELECT lower(coalesce(nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'email', ''))
-         = 'aminulislam78131@gmail.com'
+         = 'dexst12@gmail.com'
      AND coalesce(nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'role', '') = 'authenticated';
 $$;
 
