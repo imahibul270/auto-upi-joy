@@ -7,7 +7,7 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 // Self-hosting (Hostinger / any Node host): `npm run build:node` sets NITRO_PRESET=node-server.
-const selfHostPreset = process.env.NITRO_PRESET;
+const selfHostPreset = process.env['NITRO_PRESET'];
 
 export default defineConfig({
   ...(selfHostPreset ? { nitro: { preset: selfHostPreset } } : {}),
