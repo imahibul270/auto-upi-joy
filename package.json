@@ -1,5 +1,5 @@
 {
-  "name": "tanstack_start_ts",
+  "name": "auto-upi",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -9,7 +9,9 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "build:node": "NITRO_PRESET=node-server vite build",
+    "start": "node .output/server/index.mjs"
   },
   "overrides": {
     "rolldown": "1.2.1"
@@ -93,5 +95,8 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "8.1.5"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
