@@ -120,9 +120,23 @@ Admins can override the limit per user (`subscriptions.qr_limit`).
 ## 6. Admin panel
 
 - URL: `https://your-domain.com/admin`
-- Only one email can ever be admin. It is hardcoded in two places and must match:
-  1. `is_platform_admin()` in `database/setup.sql`
-  2. `ADMIN_EMAIL` in `src/routes/admin.tsx`
+- Only one email can ever be admin. It is written in exactly two places and both
+  must be the same (lowercase):
+  1. `database/setup.sql` — **line 1313**: `= 'aminulislam78131@gmail.com'`
+     (inside `is_platform_admin()`). Change it **before** running the SQL.
+  2. `src/routes/admin.tsx` — **line 15**:
+     `const ADMIN_EMAIL = "aminulislam78131@gmail.com";`
+- Step by step:
+  1. Open `database/setup.sql`, press Ctrl+F, search `aminulislam78131@gmail.com`
+     (line 1313), replace with your email, save.
+  2. Open `src/routes/admin.tsx`, go to line 15, replace the email, save and push
+     to GitHub (Hostinger redeploys automatically).
+  3. Run `setup.sql` in Supabase SQL Editor (new, empty project).
+  4. Open `https://your-domain.com/admin`, sign in with that email and any
+     password — the admin account is created on the first sign-in.
+- Already ran the SQL with the old email? Run only this in the SQL Editor:
+  `SELECT pg_get_functiondef('public.is_platform_admin'::regproc);` — copy the
+  result, replace the email, and run it again.
 - There is no role table and no way to grant admin to another account.
 - The first sign-in with that email and a password of your choice creates the
   admin account automatically.
