@@ -104,7 +104,7 @@ export async function fetchRecentMessages(options: {
   limit?: number;
   timeoutMs?: number;
   /** Optional sender keyword, e.g. "phonepe" — alerts are found even in a busy inbox. */
-  fromFilter?: string;
+  fromFilter?: string | string[];
 }): Promise<ImapMessage[]> {
   const { host, user, password } = options;
   const port = options.port ?? 993;
@@ -170,15 +170,20 @@ export async function fetchRecentMessages(options: {
     }
 
     // Targeted first: alert emails are found even when the inbox is busy.
-    const targeted = options.fromFilter
-      ? await search(`UID SEARCH SINCE ${sinceStr} FROM "${options.fromFilter.replace(/"/g, "")}"`)
+    const filters = options.fromFilter
+      ? (Array.isArray(options.fromFilter) ? options.fromFilter : [options.fromFilter])
       : [];
+    const targeted: string[] = [];
+    for (const f of filters) {
+      const found = await search(`UID SEARCH SINCE ${sinceStr} FROM "${f.replace(/"/g, "")}"`);
+      targeted.push(...found.slice(-limit));
+    }
     const all = await search(`UID SEARCH SINCE ${sinceStr}`);
     const merged: string[] = [];
-    for (const uid of [...targeted.slice(-limit), ...all.slice(-limit)]) {
+    for (const uid of [...targeted, ...all.slice(-limit)]) {
       if (!merged.includes(uid)) merged.push(uid);
     }
-    const recent = merged.slice(0, limit * 2);
+    const recent = merged.slice(0, limit * 3);
 
     const messages: ImapMessage[] = [];
     for (const uid of recent) {
