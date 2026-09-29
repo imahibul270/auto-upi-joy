@@ -6,7 +6,9 @@ import { fetchRecentMessages, parseMessage } from "@/lib/imap.server";
 
 // Only credit alerts from this exact PhonePe address may settle a payment.
 const MONITOR_SENDERS = ["noreply@phonepe.com"];
-const PAYTM_AMOUNT_RE = /Rs\.?\s*([0-9]+(?:\.[0-9]{1,2})?)\s+(?:paid|received|credited)/i;
+// Paytm alerts come from several official addresses on these domains.
+const PAYTM_DOMAINS = ["paytm.com", "paytmbank.com", "paytm.in", "paytmpayments.com"];
+const PAYTM_AMOUNT_RE = /(?:₹|Rs\.?|INR)\s*([0-9]+(?:\.[0-9]{1,2})?)\s+(?:paid|received|credited)/i;
 const PHONEPE_AMOUNT_RE = /(?:Received|Payment of)\s*(?:₹|Rs\.?|INR)?\s*([0-9]+(?:\.[0-9]{1,2})?)/i;
 const GENERIC_AMOUNT_RE = /(?:₹|Rs\.?|INR)\s*([0-9]+(?:\.[0-9]{1,2})?)/i;
 const NAME_PATTERNS: RegExp[] = [
@@ -59,7 +61,9 @@ function extractName(text: string): string | null {
 function senderMatches(from: string): boolean {
   // Take the real address inside <> when present, else the whole header.
   const address = (from.match(/<([^>]+)>/)?.[1] ?? from).trim().toLowerCase();
-  return MONITOR_SENDERS.includes(address);
+  if (MONITOR_SENDERS.includes(address)) return true;
+  const domain = address.split("@")[1] ?? "";
+  return PAYTM_DOMAINS.some((d) => domain === d || domain.endsWith(`.${d}`));
 }
 
 /** Send the HMAC-signed `payment.paid` webhook — the merchant's only trusted signal. */
@@ -169,7 +173,7 @@ export async function pollPaymentsForUser(userId: string, throttle = true): Prom
         password,
         sinceDays: 1,
         limit: 20,
-        fromFilter: "phonepe",
+        fromFilter: ["phonepe", "paytm"],
       });
 
       for (const message of messages) {
