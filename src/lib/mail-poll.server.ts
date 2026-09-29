@@ -157,7 +157,7 @@ export async function pollPaymentsForUser(userId: string, throttle = true): Prom
   // One IMAP scan per merchant every few seconds, however many payers are
   // watching a pay page — keeps mailbox load flat as merchant count grows.
   if (throttle) {
-    const { data: claimed } = await admin.rpc("try_claim_mail_poll", { _user: userId, _min_gap_seconds: 6 });
+    const { data: claimed } = await admin.rpc("try_claim_mail_poll", { _user: userId, _min_gap_seconds: 3 });
     if (claimed !== true) return { ok: true, connected: true, scanned: 0, matched: 0, expired };
   }
 
