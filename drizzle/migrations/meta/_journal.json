@@ -253,6 +253,13 @@
       "when": 1790774871255,
       "tag": "0035_reuse_mailbox_for_new_provider",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1790785877118,
+      "tag": "0036_block_fampay_provider",
+      "breakpoints": true
     }
   ]
 }
