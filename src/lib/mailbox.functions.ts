@@ -19,7 +19,7 @@ export const connectMailbox = createServerFn({ method: "POST" })
   .inputValidator((data) =>
     z
       .object({
-        provider: z.enum(["phonepe", "paytm"]),
+        provider: z.enum(["phonepe", "paytm", "fampay"]),
         email: z.string().trim().email(),
         appPassword: z.string().trim().min(8),
       })

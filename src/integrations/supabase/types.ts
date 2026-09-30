@@ -289,6 +289,7 @@ export type Database = {
           status: Database["public"]["Enums"]["link_status"]
           upi_id: string
           user_id: string
+          utr: string | null
           webhook_attempts: number
           webhook_delivered_at: string | null
           webhook_last_error: string | null
@@ -316,6 +317,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["link_status"]
           upi_id?: string
           user_id: string
+          utr?: string | null
           webhook_attempts?: number
           webhook_delivered_at?: string | null
           webhook_last_error?: string | null
@@ -343,6 +345,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["link_status"]
           upi_id?: string
           user_id?: string
+          utr?: string | null
           webhook_attempts?: number
           webhook_delivered_at?: string | null
           webhook_last_error?: string | null
@@ -736,7 +739,7 @@ export type Database = {
     Enums: {
       link_status: "active" | "paid" | "expired"
       plan_tier: "free" | "pro"
-      upi_provider: "phonepe" | "paytm"
+      upi_provider: "phonepe" | "paytm" | "fampay"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -866,7 +869,7 @@ export const Constants = {
     Enums: {
       link_status: ["active", "paid", "expired"],
       plan_tier: ["free", "pro"],
-      upi_provider: ["phonepe", "paytm"],
+      upi_provider: ["phonepe", "paytm", "fampay"],
     },
   },
 } as const

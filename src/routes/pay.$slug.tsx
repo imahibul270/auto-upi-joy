@@ -31,6 +31,9 @@ type PublicLink = {
   success_url?: string | null;
   failure_url?: string | null;
   server_now: string;
+  provider?: string | null;
+  payer_name?: string | null;
+  utr?: string | null;
 };
 
 function PayPage() {
@@ -229,6 +232,12 @@ function PayPage() {
               {copied ? <Check strokeWidth={2.6} /> : <Copy strokeWidth={2.2} />}
             </button>
           </div>
+          {!failed && link.provider === "fampay" && (link.payer_name || link.utr) ? (
+            <div className="pay-done-order pay-done-fam">
+              {link.payer_name ? <div><span>Paid by</span><small>{link.payer_name}</small></div> : null}
+              {link.utr ? <div><span>UTR</span><small>{link.utr}</small></div> : null}
+            </div>
+          ) : null}
           {closeBlocked ? <p className="pay-done-note">You can close this window.</p> : null}
         </div>
 

@@ -239,6 +239,13 @@
       "when": 1790265260780,
       "tag": "0033_fix_add_upi_id_regex",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1790774417813,
+      "tag": "0034_fampay_provider",
+      "breakpoints": true
     }
   ]
 }
