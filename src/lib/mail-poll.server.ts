@@ -6,7 +6,6 @@ import { fetchRecentMessages, parseMessage } from "@/lib/imap.server";
 
 // Only credit alerts from this exact PhonePe address may settle a payment.
 const MONITOR_SENDERS = ["noreply@phonepe.com"];
-const FAMPAY_SENDERS = ["no-reply@famapp.in"];
 // Paytm alerts come from several official addresses on these domains.
 const PAYTM_DOMAINS = ["paytm.com", "paytmbank.com", "paytm.in", "paytmpayments.com"];
 const PAYTM_AMOUNT_RE = /(?:₹|Rs\.?|INR)\s*([0-9]+(?:\.[0-9]{1,2})?)\s+(?:paid|received|credited)/i;
@@ -59,28 +58,10 @@ function extractName(text: string): string | null {
   return null;
 }
 
-function isFamPay(from: string): boolean {
-  const address = (from.match(/<([^>]+)>/)?.[1] ?? from).trim().toLowerCase();
-  return FAMPAY_SENDERS.includes(address);
-}
-
-// FamPay: payer is the "From <name>" line; the greeting "Hey <name>" is the merchant, never captured.
-function extractFamPayName(text: string): string | null {
-  const cleaned = text.replace(/\bHey\s+[^\n,!]*/gi, " ");
-  const m = cleaned.match(/\bfrom\s*:?\s*([A-Za-z][A-Za-z .'\-]{1,60}?)\s*(?=\r?\n|Transaction|Date|Updated|UPI|UTR|₹|Rs\b|INR|on\b|via\b|to\b|\d|$)/i);
-  const name = m?.[1]?.trim().replace(/\s+/g, " ");
-  return name && name.length >= 2 ? name : null;
-}
-
-function extractUtr(text: string): string | null {
-  const m = text.match(/\b(?:UTR|RRN|UPI\s*Ref(?:erence)?)(?:\s*(?:No\.?|Number|ID))?\s*[:#\-]?\s*([0-9]{10,18})/i);
-  return m?.[1] ?? null;
-}
-
 function senderMatches(from: string): boolean {
   // Take the real address inside <> when present, else the whole header.
   const address = (from.match(/<([^>]+)>/)?.[1] ?? from).trim().toLowerCase();
-  if (MONITOR_SENDERS.includes(address) || FAMPAY_SENDERS.includes(address)) return true;
+  if (MONITOR_SENDERS.includes(address)) return true;
   const domain = address.split("@")[1] ?? "";
   return PAYTM_DOMAINS.some((d) => domain === d || domain.endsWith(`.${d}`));
 }
@@ -192,7 +173,7 @@ export async function pollPaymentsForUser(userId: string, throttle = true): Prom
         password,
         sinceDays: 1,
         limit: 20,
-        fromFilter: ["phonepe", "paytm", "famapp"],
+        fromFilter: ["phonepe", "paytm"],
       });
 
       for (const message of messages) {
@@ -224,9 +205,7 @@ export async function pollPaymentsForUser(userId: string, throttle = true): Prom
         }
 
         const emailTime = new Date(headers["date"] ? Date.parse(headers["date"]) || Date.now() : Date.now()).toISOString();
-        const fam = isFamPay(from);
-        const payerName = fam ? extractFamPayName(`${headers["subject"] ?? ""}\n${text}`) : extractName(haystack);
-        const utr = fam ? extractUtr(haystack) : null;
+        const payerName = extractName(haystack);
 
         const { data: alreadyUsed } = await admin
           .from("payment_links")
@@ -263,7 +242,6 @@ export async function pollPaymentsForUser(userId: string, throttle = true): Prom
             detected_at: new Date().toISOString(),
             payer_name: payerName,
             payer_email: from,
-            ...(fam ? { utr } : {}),
             paid_email_id: messageId,
             paid_count: 1,
           })
