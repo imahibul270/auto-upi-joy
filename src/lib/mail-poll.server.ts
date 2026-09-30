@@ -67,7 +67,7 @@ function isFamPay(from: string): boolean {
 // FamPay: payer is the "From <name>" line; the greeting "Hey <name>" is the merchant, never captured.
 function extractFamPayName(text: string): string | null {
   const cleaned = text.replace(/\bHey\s+[^\n,!]*/gi, " ");
-  const m = cleaned.match(/\bFrom\s*:?\s*([A-Za-z][A-Za-z .'\-]{1,60}?)\s*(?=\r?\n|UPI|UTR|₹|Rs\b|INR|on\b|via\b|to\b|\d|$)/);
+  const m = cleaned.match(/\bfrom\s*:?\s*([A-Za-z][A-Za-z .'\-]{1,60}?)\s*(?=\r?\n|Transaction|Date|Updated|UPI|UTR|₹|Rs\b|INR|on\b|via\b|to\b|\d|$)/i);
   const name = m?.[1]?.trim().replace(/\s+/g, " ");
   return name && name.length >= 2 ? name : null;
 }
