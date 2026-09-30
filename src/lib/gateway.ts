@@ -3,12 +3,11 @@ import { useServerFn } from "@tanstack/react-start";
 import { connectMailbox, pollMyPayments } from "@/lib/mailbox.functions";
 import { supabase } from "@/integrations/supabase/client";
 
-export type Provider = "phonepe" | "paytm" | "fampay";
+export type Provider = "phonepe" | "paytm";
 
 export const PROVIDERS: { value: Provider; label: string; hint: string }[] = [
   { value: "phonepe", label: "PhonePe", hint: "Business alerts from noreply@phonepe.com" },
   { value: "paytm", label: "Paytm", hint: "Business alerts from no-reply@paytm.com" },
-  { value: "fampay", label: "FamPay", hint: "Payment alerts from no-reply@famapp.in" },
 ];
 
 export type MerchantAccount = {
