@@ -82,7 +82,7 @@ export function UpiRoutingCard({ provider }: { provider: Provider }) {
         {items.map((item) => (
           <div key={item.id} className="console-conn-row">
             <span className="console-conn-name">{item.upi_id}</span>
-            <span className="console-conn-upi">{item.provider === "paytm" ? "Paytm" : "PhonePe"} · {item.payee_name || "—"}
+            <span className="console-conn-upi">{item.provider === "paytm" ? "Paytm" : "PhonePe"} · {item.payee_name || "—"}</span>
             <span>
               {item.is_primary ? (
                 <span className="console-conn-badge is-on"><i />Primary</span>
