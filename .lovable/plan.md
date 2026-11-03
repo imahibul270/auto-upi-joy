@@ -1,26 +1,19 @@
-# PhonePe "payment through a link is not allowed" error
+# Payment result: slide-up panel on the same QR page
 
-## Why it happens
+## What changes (only the payment page)
 
-- Your UPI ID `Q168071078@ybl` is a **PhonePe Business QR merchant ID** (IDs starting with `Q` are merchant QR stickers).
-- NPCI rules say these merchant IDs can be paid by **QR scan only**. Opening them from a link (UPI intent) is blocked inside PhonePe/GPay itself. Search results say the same thing: PhonePe and GPay refuse browser-opened links for some merchant account types.
-- Razorpay/PayU get past this because they are licensed gateways. Their intents are **signed by the bank** with a secret merchant key. We cannot create that signature, and no code trick can get around it. Trying to bypass it would break UPI rules and could get the merchant ID frozen.
-
-## Real fixes (legal ones)
-
-1. **Official PhonePe Payment Gateway** (business.phonepe.com → PG): PhonePe gives you an API key. Their "UPI Intent" / "Pay Page" opens PhonePe directly, and it works 100%. This needs KYC approval and a separate integration later.
-2. **Use a personal UPI ID** (for example `name@ybl`) for intent. Links work, but there are personal-limit / risk-policy warnings, and it is not suitable for business volume.
-
-## What I will change now
-
-- On the payment page, change what the PhonePe button does:
-  - If the UPI ID is a merchant QR ID (it starts with `Q`, or the app blocks the link), the button **saves/shares the QR image** and shows the hint "Open PhonePe → Scan → choose from gallery". Paying from the gallery is allowed for merchant IDs.
-  - If the UPI ID is personal, the button keeps opening PhonePe directly, like now.
-- Add a small **"Copy UPI ID"** link under the QR as a backup.
-- Nothing else changes: detection, amount, expiry, animations and redirect stay the same.
+- The separate full result page (black/green card shown in your screenshot) is removed.
+- When a payment is detected or the link expires, a white panel **slides up from the bottom of the right side**. It covers the QR card and Card / Net Banking options up to the "Payment Options for ..." heading. The purple left side stays visible.
+- Panel animation steps, smooth and lag-free (CSS only):
+  1. **Processing:** a soft spinning ring with "Processing payment…" (replaces the current blur pill), about 2 seconds.
+  2. **Success:** a green circle pops in, a gold coin flips and drops into it, then a tick draws itself. Text: "Payment successful", amount, order ID with copy button.
+  3. **Failed:** a red circle pops with a small shake and a cross draws itself. Text: "Payment failed", amount, order ID.
+- The "Redirecting back to merchant's website... 3s" countdown shows inside the panel when a redirect URL is set. Upgrade tabs still auto close.
+- On phones the panel slides up over the options area the same way.
+- Nothing else changes: the QR, timer, detection, amount, redirect logic and design colours.
 
 ## Technical details
 
-- `src/routes/pay.$slug.tsx`: `isMerchantVpa = /^q\d+@/i.test(upi_id)`. When it is true, `openPhonePe` builds a PNG from the QR data URL. It uses `navigator.share({files})` if the phone allows it, otherwise it downloads the file. It then shows an inline hint text. A copy button uses `navigator.clipboard`.
-- `src/styles.css`: a `.chk-hint` text style.
-- Test: Playwright on a mobile viewport with a merchant ID link. Check that the button shows, the hint appears and the copy works. A real PhonePe test has to be done on your phone.
+- `src/routes/pay.$slug.tsx`: delete the early-return `pay-done` screen. The checkout layout always renders. Inside `.chk-right`, add a `.chk-sheet` overlay (absolute, inset from below the heading). It is visible when `processing || status is paid/expired` and has a stage class `is-processing | is-success | is-failed`. All hooks, polling, redirect and autoclose code stays the same.
+- `src/styles.css`: add `.chk-sheet` (translateY(100%) → 0, 0.45s cubic-bezier), `.chk-coin` (rotateY flip + drop keyframes, gold gradient), `.chk-ring` spinner, stroke-dash draw for the tick and cross SVGs, a shake keyframe, and `prefers-reduced-motion` fallbacks. `.chk-right` gets `position:relative; overflow:hidden`.
+- Testing: Playwright, viewing an expired link on desktop and mobile widths, with screenshots of the failed panel. Success is checked by forcing the state locally in the script.
