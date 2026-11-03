@@ -40,8 +40,8 @@
     function cleanup() {
       window.removeEventListener("message", onMessage);
       document.body.style.overflow = prevOverflow;
-      overlay.style.opacity = "0";
-      setTimeout(function () { overlay.remove(); }, 250);
+      overlay.style.opacity = "0"; box.style.opacity = "0"; box.style.transform = "translateY(20px) scale(.97)";
+      setTimeout(function () { overlay.remove(); }, 350);
     }
     function onMessage(ev) {
       if (ev.origin !== ORIGIN || ev.source !== frame.contentWindow || !ev.data) return;
