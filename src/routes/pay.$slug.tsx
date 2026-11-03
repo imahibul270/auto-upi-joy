@@ -119,8 +119,23 @@ function PayPage() {
   }, [slug]);
 
   const upiParams = link
-    ? `pa=${encodeURIComponent(link.upi_id)}&pn=${encodeURIComponent(link.payee_name || "Auto Upi")}&am=${link.payable_amount.toFixed(2)}&cu=INR&tn=${encodeURIComponent(link.order_id)}`
+    ? `pa=${encodeURIComponent(link.upi_id)}&pn=${encodeURIComponent(link.payee_name || "Auto Upi")}&am=${link.payable_amount.toFixed(2)}&cu=INR&tn=${encodeURIComponent(link.order_id)}&tr=${encodeURIComponent(link.order_id)}`
     : "";
+
+  const isMobile = typeof navigator !== "undefined" && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  // UPI intent: open PhonePe directly; if it isn't installed, fall back to the UPI app chooser.
+  const openPhonePe = () => {
+    if (!upiParams) return;
+    let left = false;
+    const onHide = () => { if (document.hidden) left = true; };
+    document.addEventListener("visibilitychange", onHide);
+    window.location.href = `phonepe://pay?${upiParams}`;
+    window.setTimeout(() => {
+      document.removeEventListener("visibilitychange", onHide);
+      if (!left && !document.hidden) window.location.href = `upi://pay?${upiParams}`;
+    }, 1500);
+  };
 
   useEffect(() => {
     if (!link || link.status !== "active") return;
@@ -271,6 +286,12 @@ function PayPage() {
                   )}
                 </div>
                 <p className="chk-expire">Expires in <b>{mm}:{ss}</b> mins</p>
+                {isMobile && qr && !loading && !processing ? (
+                  <button type="button" className="chk-intent" onClick={openPhonePe} aria-label="Pay with PhonePe">
+                    <span className="chk-intent-logo">Pe</span>
+                    <span>Pay with PhonePe</span>
+                  </button>
+                ) : null}
               </div>
               <div className="chk-apps-col">
                 <p>Scan and pay with</p>
