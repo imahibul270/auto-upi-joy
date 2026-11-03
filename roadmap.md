@@ -1,4 +1,4 @@
 # Checkout compactness
-- [ ] Reduce timer and merchant popup height; fit success/failure panels.
-- [ ] Update popup setup docs and provide a merchant prompt TXT.
-- [ ] Check desktop/mobile checkout and result layout.
+- [x] Reduce timer and merchant popup height; fit success/failure panels.
+- [x] Update popup setup docs and provide a merchant prompt TXT.
+- [x] Check desktop/mobile checkout and result layout using simulated statuses (not a real payment).
