@@ -1143,3 +1143,5 @@ section[id]{scroll-margin-top:var(--header-height)}
 .chk-qr-card.is-blurred{filter:none}
 .chk-qr-wrap{transition:filter .35s ease}
 .chk-qr-wrap.is-blurred{filter:blur(6px);pointer-events:none}
+.chk-options-wrap:has(.chk-sheet){min-height:210px}
+.chk-options-wrap .chk-sheet{inset:0;justify-content:center;padding:14px 12px;gap:6px}
