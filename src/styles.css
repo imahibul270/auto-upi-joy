@@ -1111,3 +1111,15 @@ section[id]{scroll-margin-top:var(--header-height)}
 @keyframes chk-go-green{to{background:oklch(.68 .17 150)}}
 @keyframes chk-pulse{0%{opacity:.6;box-shadow:0 0 0 0 oklch(.68 .17 150 / .6)}100%{opacity:0;box-shadow:0 0 0 18px oklch(.68 .17 150 / 0)}}
 @media (prefers-reduced-motion:reduce){.chk-options-wrap .chk-coin{display:none}.is-success .chk-badge{background:oklch(.68 .17 150)}.chk-pulse{display:none}}
+
+/* Full-cover result panel (title + options), no coin */
+.chk-options-wrap .chk-sheet{inset:0;min-height:0;z-index:6}
+.is-success .chk-badge{background:oklch(.68 .17 150);animation:chk-pop .55s cubic-bezier(.34,1.56,.64,1) both}
+.is-success .chk-mark{animation:chk-draw .45s .45s ease forwards}
+.is-success .chk-pulse{animation:chk-pulse 1s .5s ease-out}
+.chk-wave{position:absolute;inset:0;border-radius:50%;border:2px solid oklch(.68 .17 150 / .5);animation:chk-wave 1.8s .3s ease-out infinite;pointer-events:none}
+.chk-wave-2{animation-delay:1.2s}
+.chk-sheet-info{animation:chk-rise .45s .35s cubic-bezier(.22,1,.36,1) both}
+@keyframes chk-wave{0%{transform:scale(1);opacity:.8}100%{transform:scale(1.9);opacity:0}}
+@keyframes chk-rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.chk-wave{display:none}.chk-sheet-info{animation:none}}
