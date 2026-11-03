@@ -7,7 +7,7 @@ import { fetchRecentMessages, parseMessage } from "@/lib/imap.server";
 // Only credit alerts from this exact PhonePe address may settle a payment.
 const MONITOR_SENDERS = ["noreply@phonepe.com"];
 // Paytm alerts come from several official addresses on these domains.
-const PAYTM_DOMAINS = ["paytm.com", "paytmbank.com", "paytm.in", "paytmpayments.com"];
+
 const PAYTM_AMOUNT_RE = /(?:₹|Rs\.?|INR)\s*([0-9]+(?:\.[0-9]{1,2})?)\s+(?:paid|received|credited)/i;
 const PHONEPE_AMOUNT_RE = /(?:Received|Payment of)\s*(?:₹|Rs\.?|INR)?\s*([0-9]+(?:\.[0-9]{1,2})?)/i;
 const GENERIC_AMOUNT_RE = /(?:₹|Rs\.?|INR)\s*([0-9]+(?:\.[0-9]{1,2})?)/i;
@@ -61,9 +61,7 @@ function extractName(text: string): string | null {
 function senderMatches(from: string): boolean {
   // Take the real address inside <> when present, else the whole header.
   const address = (from.match(/<([^>]+)>/)?.[1] ?? from).trim().toLowerCase();
-  if (MONITOR_SENDERS.includes(address)) return true;
-  const domain = address.split("@")[1] ?? "";
-  return PAYTM_DOMAINS.some((d) => domain === d || domain.endsWith(`.${d}`));
+  return MONITOR_SENDERS.includes(address);
 }
 
 /** Send the HMAC-signed `payment.paid` webhook — the merchant's only trusted signal. */
@@ -157,7 +155,7 @@ export async function pollPaymentsForUser(userId: string, throttle = true): Prom
   // One IMAP scan per merchant every few seconds, however many payers are
   // watching a pay page — keeps mailbox load flat as merchant count grows.
   if (throttle) {
-    const { data: claimed } = await admin.rpc("try_claim_mail_poll", { _user: userId, _min_gap_seconds: 3 });
+    const { data: claimed } = await admin.rpc("try_claim_mail_poll", { _user: userId, _min_gap_seconds: 2 });
     if (claimed !== true) return { ok: true, connected: true, scanned: 0, matched: 0, expired };
   }
 
@@ -172,14 +170,18 @@ export async function pollPaymentsForUser(userId: string, throttle = true): Prom
         user: email,
         password,
         sinceDays: 1,
-        limit: 20,
-        fromFilter: ["phonepe", "paytm"],
+        limit: 5,
+        fromFilter: ["noreply@phonepe.com"],
+        onlyFiltered: true,
       });
 
       for (const message of messages) {
         const { headers, text } = parseMessage(message.raw);
         const from = headers["from"] ?? "";
         if (!senderMatches(from)) continue;
+        // Only fresh alerts (last 30 minutes) can settle a payment link.
+        const sentAt = headers["date"] ? Date.parse(headers["date"]) : Number.NaN;
+        if (Number.isFinite(sentAt) && Date.now() - sentAt > 30 * 60_000) continue;
 
         const messageId = (headers["message-id"] ?? `${email}:${message.uid}`).slice(0, 250);
 

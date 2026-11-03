@@ -105,6 +105,8 @@ export async function fetchRecentMessages(options: {
   timeoutMs?: number;
   /** Optional sender keyword, e.g. "phonepe" — alerts are found even in a busy inbox. */
   fromFilter?: string | string[];
+  /** Skip the unfiltered inbox scan; read only sender-matched mail. */
+  onlyFiltered?: boolean;
 }): Promise<ImapMessage[]> {
   const { host, user, password } = options;
   const port = options.port ?? 993;
@@ -178,12 +180,13 @@ export async function fetchRecentMessages(options: {
       const found = await search(`UID SEARCH SINCE ${sinceStr} FROM "${f.replace(/"/g, "")}"`);
       targeted.push(...found.slice(-limit));
     }
-    const all = await search(`UID SEARCH SINCE ${sinceStr}`);
+    const all = options.onlyFiltered && filters.length ? [] : await search(`UID SEARCH SINCE ${sinceStr}`);
     const merged: string[] = [];
     for (const uid of [...targeted, ...all.slice(-limit)]) {
       if (!merged.includes(uid)) merged.push(uid);
     }
-    const recent = merged.slice(0, limit * 3);
+    // Newest first, so the latest alert is read before older ones.
+    const recent = merged.sort((a, b) => Number(b) - Number(a)).slice(0, limit * 3);
 
     const messages: ImapMessage[] = [];
     for (const uid of recent) {
