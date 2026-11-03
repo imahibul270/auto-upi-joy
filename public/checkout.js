@@ -23,8 +23,8 @@
     var box = document.createElement("div");
     var mobile = window.matchMedia("(max-width:760px)").matches;
     box.setAttribute("style", mobile
-      ? "--autoupi-popup-border:rgba(0,0,0,.08);position:relative;box-sizing:border-box;width:94vw;height:90vh;height:90dvh;border:1px solid var(--autoupi-popup-border);border-radius:8px;overflow:hidden;background:#fff"
-      : "--autoupi-popup-border:rgba(0,0,0,.08);position:relative;box-sizing:border-box;width:min(860px,94vw);height:min(600px,90vh);border:1px solid var(--autoupi-popup-border);border-radius:8px;overflow:hidden;background:#fff;box-shadow:0 30px 80px rgba(0,0,0,.35);transform:translateY(16px);transition:transform .3s ease");
+      ? "--autoupi-popup-border:rgba(0,0,0,.08);position:relative;box-sizing:border-box;width:94vw;height:85vh;height:85dvh;border:2px solid var(--autoupi-popup-border);border-radius:8px;overflow:hidden;background:#fff"
+      : "--autoupi-popup-border:rgba(0,0,0,.08);position:relative;box-sizing:border-box;width:min(860px,94vw);height:min(560px,85vh);border:2px solid var(--autoupi-popup-border);border-radius:8px;overflow:hidden;background:#fff;box-shadow:0 30px 80px rgba(0,0,0,.35);transform:translateY(16px);transition:transform .3s ease");
     var frame = document.createElement("iframe");
     frame.src = target.toString();
     frame.title = "Auto Upi checkout";
