@@ -220,9 +220,9 @@ function PayPage() {
           {!loading && !link ? (
             <div className="chk-card chk-state"><p className="pay-note">This payment link does not exist.</p></div>
           ) : (
-            <div className={`chk-card chk-qr-card${link && (processing || status !== "active") ? " is-blurred" : ""}`}>
+            <div className="chk-card chk-qr-card">
               <div className="chk-qr-col">
-                <div className="pay-qr-wrap chk-qr-wrap">
+                <div className={`pay-qr-wrap chk-qr-wrap${link && (processing || status !== "active") ? " is-blurred" : ""}`}>
                   {qr && !loading ? <img className="pay-qr chk-qr" src={qr} alt="UPI QR code" width={160} height={160} /> : <div className="pay-qr chk-qr pay-skeleton" />}
                   {qr && !loading ? <span className="pay-qr-logo"><img src={brandLogoUrl} alt="" /></span> : null}
                 </div>
