@@ -114,7 +114,7 @@ function PayPage() {
     void load();
     kickDetection();
     const timer = setInterval(() => void load(), 2000);
-    const poller = setInterval(kickDetection, 3000);
+    const poller = setInterval(kickDetection, 2000);
     return () => { active = false; clearInterval(timer); clearInterval(poller); };
   }, [slug]);
 
@@ -237,6 +237,7 @@ function PayPage() {
           )}
 
           <p className="chk-other-title">Other Payment Options</p>
+          <div className="chk-options-wrap">
           <div className="chk-card chk-options">
             <button type="button" className="chk-option">
               <CreditCard className="chk-opt-icon" />
@@ -262,11 +263,13 @@ function PayPage() {
               ) : (
                 <>
                   <div className="chk-badge">
+                    <span className="chk-pulse" />
                     {status === "paid" ? <span className="chk-coin">₹</span> : null}
                     <svg viewBox="0 0 52 52" className="chk-mark" aria-hidden="true">
                       {status === "paid" ? <path d="M15 27l7 7 15-16" /> : <path d="M17 17l18 18M35 17L17 35" />}
                     </svg>
                   </div>
+                  <div className="chk-sheet-info">
                   <h2>{status === "paid" ? "Payment successful" : "Payment failed"}</h2>
                   <b className="chk-sheet-amt">₹{link.amount.toFixed(2)}</b>
                   <div className="chk-sheet-order">
@@ -277,10 +280,12 @@ function PayPage() {
                   </div>
                   {redirectTarget && !autoCloseUpgrade ? <p>Redirecting back to merchant&apos;s website... {redirectSeconds}s</p> : null}
                   {closeBlocked ? <p>You can close this window.</p> : null}
+                  </div>
                 </>
               )}
             </div>
           ) : null}
+          </div>
         </main>
       </div>
     </div>

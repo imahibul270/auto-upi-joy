@@ -1085,6 +1085,29 @@ section[id]{scroll-margin-top:var(--header-height)}
 @keyframes chk-pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
 @keyframes chk-shake{25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-3px)}}
 @keyframes chk-draw{to{stroke-dashoffset:0}}
-@keyframes chk-coin{0%{transform:translateY(-60px) rotateY(0);opacity:0}30%{opacity:1}80%{transform:translateY(20px) rotateY(720deg);opacity:1}100%{transform:translateY(30px) rotateY(720deg) scale(.4);opacity:0}}
-@media (max-width:760px){.chk-sheet{top:52px}}
 @media (prefers-reduced-motion:reduce){.chk-sheet,.chk-badge,.chk-coin,.chk-ring{animation:none}.chk-mark{animation:none;stroke-dashoffset:0}.chk-coin{display:none}}
+
+/* Compact result panel covering only the Card / Net Banking box */
+.chk-options-wrap{position:relative}
+.chk-options-wrap .chk-sheet{position:absolute;inset:auto 0 0 0;top:auto;min-height:100%;border-radius:14px;flex-direction:row;justify-content:flex-start;gap:14px;padding:12px 14px;text-align:left;box-shadow:0 -6px 20px -10px oklch(.3 .1 300 / .3);overflow:hidden}
+.chk-options-wrap .chk-sheet.is-processing{justify-content:center}
+.chk-options-wrap .chk-sheet h2{margin:0;font-size:15px}
+.chk-options-wrap .chk-sheet p{font-size:12px}
+.chk-options-wrap .chk-ring{width:30px;height:30px;border-width:3px;flex:none}
+.chk-sheet-info{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.chk-options-wrap .chk-sheet-amt{font-size:17px}
+.chk-options-wrap .chk-sheet-order{padding:4px 8px;gap:8px;font-size:11px;align-self:flex-start;max-width:100%}
+.chk-options-wrap .chk-sheet-order small{overflow-wrap:anywhere}
+.chk-options-wrap .chk-badge{width:58px;height:58px;flex:none;perspective:400px}
+.chk-options-wrap .chk-mark{width:32px;height:32px}
+/* Success: coin slowly spins, then becomes green tick */
+.is-success .chk-badge{background:transparent;animation:chk-pop .4s cubic-bezier(.34,1.56,.64,1) both,chk-go-green .35s 3.1s ease forwards}
+.chk-options-wrap .chk-coin{inset:0;top:0;left:0;width:100%;height:100%;margin:0;font-size:24px;animation:chk-coin-spin 3.2s cubic-bezier(.45,0,.55,1) both,chk-fade .3s 3.1s ease forwards}
+.is-success .chk-mark{animation:chk-draw .4s 3.3s ease forwards;position:relative;z-index:1}
+.chk-pulse{position:absolute;inset:0;border-radius:50%;opacity:0}
+.is-success .chk-pulse{animation:chk-pulse .9s 3.3s ease-out}
+@keyframes chk-coin-spin{0%{transform:rotateY(0) scale(.6);opacity:0}10%{opacity:1;transform:rotateY(60deg) scale(1)}100%{transform:rotateY(720deg) scale(1);opacity:1}}
+@keyframes chk-fade{to{opacity:0;transform:rotateY(720deg) scale(.5)}}
+@keyframes chk-go-green{to{background:oklch(.68 .17 150)}}
+@keyframes chk-pulse{0%{opacity:.6;box-shadow:0 0 0 0 oklch(.68 .17 150 / .6)}100%{opacity:0;box-shadow:0 0 0 18px oklch(.68 .17 150 / 0)}}
+@media (prefers-reduced-motion:reduce){.chk-options-wrap .chk-coin{display:none}.is-success .chk-badge{background:oklch(.68 .17 150)}.chk-pulse{display:none}}
