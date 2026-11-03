@@ -2,7 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useProPrice, useQrQuota } from "@/lib/quota";
 import { useState, type FormEvent } from "react";
-import { Copy, Link2, Sparkles, XCircle } from "lucide-react";
+import { CheckCircle2, Copy, Link2, Sparkles, XCircle } from "lucide-react";
+import { markPaymentLinkPaid } from "@/lib/mailbox.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ConsoleLayout } from "@/components/console/ConsoleLayout";
@@ -116,6 +117,25 @@ function PaymentLinksPage() {
     });
   }
 
+  function markPaid(id: string) {
+    void Swal.fire({
+      icon: "question",
+      title: "Mark this payment as successful?",
+      text: "Only do this if you have received the money.",
+      showCancelButton: true,
+      confirmButtonText: "Yes, mark paid",
+      cancelButtonText: "Cancel",
+    }).then(async (result) => {
+      if (!result.isConfirmed) return;
+      try {
+        await markPaymentLinkPaid({ data: { id } });
+      } catch (error) {
+        void Swal.fire({ icon: "error", title: "Could not mark paid", text: error instanceof Error ? error.message : "Please try again." });
+      }
+      await queryClient.invalidateQueries({ queryKey: ["payment-links"] });
+    });
+  }
+
   return (
     <ConsoleLayout title="Payment Links" user={user} userName={name}>
       <section className="console-page-head" data-reveal>
@@ -181,7 +201,7 @@ function PaymentLinksPage() {
                     </td>
                     <td><strong>{row.clicks}</strong> / <strong className="console-paid-count">{row.paid_count}</strong></td>
                     <td>{formatDate(row.created_at)}</td>
-                    <td>{row.status === "active" ? <button type="button" className="console-row-action" aria-label="Expire link" onClick={() => cancelLink(row.id)}><XCircle /></button> : null}</td>
+                    <td>{row.status === "active" ? <span style={{ display: "inline-flex", gap: 6 }}><button type="button" className="console-row-action" aria-label="Mark as paid" title="Mark as paid" onClick={() => markPaid(row.id)}><CheckCircle2 /></button><button type="button" className="console-row-action" aria-label="Expire link" title="Expire link" onClick={() => cancelLink(row.id)}><XCircle /></button></span> : null}</td>
                   </tr>
                 ))}
               </tbody>
