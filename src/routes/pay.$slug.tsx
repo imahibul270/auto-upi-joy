@@ -4,6 +4,7 @@ import QRCode from "qrcode";
 import { supabase } from "@/integrations/supabase/client";
 import { Check, ChevronLeft, ChevronRight, Copy, CreditCard, Landmark } from "lucide-react";
 import { brandLogoUrl } from "@/components/BrandLogo";
+import { Button } from "@/components/ui/button";
 import upiAppsReal from "@/assets/upi-apps-real.jpg.asset.json";
 
 export const Route = createFileRoute("/pay/$slug")({
@@ -52,6 +53,20 @@ function PayPage() {
   const [copied, setCopied] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   const [redirectSeconds, setRedirectSeconds] = useState(3);
+  const [exitConfirmation, setExitConfirmation] = useState(false);
+  const backButtonRef = useRef<HTMLButtonElement>(null);
+
+  const cancelExit = () => {
+    setExitConfirmation(false);
+    backButtonRef.current?.focus();
+  };
+
+  useEffect(() => {
+    // Payment results keep priority if detection completes during confirmation.
+    if (processing || shownStatus === "paid" || shownStatus === "expired") {
+      setExitConfirmation(false);
+    }
+  }, [processing, shownStatus]);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
@@ -213,7 +228,7 @@ function PayPage() {
       <div className="chk-shell">
         <aside className="chk-left">
           <div className="chk-left-top">
-            <button type="button" className="chk-back" aria-label="Back" onClick={() => window.history.back()}>
+            <button ref={backButtonRef} type="button" className="chk-back" aria-label="Back" onClick={() => setExitConfirmation(true)}>
               <ChevronLeft />
             </button>
             <img className="chk-logo" src={brandLogoUrl} alt="Auto Upi" />
@@ -274,7 +289,20 @@ function PayPage() {
               <ChevronRight />
             </button>
           </div>
-          {link && (processing || status === "paid" || status === "expired") ? (
+          {exitConfirmation ? (
+            <div className="chk-sheet chk-exit-sheet" role="dialog" aria-labelledby="chk-exit-title" onKeyDown={(event) => {
+              if (event.key === "Escape") cancelExit();
+            }}>
+              <div className="chk-badge chk-exit-badge" aria-hidden="true">?</div>
+              <div className="chk-sheet-info">
+                <h2 id="chk-exit-title">Are you sure you want to exit?</h2>
+                <div className="chk-exit-actions">
+                  <Button type="button" variant="outline" size="sm" autoFocus onClick={cancelExit}>No</Button>
+                  <Button type="button" size="sm" onClick={() => window.history.back()}>Yes</Button>
+                </div>
+              </div>
+            </div>
+          ) : link && (processing || status === "paid" || status === "expired") ? (
             <div className={`chk-sheet ${processing ? "is-processing" : status === "paid" ? "is-success" : "is-failed"}`} role="status">
               {processing ? (
                 <>

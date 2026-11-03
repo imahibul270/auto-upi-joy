@@ -1166,3 +1166,6 @@ section[id]{scroll-margin-top:var(--header-height)}
 .chk-embedded .chk-other-title{margin-top:16px}
 .chk-embedded .chk-option{padding:14px 16px}
 @media(max-width:760px){.chk-embedded .chk-shell{grid-template-columns:minmax(0,1fr)}.chk-embedded .chk-right{padding:36px 10px 12px}.chk-embedded .chk-qr-card{grid-template-columns:1fr;padding:12px;gap:10px}.chk-embedded .chk-qr-col{gap:6px}.chk-embedded .chk-apps-col{gap:4px}.chk-embedded .chk-apps{max-width:180px}.chk-embedded .chk-apps-col p{font-size:12px}}
+.chk-exit-badge{background:var(--secondary);color:var(--secondary-foreground);font-size:28px;font-weight:700}
+.chk-exit-actions{display:flex;justify-content:center;gap:10px;margin-top:10px}
+.chk-exit-actions button{min-width:72px;border-radius:6px}
