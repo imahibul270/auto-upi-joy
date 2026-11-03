@@ -260,6 +260,13 @@
       "when": 1790785877118,
       "tag": "0036_block_fampay_provider",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1793681510836,
+      "tag": "0037_paise_limit_15",
+      "breakpoints": true
     }
   ]
 }
