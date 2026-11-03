@@ -1169,3 +1169,11 @@ section[id]{scroll-margin-top:var(--header-height)}
 .chk-exit-badge{background:var(--secondary);color:var(--secondary-foreground);font-size:28px;font-weight:700}
 .chk-exit-actions{display:flex;justify-content:center;gap:10px;margin-top:10px}
 .chk-exit-actions button{min-width:72px;border-radius:6px}
+/* Exit confirm: no layout jump/shake */
+.chk-right,.chk-options-wrap{overflow-anchor:none}
+.chk-options-wrap:has(.chk-exit-sheet){min-height:0}
+.chk-options-wrap .chk-sheet.chk-exit-sheet{inset:0;min-height:0;flex-direction:row;justify-content:center;gap:12px;padding:10px 12px;text-align:left;animation:chk-up .4s cubic-bezier(.22,1,.36,1) both;will-change:transform}
+.chk-exit-sheet .chk-badge{width:40px;height:40px;font-size:20px;flex-shrink:0}
+.chk-exit-sheet .chk-exit-actions{justify-content:flex-start;margin-top:8px}
+.chk-exit-actions button{background:var(--chk-purple);color:oklch(1 0 0);border-color:var(--chk-purple)}
+.chk-exit-actions button:hover{background:var(--chk-purple-2);color:oklch(1 0 0)}
