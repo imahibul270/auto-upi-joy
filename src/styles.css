@@ -1123,3 +1123,10 @@ section[id]{scroll-margin-top:var(--header-height)}
 @keyframes chk-wave{0%{transform:scale(1);opacity:.8}100%{transform:scale(1.9);opacity:0}}
 @keyframes chk-rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.chk-wave{display:none}.chk-sheet-info{animation:none}}
+/* Centered result content */
+.chk-options-wrap .chk-sheet{flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:8px}
+.chk-options-wrap .chk-sheet-info{align-items:center;flex:none}
+.chk-options-wrap .chk-sheet-order{align-self:center}
+/* Mobile: hide purple header panel and the order heading row */
+@media (max-width:760px){.chk-left,.chk-head{display:none}}
+.chk-options-wrap .chk-sheet{inset:auto 0 0 0;min-height:max(100%,230px);padding:16px 14px}
