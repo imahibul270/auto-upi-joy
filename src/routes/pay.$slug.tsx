@@ -134,6 +134,9 @@ function PayPage() {
   const redirectTarget = status === "paid" ? link?.success_url : status === "expired" ? link?.failure_url : null;
   const autoCloseUpgrade =
     typeof window !== "undefined" && new URLSearchParams(window.location.search).get("autoclose") === "1";
+  // Opened inside a merchant site's popup (checkout.js): tell the parent, never redirect.
+  const embedded =
+    typeof window !== "undefined" && new URLSearchParams(window.location.search).get("embed") === "1" && window.parent !== window;
 
   // Tabs opened by our own upgrade flow tell the opener and then close themselves.
   const [closeBlocked, setCloseBlocked] = useState(false);
@@ -141,7 +144,7 @@ function PayPage() {
   // Merchant redirect: send the payer back to the merchant's own result page.
   useEffect(() => {
     if (!link?.order_id || (status !== "paid" && status !== "expired")) return;
-    if (autoCloseUpgrade || !redirectTarget || !/^https?:\/\//i.test(redirectTarget)) return;
+    if (autoCloseUpgrade || embedded || !redirectTarget || !/^https?:\/\//i.test(redirectTarget)) return;
 
     setRedirectSeconds(3);
     const destination = new URL(redirectTarget);
@@ -160,7 +163,7 @@ function PayPage() {
       window.clearInterval(countdown);
       window.clearTimeout(redirect);
     };
-  }, [autoCloseUpgrade, link?.order_id, redirectTarget, status]);
+  }, [autoCloseUpgrade, embedded, link?.order_id, redirectTarget, status]);
   useEffect(() => {
     if (!autoCloseUpgrade || !link || (status !== "paid" && status !== "expired")) return;
     const opener = typeof window !== "undefined" ? window.opener : null;
@@ -178,6 +181,18 @@ function PayPage() {
     return () => window.clearTimeout(id);
   }, [autoCloseUpgrade, link?.order_id, status]);
 
+
+  useEffect(() => {
+    if (!embedded || !link || (status !== "paid" && status !== "expired")) return;
+    // Let the result animation play, then hand the result to the merchant page.
+    const id = window.setTimeout(() => {
+      window.parent.postMessage(
+        { type: status === "paid" ? "autoupi:paid" : "autoupi:failed", order_id: link.order_id },
+        "*",
+      );
+    }, 2500);
+    return () => window.clearTimeout(id);
+  }, [embedded, link?.order_id, status]);
 
   const copyOrder = async () => {
     if (!link) return;
@@ -278,7 +293,7 @@ function PayPage() {
                       {copied ? <Check strokeWidth={2.6} /> : <Copy strokeWidth={2.2} />}
                     </button>
                   </div>
-                  {redirectTarget && !autoCloseUpgrade ? <p>Redirecting back to merchant&apos;s website... {redirectSeconds}s</p> : null}
+                  {redirectTarget && !autoCloseUpgrade && !embedded ? <p>Redirecting back to merchant&apos;s website... {redirectSeconds}s</p> : null}
                   {closeBlocked ? <p>You can close this window.</p> : null}
                   </div>
                 </>
