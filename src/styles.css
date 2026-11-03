@@ -1130,3 +1130,13 @@ section[id]{scroll-margin-top:var(--header-height)}
 /* Mobile: hide purple header panel and the order heading row */
 @media (max-width:760px){.chk-left,.chk-head{display:none}}
 .chk-options-wrap .chk-sheet{inset:auto 0 0 0;min-height:max(100%,230px);padding:16px 14px}
+/* Panel stops at the "Other Payment Options" title; compact so it fits */
+.chk-options-wrap .chk-sheet{inset:0;min-height:0;padding:8px 12px;gap:4px}
+.chk-options-wrap .chk-badge{width:44px;height:44px}
+.chk-options-wrap .chk-mark{width:24px;height:24px}
+.chk-options-wrap .chk-sheet h2{font-size:14px}
+.chk-options-wrap .chk-sheet-amt{font-size:15px}
+.chk-options-wrap .chk-sheet-info{gap:2px}
+/* Blur only the QR area once a result is detected */
+.chk-qr-card{transition:filter .35s ease}
+.chk-qr-card.is-blurred{filter:blur(6px);pointer-events:none;user-select:none}
