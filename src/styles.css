@@ -1177,3 +1177,6 @@ section[id]{scroll-margin-top:var(--header-height)}
 .chk-exit-sheet .chk-exit-actions{justify-content:flex-start;margin-top:8px}
 .chk-exit-actions button{background:var(--chk-purple);color:oklch(1 0 0);border-color:var(--chk-purple)}
 .chk-exit-actions button:hover{background:var(--chk-purple-2);color:oklch(1 0 0)}
+.chk-options-wrap:has(.chk-exit-sheet){overflow:hidden;contain:layout paint}
+.chk-options-wrap .chk-sheet.chk-exit-sheet{flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:6px}
+.chk-exit-sheet .chk-exit-actions{justify-content:center;margin-top:6px}
