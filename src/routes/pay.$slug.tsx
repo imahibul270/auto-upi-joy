@@ -236,8 +236,8 @@ function PayPage() {
             </div>
           )}
 
-          <p className="chk-other-title">Other Payment Options</p>
           <div className="chk-options-wrap">
+          <p className="chk-other-title">Other Payment Options</p>
           <div className="chk-card chk-options">
             <button type="button" className="chk-option">
               <CreditCard className="chk-opt-icon" />
@@ -264,7 +264,7 @@ function PayPage() {
                 <>
                   <div className="chk-badge">
                     <span className="chk-pulse" />
-                    {status === "paid" ? <span className="chk-coin">₹</span> : null}
+                    {status === "paid" ? <><span className="chk-wave" /><span className="chk-wave chk-wave-2" /></> : null}
                     <svg viewBox="0 0 52 52" className="chk-mark" aria-hidden="true">
                       {status === "paid" ? <path d="M15 27l7 7 15-16" /> : <path d="M17 17l18 18M35 17L17 35" />}
                     </svg>
