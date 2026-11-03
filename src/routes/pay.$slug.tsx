@@ -226,6 +226,11 @@ function PayPage() {
               {loading ? <span className="pay-skeleton pay-skeleton-amount" /> : link ? <>₹{link.payable_amount.toFixed(2)} <ChevronRight /></> : "—"}
             </div>
           </div>
+          <div className="chk-secured">
+            <span>Secured by</span>
+            <img src={brandLogoUrl} alt="" width={18} height={18} />
+            <strong>Auto Upi</strong>
+          </div>
         </aside>
 
         <main className="chk-right">
@@ -302,6 +307,11 @@ function PayPage() {
               )}
             </div>
           ) : null}
+          </div>
+          <div className="chk-secured chk-secured-mobile">
+            <span>Secured by</span>
+            <img src={brandLogoUrl} alt="" width={18} height={18} />
+            <strong>Auto Upi</strong>
           </div>
         </main>
       </div>
