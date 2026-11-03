@@ -65,13 +65,19 @@ function PayPage() {
     let pending = true;
     void supabase.rpc("register_payment_link_click", { _slug: slug });
 
+    let inFlight = false;
     const kickDetection = () => {
-      if (!pending) return;
+      if (!pending || inFlight) return;
+      inFlight = true;
       void fetch("/api/public/payments/poll", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ slug }),
-      }).catch(() => {});
+      })
+        .then((r) => r.json())
+        .then((r: { matched?: number }) => { if (active && (r?.matched ?? 0) > 0) void load(); })
+        .catch(() => {})
+        .finally(() => { inFlight = false; });
     };
 
     const load = async () => {
@@ -123,27 +129,6 @@ function PayPage() {
       .then(setQr);
   }, [link, upiParams]);
 
-  /** Share the QR image itself — Paytm reads a shared QR and opens its pay screen. */
-  const openPaytm = async () => {
-    if (!link || !qr) return;
-    try {
-      const blob = await (await fetch(qr)).blob();
-      const file = new File([blob], `${link.order_id}.png`, { type: "image/png" });
-      const share = navigator.share as ((data: ShareData) => Promise<void>) | undefined;
-      const canShareFiles = navigator.canShare?.({ files: [file] }) ?? false;
-      if (share && canShareFiles) {
-        await navigator.share({ files: [file] });
-        return;
-      }
-      // No share sheet (desktop / old browser): save the QR so it can be uploaded in Paytm.
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = file.name;
-      a.click();
-      window.setTimeout(() => URL.revokeObjectURL(url), 2000);
-    } catch { /* payer dismissed the share sheet */ }
-  };
 
   const status = processing ? "active" : shownStatus ?? link?.status ?? "active";
   const redirectTarget = status === "paid" ? link?.success_url : status === "expired" ? link?.failure_url : null;
@@ -292,9 +277,6 @@ function PayPage() {
                 <p>Scan and pay with</p>
                 <img className="chk-apps" src={upiAppsReal.url} alt="PhonePe, Google Pay, Paytm and other UPI apps" />
                 <p>or other UPI apps</p>
-                <button type="button" className="pay-paytm" onClick={() => void openPaytm()} aria-label="Pay with Paytm">
-                  <img src={paytmLogo.url} alt="Paytm" />
-                </button>
               </div>
             </div>
           )}
