@@ -1,32 +1,27 @@
-# Pay page: smaller result panel, slow spinning coin, faster PhonePe-only detection
+# Popup checkout on the merchant's own website
 
-## 1. Smaller result panel
-- The slide-up panel now covers only the "Card / Net Banking" box at the bottom, not the QR area.
-- The QR, timer and "Payment Options for …" heading stay visible above it.
-- On mobile it is the same: it covers only the bottom options box.
-- Content is made more compact (smaller badge, amount, order ID row, redirect line) so it fits inside that box.
+Yes, this is possible. The customer stays on the merchant's website, and our same payment page opens on top of it as a popup. The payment page design stays exactly as it is.
 
-## 2. New success animation (Razorpay-style feel, our own design)
-- No more falling coin. A gold ₹ coin appears in the centre and slowly spins on its axis (about 1.6s per turn, 2 turns, smooth ease).
-- Once it finishes spinning, the coin turns into a green circle and the tick draws in.
-- A soft green ring pulses outward once.
-- The failed state stays as it is now (red cross with a small shake), only resized to the smaller panel.
-- The animation is drawn by us; no Razorpay files are copied.
+## How it works for the merchant
+1. The merchant adds one line to their website to load our small "Auto Upi Checkout" script from autoupi.in.
+2. Their server creates an order through our API, same as today, and gets the payment link.
+3. On their "Pay" button they call `AutoUpi.open(...)` with that link.
+4. A dark overlay covers their page and our payment page opens in the middle (full screen on phones), with the same QR, timer, processing, success and failed animations.
+5. When the payment succeeds or fails, the popup closes by itself after the result animation and tells the merchant's page the result (order ID + paid/failed). The merchant decides what to show next.
+6. The customer can close the popup with a × button. The merchant's page is then told "closed", and the order stays pending until it expires.
+7. Server-to-server webhooks keep working exactly as today. They are still the only trusted proof of payment. The popup message is only for updating the screen.
 
-## 3. Faster detection, PhonePe only
-- Only emails from exactly `noreply@phonepe.com` are accepted. Paytm emails will no longer be detected (as you asked).
-- The mailbox search asks the server only for PhonePe emails from the last 30 minutes, instead of the whole day.
-- Only the newest 5 emails are read, newest first, so each scan is much shorter.
-- Mailbox checks run every 2 seconds while the pay page is open (now 3 seconds), with the shared limit lowered to 2 seconds per merchant so the mailbox is not overloaded.
-- The page refreshes the status immediately when a match is found (already in place).
+## What stays the same
+- Payment page design, QR, timer, detection, paise logic, webhooks, plans and dashboard.
+- Normal links and redirects keep working for merchants who don't use the popup.
+- Inside the popup, the saved success/failure redirect is skipped. The merchant's page gets the result instead.
 
-Note: the biggest delay is how long PhonePe takes to send the email and Gmail takes to deliver it. That part we cannot speed up; these changes remove our own delay.
-
-## Nothing else changes
-QR, timer, amount/paise logic, webhooks, redirects, plans and dashboard stay as they are.
+## Docs
+A new "Popup checkout" section in Docs with a copy-paste HTML/JS example and a PHP example.
 
 ## Technical details
-- `src/styles.css`: `.chk-sheet` anchored to the `.chk-options` card (position the sheet relative to a wrapper around the "Other Payment Options" card; top = card top). New `chk-coin-spin` keyframes (rotateY 0 to 720deg, 3.2s) then badge colour fade + tick stroke; remove the drop keyframes.
-- `src/routes/pay.$slug.tsx`: render the sheet inside a relative wrapper around the options card; poller interval 2000ms.
-- `src/lib/mail-poll.server.ts`: `MONITOR_SENDERS` only, drop Paytm domains; `fromFilter: ["noreply@phonepe.com"]`, `limit: 5`; skip emails whose Date is older than 30 minutes; throttle `_min_gap_seconds: 2`.
-- `src/lib/imap.server.ts`: fetch newest UIDs first (already limited by `limit`).
+- `public/checkout.js` (new, plain JS): `AutoUpi.open({ url, onSuccess, onFailure, onClose })`. It creates a fixed overlay and an iframe pointing to `/pay/<slug>?embed=1`, and adds a close button. It listens for `message` events only from the autoupi origin and only for the matching order_id, and removes the iframe after the result arrives.
+- `src/routes/pay.$slug.tsx`: when `embed=1`, it posts `{type:"autoupi:paid"|"autoupi:failed", order_id}` to `window.parent` and skips the redirect. Background is transparent around the card. Nothing else changes.
+- The page can be embedded in an iframe: there is currently no frame-blocking header, so this already works. Only `/pay/*` will be allowed to embed; dashboard and admin pages get `frame-ancestors 'none'` so they can't be loaded inside other sites (clickjacking protection).
+- `src/routes/docs.tsx`: new section.
+- Test: a local HTML test page opens the popup on an expired link and checks that the failed message reaches the parent page.
