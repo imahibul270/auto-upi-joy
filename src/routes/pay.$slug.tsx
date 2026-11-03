@@ -12,6 +12,8 @@ export const Route = createFileRoute("/pay/$slug")({
     { name: "description", content: "Scan the UPI QR code and pay securely through Auto Upi." },
     { property: "og:title", content: "autoupi | Scan and Pay" },
     { property: "og:description", content: "Scan the UPI QR code and pay securely through Auto Upi." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary_large_image" },
   ]}),
   ssr: false,
   component: PayPage,

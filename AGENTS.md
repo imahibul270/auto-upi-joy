@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- The hosted checkout script owns merchant popup dimensions; embedded checkout CSS owns internal fitting and scrolling so merchants do not duplicate or restyle the payment UI.

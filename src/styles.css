@@ -1047,7 +1047,7 @@ section[id]{scroll-margin-top:var(--header-height)}
 .chk-qr-col{display:flex;flex-direction:column;align-items:center;gap:10px}
 .chk-qr-wrap{width:160px;height:160px}
 .chk-qr{width:160px!important;height:160px!important}
-.chk-expire{margin:0;color:var(--chk-muted)}
+.chk-expire{margin:0;color:var(--chk-muted);font-size:12px;line-height:1.4;white-space:nowrap}
 .chk-expire b{color:var(--chk-orange);font-weight:500}
 .chk-apps-col{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
 .chk-apps-col p{margin:0;font-size:14px}
@@ -1145,5 +1145,19 @@ section[id]{scroll-margin-top:var(--header-height)}
 .chk-qr-card.is-blurred{filter:none}
 .chk-qr-wrap{transition:filter .35s ease}
 .chk-qr-wrap.is-blurred{filter:blur(6px);pointer-events:none}
-.chk-options-wrap:has(.chk-sheet){min-height:210px}
-.chk-options-wrap .chk-sheet{inset:0;justify-content:center;padding:14px 12px;gap:6px}
+.chk-options-wrap:has(.chk-sheet){min-height:170px}
+.chk-options-wrap .chk-sheet{inset:0;justify-content:center;padding:10px 12px;gap:5px}
+.chk-options-wrap .chk-sheet-order{border-radius:6px;padding:3px 6px;line-height:1.3}
+.chk-options-wrap .chk-sheet-order button{padding:4px;flex:none}
+.chk-options-wrap .chk-sheet-info{max-width:100%}
+.chk-options-wrap .chk-sheet p{line-height:1.35;overflow-wrap:anywhere}
+/* The hosted checkout owns compact iframe sizing; short screens scroll inside it. */
+.chk-screen.chk-embedded{height:100dvh;min-height:0;overflow:hidden}
+.chk-embedded .chk-shell{height:100%;min-height:0;grid-template-columns:minmax(0,38%) minmax(0,62%)}
+.chk-embedded .chk-right{min-height:0;min-width:0;overflow-y:auto;overflow-x:hidden;padding:18px 16px;scrollbar-width:thin}
+.chk-embedded .chk-head{gap:8px;padding-right:26px;margin-bottom:12px}
+.chk-embedded .chk-head p{font-size:14px;overflow-wrap:anywhere}
+.chk-embedded .chk-qr-card{padding:16px;gap:10px;grid-template-columns:minmax(160px,1fr) minmax(0,1fr)}
+.chk-embedded .chk-other-title{margin-top:16px}
+.chk-embedded .chk-option{padding:14px 16px}
+@media(max-width:760px){.chk-embedded .chk-shell{grid-template-columns:minmax(0,1fr)}.chk-embedded .chk-right{padding:36px 10px 12px}.chk-embedded .chk-qr-card{grid-template-columns:1fr;padding:12px;gap:10px}.chk-embedded .chk-qr-col{gap:6px}.chk-embedded .chk-apps-col{gap:4px}.chk-embedded .chk-apps{max-width:180px}.chk-embedded .chk-apps-col p{font-size:12px}}
