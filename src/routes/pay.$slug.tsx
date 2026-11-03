@@ -4,7 +4,6 @@ import QRCode from "qrcode";
 import { supabase } from "@/integrations/supabase/client";
 import { Check, ChevronLeft, ChevronRight, Copy, CreditCard, Landmark, Store, X } from "lucide-react";
 import { brandLogoUrl } from "@/components/BrandLogo";
-import paytmLogo from "@/assets/paytm-logo.png.asset.json";
 import upiAppsReal from "@/assets/upi-apps-real.jpg.asset.json";
 
 export const Route = createFileRoute("/pay/$slug")({
