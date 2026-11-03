@@ -32,6 +32,7 @@ const NAV = [
   ["create-order", "Create order"],
   ["order-status", "Order status"],
   ["webhooks", "Webhooks"],
+  ["popup", "Popup checkout"],
   ["php", "PHP integration"],
   
   ["errors", "Errors"],
@@ -376,6 +377,49 @@ if (!timingSafeEqual(Buffer.from(v1), Buffer.from(expected))) {
               ]}
             />
             <p className="docs-note">Always treat delivery as at-least-once and keep your handler idempotent.</p>
+          </section>
+
+          <section id="popup" className="docs-section">
+            <h2>Popup checkout</h2>
+            <p>
+              Keep the customer on your own website. Load our script once, create the order on your server as usual,
+              then open the returned <code>payment_url</code> as a popup. The same Auto Upi payment page opens on top of
+              your page and closes by itself after the result.
+            </p>
+            <CodeBlock
+              title="HTML / JavaScript"
+              code={`<script src="https://autoupi.in/checkout.js"></script>
+<button id="pay">Pay now</button>
+<script>
+  document.getElementById("pay").onclick = async () => {
+    // Your server calls /api/public/v1/create-order and returns payment_url
+    const { payment_url } = await fetch("/create-order.php", { method: "POST" }).then(r => r.json());
+    AutoUpi.open({
+      url: payment_url,
+      onSuccess: (r) => { location.href = "/thank-you?order_id=" + r.order_id; },
+      onFailure: (r) => { alert("Payment failed for " + r.order_id); },
+      onClose:   () => { console.log("Customer closed the popup"); },
+    });
+  };
+</script>`}
+            />
+            <CodeBlock
+              title="create-order.php"
+              code={`<?php
+$ch = curl_init("https://autoupi.in/api/public/v1/create-order");
+curl_setopt_array($ch, [
+  CURLOPT_POST => true,
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_HTTPHEADER => ["Content-Type: application/json", "x-api-key: YOUR_API_KEY"],
+  CURLOPT_POSTFIELDS => json_encode(["amount" => 100]),
+]);
+header("Content-Type: application/json");
+echo curl_exec($ch);`}
+            />
+            <p className="docs-note">
+              The popup result only updates your screen. Deliver the product only after the signed webhook (or the
+              order status API) says the order is paid. Inside the popup, your saved redirect URLs are not used.
+            </p>
           </section>
 
           <section id="php" className="docs-section">
