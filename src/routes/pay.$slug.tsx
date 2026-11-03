@@ -58,7 +58,7 @@ function PayPage() {
 
   const cancelExit = () => {
     setExitConfirmation(false);
-    backButtonRef.current?.focus();
+    backButtonRef.current?.focus({ preventScroll: true });
   };
 
   useEffect(() => {
@@ -297,7 +297,7 @@ function PayPage() {
               <div className="chk-sheet-info">
                 <h2 id="chk-exit-title">Are you sure you want to exit?</h2>
                 <div className="chk-exit-actions">
-                  <Button type="button" variant="outline" size="sm" autoFocus onClick={cancelExit}>No</Button>
+                  <Button type="button" variant="outline" size="sm" ref={(el) => { el?.focus({ preventScroll: true }); }} onClick={cancelExit}>No</Button>
                   <Button type="button" size="sm" onClick={() => window.history.back()}>Yes</Button>
                 </div>
               </div>
