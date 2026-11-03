@@ -207,7 +207,7 @@ function PayPage() {
   const ss = (secondsLeft % 60).toString().padStart(2, "0");
 
   return (
-    <div className="chk-screen">
+    <div className={`chk-screen${embedded ? " chk-embedded" : ""}`}>
       <div className="chk-shell">
         <aside className="chk-left">
           <div className="chk-left-top">
