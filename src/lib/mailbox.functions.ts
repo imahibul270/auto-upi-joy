@@ -68,3 +68,33 @@ function mailHost(email: string): string {
   if (domain.includes("zoho")) return "imap.zoho.in";
   return "imap.gmail.com";
 }
+
+/** Merchant manually marks one of their own active links as paid. */
+export const markPaymentLinkPaid = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    // Ownership check runs as the merchant (RLS), never via admin.
+    const { data: own } = await (context.supabase.from("payment_links") as any)
+      .select("id")
+      .eq("id", data.id)
+      .eq("user_id", context.userId)
+      .eq("status", "active")
+      .maybeSingle();
+    if (!own) throw new Error("This link is not active or not yours.");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const now = new Date().toISOString();
+    const { data: link } = await (supabaseAdmin.from("payment_links") as any)
+      .update({ status: "paid", paid_at: now, detected_at: now, paid_count: 1 })
+      .eq("id", data.id)
+      .eq("user_id", context.userId)
+      .eq("status", "active")
+      .select("id,order_id,amount,payable_amount,webhook_url")
+      .maybeSingle();
+    if (!link) throw new Error("This link is no longer active.");
+
+    const { deliverWebhook } = await import("@/lib/mail-poll.server");
+    await deliverWebhook(context.userId, link, null);
+    return { ok: true };
+  });

@@ -65,7 +65,7 @@ function senderMatches(from: string): boolean {
 }
 
 /** Send the HMAC-signed `payment.paid` webhook — the merchant's only trusted signal. */
-async function deliverWebhook(
+export async function deliverWebhook(
   userId: string,
   link: { id: string; order_id: string; amount: number; payable_amount: number; webhook_url?: string | null },
   payerName: string | null,
