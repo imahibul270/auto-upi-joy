@@ -1129,3 +1129,4 @@ section[id]{scroll-margin-top:var(--header-height)}
 .chk-options-wrap .chk-sheet-order{align-self:center}
 /* Mobile: hide purple header panel and the order heading row */
 @media (max-width:760px){.chk-left,.chk-head{display:none}}
+.chk-options-wrap .chk-sheet{inset:auto 0 0 0;min-height:max(100%,230px);padding:16px 14px}
