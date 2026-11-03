@@ -2,11 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Check, Copy, Store, X } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Copy, CreditCard, Landmark, Store, X } from "lucide-react";
 import { brandLogoUrl } from "@/components/BrandLogo";
-import bhimUpiLogo from "@/assets/bhim-upi-logo.png.asset.json";
 import paytmLogo from "@/assets/paytm-logo.png.asset.json";
+import upiAppsReal from "@/assets/upi-apps-real.jpg.asset.json";
 
 export const Route = createFileRoute("/pay/$slug")({
   head: () => ({ meta: [
@@ -239,78 +238,83 @@ function PayPage() {
     );
   }
 
+  const mm = Math.floor(secondsLeft / 60).toString().padStart(2, "0");
+  const ss = (secondsLeft % 60).toString().padStart(2, "0");
+
   return (
-    <div className="pay-screen">
-      <div className="pay-card">
-        <header className="pay-head">
-          <img className="pay-bhim-logo" src={bhimUpiLogo.url} alt="BHIM UPI" />
-          {loading ? (
-            <>
+    <div className="chk-screen">
+      <div className="chk-shell">
+        <aside className="chk-left">
+          <div className="chk-left-top">
+            <button type="button" className="chk-back" aria-label="Back" onClick={() => window.history.back()}>
+              <ChevronLeft />
+            </button>
+            <img className="chk-logo" src={brandLogoUrl} alt="Auto Upi" />
+            {loading ? (
               <span className="pay-skeleton pay-skeleton-title" />
-              <span className="pay-skeleton pay-skeleton-line" />
-            </>
-          ) : link ? (
-            <>
-              <h1 className="pay-payee">{link.payee_name || link.upi_id}</h1>
-              <p className="pay-transfer-label">Transfer to</p>
-            </>
-          ) : null}
-        </header>
-        {loading ? (
-          <>
-            <section className="pay-total">
-              <span>Total Amount</span>
-              <strong><span className="pay-skeleton pay-skeleton-amount" /></strong>
-            </section>
-            <section className="pay-code-area">
-              <div className="pay-qr pay-skeleton" />
-              <span className="pay-skeleton pay-skeleton-apps" />
-            </section>
-            <footer className="pay-footer">
-              <span className="pay-skeleton pay-skeleton-line" />
-              <span className="pay-skeleton pay-skeleton-button" />
-            </footer>
-          </>
-        ) : !link ? (
-          <div className="pay-state"><p className="pay-note">This payment link does not exist.</p></div>
-        ) : status === "paid" ? (
-          <div className="pay-state">
-            <h1 className="pay-amount">₹{link.payable_amount.toFixed(2)}</h1>
-            <p className="pay-success">Payment received</p>
-            <p className="pay-note">Order {link.order_id}</p>
+            ) : (
+              <h1 className="chk-payee">{link ? link.payee_name || link.upi_id : "Auto Upi"}</h1>
+            )}
+            <div className="chk-amount">
+              {loading ? <span className="pay-skeleton pay-skeleton-amount" /> : link ? <>₹{link.payable_amount.toFixed(2)} <ChevronRight /></> : "—"}
+            </div>
           </div>
-        ) : status === "expired" ? (
-          <div className="pay-state">
-            <h1 className="pay-amount">₹{link.payable_amount.toFixed(2)}</h1>
-            <p className="pay-note">This payment link has expired.</p>
+        </aside>
+
+        <main className="chk-right">
+          <div className="chk-head">
+            <p>Payment Options for <strong>{loading ? "…" : link?.order_id ?? "—"}</strong></p>
+            <button type="button" className="chk-change">Change</button>
           </div>
-        ) : (
-          <>
-            <section className="pay-total">
-              <span>Total Amount</span>
-              <strong>₹{link.payable_amount.toFixed(2)}</strong>
-            </section>
-            <section className="pay-code-area">
-              <div className="pay-qr-wrap">
-                {qr ? <img className="pay-qr" src={qr} alt="UPI QR code" width={250} height={250} /> : <div className="pay-qr pay-skeleton" />}
-                {qr ? <span className="pay-qr-logo"><img src={brandLogoUrl} alt="" /></span> : null}
-                {processing && (
-                  <div className="pay-processing">
-                    <span className="pay-spinner" />
-                    <p>Processing payment…</p>
-                  </div>
-                )}
+
+          {!loading && !link ? (
+            <div className="chk-card chk-state"><p className="pay-note">This payment link does not exist.</p></div>
+          ) : !loading && link && status === "paid" ? (
+            <div className="chk-card chk-state"><p className="pay-success">Payment received</p><p className="pay-note">Order {link.order_id}</p></div>
+          ) : !loading && link && status === "expired" ? (
+            <div className="chk-card chk-state"><p className="pay-note">This payment link has expired.</p></div>
+          ) : (
+            <div className="chk-card chk-qr-card">
+              <div className="chk-qr-col">
+                <div className="pay-qr-wrap chk-qr-wrap">
+                  {qr && !loading ? <img className="pay-qr chk-qr" src={qr} alt="UPI QR code" width={160} height={160} /> : <div className="pay-qr chk-qr pay-skeleton" />}
+                  {qr && !loading ? <span className="pay-qr-logo"><img src={brandLogoUrl} alt="" /></span> : null}
+                  {processing && (
+                    <div className="pay-processing">
+                      <span className="pay-spinner" />
+                      <p>Processing payment…</p>
+                    </div>
+                  )}
+                </div>
+                <p className="chk-expire">Expires in <b>{mm}:{ss}</b> mins</p>
               </div>
-              <button type="button" className="pay-paytm" onClick={() => void openPaytm()} aria-label="Pay with Paytm">
-                <img src={paytmLogo.url} alt="Paytm" />
-              </button>
-            </section>
-            <footer className="pay-footer">
-              <p>Expire in <strong>{Math.floor(secondsLeft / 60).toString().padStart(2, "0")}:{(secondsLeft % 60).toString().padStart(2, "0")}</strong></p>
-              <Button type="button" className="pay-cancel">Cancel</Button>
-            </footer>
-          </>
-        )}
+              <div className="chk-apps-col">
+                <p>Scan and pay with</p>
+                <img className="chk-apps" src={upiAppsReal.url} alt="PhonePe, Google Pay, Paytm and other UPI apps" />
+                <p>or other UPI apps</p>
+                <button type="button" className="pay-paytm" onClick={() => void openPaytm()} aria-label="Pay with Paytm">
+                  <img src={paytmLogo.url} alt="Paytm" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          <p className="chk-other-title">Other Payment Options</p>
+          <div className="chk-card chk-options">
+            <button type="button" className="chk-option">
+              <CreditCard className="chk-opt-icon" />
+              <span>Card</span>
+              <span className="chk-brands"><i>VISA</i><i>MC</i><i>RuPay</i></span>
+              <ChevronRight />
+            </button>
+            <button type="button" className="chk-option">
+              <Landmark className="chk-opt-icon" />
+              <span>Net Banking</span>
+              <span className="chk-brands" />
+              <ChevronRight />
+            </button>
+          </div>
+        </main>
       </div>
     </div>
   );
