@@ -420,6 +420,16 @@ echo curl_exec($ch);`}
               The popup result only updates your screen. Deliver the product only after the signed webhook (or the
               order status API) says the order is paid. Inside the popup, your saved redirect URLs are not used.
             </p>
+            <h3>Popup size and setup checklist</h3>
+            <ul>
+              <li>Desktop: up to 860px wide and 520px high, limited to 94% of screen width and 80% of screen height.</li>
+              <li>Mobile: 94% of screen width and 80% of the visible screen height. Short screens scroll inside the checkout so the result stays accessible.</li>
+              <li>The script adds the 2px border, close button and backdrop. Do not add another modal, iframe, white wrapper, padding or custom checkout styles.</li>
+              <li>Load the hosted script once and call <code>AutoUpi.open</code> directly with the returned <code>payment_url</code>. Do not copy or self-host an older checkout.js.</li>
+              <li>Allow <code>https://autoupi.in</code> in your site's script-src and frame-src policies if you use Content Security Policy.</li>
+              <li>Keep API keys and webhook secrets on your server. Keep your existing order creation and payment verification unchanged.</li>
+              <li>Check one paid order, one failed/expired order and the close button on desktop and mobile before going live. Callbacks update your page; only server verification authorizes delivery.</li>
+            </ul>
           </section>
 
           <section id="php" className="docs-section">
