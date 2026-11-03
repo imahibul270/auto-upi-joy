@@ -1062,3 +1062,29 @@ section[id]{scroll-margin-top:var(--header-height)}
 @media (max-width:760px){.chk-screen{overflow-x:hidden}.chk-shell{width:100%;padding:0;box-shadow:none}.chk-left-top{border-radius:0 0 16px 16px}.chk-right{min-width:0}.chk-qr-card{justify-items:center;text-align:center;gap:14px}.chk-apps-col{display:flex;flex-direction:column;align-items:center}.chk-apps{max-width:100%;height:auto}.chk-option{min-height:52px}}
 @media (max-width:420px){.chk-right{padding:14px 6px}.chk-right h1,.chk-right h2{font-size:1rem;overflow-wrap:anywhere}.chk-qr{width:150px;height:150px}}
 
+
+/* Result sheet: slides up over payment options */
+.chk-right{position:relative;overflow:hidden}
+.chk-sheet{position:absolute;left:0;right:0;bottom:0;top:62px;background:oklch(1 0 0);border-radius:18px 18px 0 0;box-shadow:0 -10px 30px -12px oklch(.3 .1 300 / .25);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:24px;text-align:center;animation:chk-up .45s cubic-bezier(.22,1,.36,1) both;z-index:5}
+.chk-sheet h2{margin:8px 0 0;font-size:20px;font-weight:700;color:oklch(.22 .02 300)}
+.chk-sheet p{margin:0;color:oklch(.5 .02 300);font-size:13px}
+.chk-ring{width:54px;height:54px;border-radius:50%;border:4px solid oklch(.92 .03 300);border-top-color:oklch(.45 .2 300);animation:chk-spin .8s linear infinite}
+.chk-badge{position:relative;width:84px;height:84px;border-radius:50%;display:grid;place-items:center;animation:chk-pop .5s cubic-bezier(.34,1.56,.64,1) both}
+.is-success .chk-badge{background:oklch(.68 .17 150)}
+.is-failed .chk-badge{background:oklch(.6 .22 25);animation:chk-pop .5s cubic-bezier(.34,1.56,.64,1) both,chk-shake .4s .5s ease both}
+.chk-mark{width:46px;height:46px;fill:none;stroke:oklch(1 0 0);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:chk-draw .4s .9s ease forwards}
+.is-failed .chk-mark{animation-delay:.45s}
+.chk-coin{position:absolute;top:-6px;left:50%;width:34px;height:34px;margin-left:-17px;border-radius:50%;background:radial-gradient(circle at 35% 30%,oklch(.95 .12 95),oklch(.78 .16 80) 60%,oklch(.62 .14 70));color:oklch(.45 .1 70);font-weight:800;font-size:16px;display:grid;place-items:center;box-shadow:0 2px 6px oklch(.4 .1 70 / .4);animation:chk-coin .9s .2s cubic-bezier(.5,0,.5,1) both}
+.chk-sheet-amt{font-size:24px;color:oklch(.22 .02 300)}
+.chk-sheet-order{display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid oklch(.92 .02 300);border-radius:12px;font-size:13px}
+.chk-sheet-order small{display:block;color:oklch(.5 .02 300)}
+.chk-sheet-order button{border:0;background:oklch(.95 .02 300);border-radius:8px;padding:6px;cursor:pointer;display:grid}
+.chk-sheet-order svg{width:16px;height:16px}
+@keyframes chk-up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes chk-spin{to{transform:rotate(360deg)}}
+@keyframes chk-pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes chk-shake{25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-3px)}}
+@keyframes chk-draw{to{stroke-dashoffset:0}}
+@keyframes chk-coin{0%{transform:translateY(-60px) rotateY(0);opacity:0}30%{opacity:1}80%{transform:translateY(20px) rotateY(720deg);opacity:1}100%{transform:translateY(30px) rotateY(720deg) scale(.4);opacity:0}}
+@media (max-width:760px){.chk-sheet{top:52px}}
+@media (prefers-reduced-motion:reduce){.chk-sheet,.chk-badge,.chk-coin,.chk-ring{animation:none}.chk-mark{animation:none;stroke-dashoffset:0}.chk-coin{display:none}}

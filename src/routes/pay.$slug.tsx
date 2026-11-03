@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { supabase } from "@/integrations/supabase/client";
-import { Check, ChevronLeft, ChevronRight, Copy, CreditCard, Landmark, Store, X } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Copy, CreditCard, Landmark } from "lucide-react";
 import { brandLogoUrl } from "@/components/BrandLogo";
 import upiAppsReal from "@/assets/upi-apps-real.jpg.asset.json";
 
@@ -188,41 +188,6 @@ function PayPage() {
     } catch { /* clipboard unavailable */ }
   };
 
-  if (!loading && link && (status === "paid" || status === "expired")) {
-    const failed = status === "expired";
-    return (
-      <div className="pay-screen">
-        <div className={failed ? "pay-done is-failed" : "pay-done"}>
-          <div className="pay-done-top">
-            <div className="pay-done-tick">{failed ? <X strokeWidth={4} /> : <Check strokeWidth={4} />}</div>
-            <h1>{failed ? "Payment failed" : "Payment successful!"}</h1>
-            {redirectTarget && !autoCloseUpgrade ? (
-              <p>Redirecting back to merchant&apos;s website... {redirectSeconds}s</p>
-            ) : null}
-          </div>
-          <div className="pay-done-row">
-            <span className="pay-done-avatar"><Store strokeWidth={2.4} /></span>
-            <div className="pay-done-meta">
-              <strong>{link.order_id}</strong>
-              <b>₹{link.amount.toFixed(2)}</b>
-            </div>
-          </div>
-          <div className="pay-done-order">
-            <div>
-              <span>Order ID</span>
-              <small>{link.order_id}</small>
-            </div>
-            <button type="button" onClick={copyOrder} aria-label="Copy order ID">
-              {copied ? <Check strokeWidth={2.6} /> : <Copy strokeWidth={2.2} />}
-            </button>
-          </div>
-          {closeBlocked ? <p className="pay-done-note">You can close this window.</p> : null}
-        </div>
-
-      </div>
-    );
-  }
-
   const mm = Math.floor(secondsLeft / 60).toString().padStart(2, "0");
   const ss = (secondsLeft % 60).toString().padStart(2, "0");
 
@@ -254,22 +219,12 @@ function PayPage() {
 
           {!loading && !link ? (
             <div className="chk-card chk-state"><p className="pay-note">This payment link does not exist.</p></div>
-          ) : !loading && link && status === "paid" ? (
-            <div className="chk-card chk-state"><p className="pay-success">Payment received</p><p className="pay-note">Order {link.order_id}</p></div>
-          ) : !loading && link && status === "expired" ? (
-            <div className="chk-card chk-state"><p className="pay-note">This payment link has expired.</p></div>
           ) : (
             <div className="chk-card chk-qr-card">
               <div className="chk-qr-col">
                 <div className="pay-qr-wrap chk-qr-wrap">
                   {qr && !loading ? <img className="pay-qr chk-qr" src={qr} alt="UPI QR code" width={160} height={160} /> : <div className="pay-qr chk-qr pay-skeleton" />}
                   {qr && !loading ? <span className="pay-qr-logo"><img src={brandLogoUrl} alt="" /></span> : null}
-                  {processing && (
-                    <div className="pay-processing">
-                      <span className="pay-spinner" />
-                      <p>Processing payment…</p>
-                    </div>
-                  )}
                 </div>
                 <p className="chk-expire">Expires in <b>{mm}:{ss}</b> mins</p>
               </div>
@@ -296,6 +251,36 @@ function PayPage() {
               <ChevronRight />
             </button>
           </div>
+          {link && (processing || status === "paid" || status === "expired") ? (
+            <div className={`chk-sheet ${processing ? "is-processing" : status === "paid" ? "is-success" : "is-failed"}`} role="status">
+              {processing ? (
+                <>
+                  <span className="chk-ring" />
+                  <h2>Processing payment…</h2>
+                  <p>Please don&apos;t close this page</p>
+                </>
+              ) : (
+                <>
+                  <div className="chk-badge">
+                    {status === "paid" ? <span className="chk-coin">₹</span> : null}
+                    <svg viewBox="0 0 52 52" className="chk-mark" aria-hidden="true">
+                      {status === "paid" ? <path d="M15 27l7 7 15-16" /> : <path d="M17 17l18 18M35 17L17 35" />}
+                    </svg>
+                  </div>
+                  <h2>{status === "paid" ? "Payment successful" : "Payment failed"}</h2>
+                  <b className="chk-sheet-amt">₹{link.amount.toFixed(2)}</b>
+                  <div className="chk-sheet-order">
+                    <span>Order ID <small>{link.order_id}</small></span>
+                    <button type="button" onClick={copyOrder} aria-label="Copy order ID">
+                      {copied ? <Check strokeWidth={2.6} /> : <Copy strokeWidth={2.2} />}
+                    </button>
+                  </div>
+                  {redirectTarget && !autoCloseUpgrade ? <p>Redirecting back to merchant&apos;s website... {redirectSeconds}s</p> : null}
+                  {closeBlocked ? <p>You can close this window.</p> : null}
+                </>
+              )}
+            </div>
+          ) : null}
         </main>
       </div>
     </div>
