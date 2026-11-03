@@ -1757,10 +1757,10 @@ BEGIN
   SELECT COALESCE(array_agg(payable_amount), '{}') INTO taken
     FROM public.payment_links
    WHERE user_id = _user AND status = 'active'
-     AND payable_amount BETWEEN base AND base + 0.99;
+     AND payable_amount BETWEEN base AND base + 0.15;
 
   candidate := NULL;
-  FOR i IN SELECT g FROM generate_series(1, 99) g ORDER BY random() LOOP
+  FOR i IN SELECT g FROM generate_series(1, 15) g ORDER BY random() LOOP
     IF NOT (base + (i::numeric / 100)) = ANY (taken) THEN
       candidate := base + (i::numeric / 100); EXIT;
     END IF;
@@ -1816,10 +1816,10 @@ BEGIN
   SELECT COALESCE(array_agg(payable_amount), '{}') INTO taken
     FROM public.payment_links
    WHERE user_id = _user AND status = 'active'
-     AND payable_amount BETWEEN base AND base + 0.99;
+     AND payable_amount BETWEEN base AND base + 0.15;
 
   candidate := NULL;
-  FOR i IN SELECT g FROM generate_series(1, 99) g ORDER BY random() LOOP
+  FOR i IN SELECT g FROM generate_series(1, 15) g ORDER BY random() LOOP
     IF NOT (base + (i::numeric / 100)) = ANY (taken) THEN
       candidate := base + (i::numeric / 100); EXIT;
     END IF;
@@ -3083,10 +3083,10 @@ BEGIN
   SELECT COALESCE(array_agg(payable_amount), '{}') INTO taken
     FROM public.payment_links
    WHERE user_id = _user AND status = 'active'
-     AND payable_amount BETWEEN base AND base + 0.99;
+     AND payable_amount BETWEEN base AND base + 0.15;
 
   candidate := NULL;
-  FOR i IN SELECT g FROM generate_series(1, 99) g ORDER BY random() LOOP
+  FOR i IN SELECT g FROM generate_series(1, 15) g ORDER BY random() LOOP
     IF NOT (base + (i::numeric / 100)) = ANY (taken) THEN
       candidate := base + (i::numeric / 100); EXIT;
     END IF;
@@ -3146,10 +3146,10 @@ BEGIN
   SELECT COALESCE(array_agg(payable_amount), '{}') INTO taken
     FROM public.payment_links
    WHERE user_id = _user AND status = 'active'
-     AND payable_amount BETWEEN base AND base + 0.99;
+     AND payable_amount BETWEEN base AND base + 0.15;
 
   candidate := NULL;
-  FOR i IN SELECT g FROM generate_series(1, 99) g ORDER BY random() LOOP
+  FOR i IN SELECT g FROM generate_series(1, 15) g ORDER BY random() LOOP
     IF NOT (base + (i::numeric / 100)) = ANY (taken) THEN
       candidate := base + (i::numeric / 100); EXIT;
     END IF;
