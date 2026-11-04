@@ -59,10 +59,19 @@ function PayPage() {
   const backButtonRef = useRef<HTMLButtonElement>(null);
   // Razorpay-style splash: white card, logo flash, "Secured by" — ~1 second.
   const [splash, setSplash] = useState(true);
+  const [splashLeaving, setSplashLeaving] = useState(false);
+  const [imagesReady, setImagesReady] = useState(false);
 
+  // Preload checkout images so the UI appears fully loaded after the splash.
   useEffect(() => {
-    const id = window.setTimeout(() => setSplash(false), 1400);
-    return () => window.clearTimeout(id);
+    let cancelled = false;
+    const urls = [brandLogoUrl, upiAppsReal.url, checkoutSideArt];
+    void Promise.all(urls.map((src) => new Promise<void>((resolve) => {
+      const img = new Image();
+      img.onload = img.onerror = () => resolve();
+      img.src = src;
+    }))).then(() => { if (!cancelled) setImagesReady(true); });
+    return () => { cancelled = true; };
   }, []);
 
   const cancelExit = () => {
@@ -219,6 +228,20 @@ function PayPage() {
     }, 2500);
     return () => window.clearTimeout(id);
   }, [embedded, link?.order_id, status]);
+
+  // Splash acts as a loader: hide only once data, QR and images are ready (8s safety cap).
+  const dataReady = !loading && imagesReady && (!link || link.status !== "active" || !!qr);
+  useEffect(() => {
+    if (!splash || splashLeaving) return;
+    if (dataReady) { setSplashLeaving(true); return; }
+    const cap = window.setTimeout(() => setSplashLeaving(true), 8000);
+    return () => window.clearTimeout(cap);
+  }, [dataReady, splash, splashLeaving]);
+  useEffect(() => {
+    if (!splashLeaving) return;
+    const id = window.setTimeout(() => setSplash(false), 350);
+    return () => window.clearTimeout(id);
+  }, [splashLeaving]);
 
   const copyOrder = async () => {
     if (!link) return;
