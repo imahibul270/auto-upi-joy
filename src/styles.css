@@ -1040,7 +1040,7 @@ section[id]{scroll-margin-top:var(--header-height)}
 .chk-embedded .chk-splash{position:absolute;padding:0;background:var(--chk-bg)}
 .chk-splash-card{width:min(860px,100%);height:min(520px,100%);background:oklch(1 0 0);border-radius:14px;box-shadow:0 20px 50px -20px oklch(.3 .1 262/.35);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;animation:chk-splash-in .35s cubic-bezier(.22,1,.36,1) both}
 .chk-embedded .chk-splash-card{width:100%;height:100%;border-radius:0;box-shadow:none}
-.chk-splash-logo{position:relative;width:96px;height:96px;border-radius:24px;overflow:hidden;box-shadow:0 0 0 1px oklch(0 0 0 / .14),0 2px 8px oklch(0 0 0 / .18),0 12px 30px -8px oklch(.45 .19 262 / .45);animation:chk-splash-pop .55s cubic-bezier(.34,1.56,.64,1) both}
+.chk-splash-logo{position:relative;width:96px;height:96px;border-radius:24px;overflow:hidden;box-shadow:0 12px 30px -8px oklch(.45 .19 262 / .45);animation:chk-splash-pop .55s cubic-bezier(.34,1.56,.64,1) both}
 .chk-splash-logo img{width:100%;height:100%;object-fit:cover;display:block}
 .chk-splash-flash{position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,oklch(1 0 0 / .85) 50%,transparent 70%);transform:translateX(-120%);animation:chk-splash-shine .8s .35s ease both}
 .chk-splash-secured{position:absolute;bottom:26px;display:flex;align-items:center;gap:5px;font-size:12px;line-height:18px;color:var(--chk-ink);white-space:nowrap;animation:chk-splash-fade .4s .25s ease both}
