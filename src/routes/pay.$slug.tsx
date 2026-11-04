@@ -7,6 +7,7 @@ import { brandLogoUrl } from "@/components/BrandLogo";
 import { Button } from "@/components/ui/button";
 import upiAppsReal from "@/assets/upi-apps-real.jpg.asset.json";
 import checkoutSideArt from "@/assets/checkout-side-art.png";
+import splashLogo from "@/assets/autoupi-logo-2.jpg.asset.json";
 
 export const Route = createFileRoute("/pay/$slug")({
   head: () => ({ meta: [
@@ -56,6 +57,13 @@ function PayPage() {
   const [redirectSeconds, setRedirectSeconds] = useState(3);
   const [exitConfirmation, setExitConfirmation] = useState(false);
   const backButtonRef = useRef<HTMLButtonElement>(null);
+  // Razorpay-style splash: white card, logo flash, "Secured by" — ~1 second.
+  const [splash, setSplash] = useState(true);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => setSplash(false), 1400);
+    return () => window.clearTimeout(id);
+  }, []);
 
   const cancelExit = () => {
     setExitConfirmation(false);
@@ -226,6 +234,21 @@ function PayPage() {
 
   return (
     <div className={`chk-screen${embedded ? " chk-embedded" : ""}`}>
+      {splash ? (
+        <div className="chk-splash" aria-hidden="true">
+          <div className="chk-splash-card">
+            <div className="chk-splash-logo">
+              <img src={splashLogo.url} alt="" />
+              <span className="chk-splash-flash" />
+            </div>
+            <div className="chk-splash-secured">
+              <span>Secured by</span>
+              <img src={splashLogo.url} alt="" width={16} height={16} />
+              <strong>Auto Upi</strong>
+            </div>
+          </div>
+        </div>
+      ) : null}
       <div className="chk-shell">
         <aside className="chk-left">
           <div className="chk-left-top">
