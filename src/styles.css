@@ -1028,7 +1028,7 @@ section[id]{scroll-margin-top:var(--header-height)}
 /* Two-panel checkout (pay page) */
 .chk-screen{--chk-purple:oklch(.45 .19 262);--chk-purple-2:oklch(.53 .17 262);--chk-lav:oklch(.93 .02 262);--chk-bg:oklch(.975 0 0);--chk-ink:oklch(.25 .02 262);--chk-muted:oklch(.5 .02 262);--chk-line:oklch(.91 .005 262);--chk-orange:oklch(.7 .15 65);
   min-height:100vh;display:grid;place-items:center;padding:24px;background:oklch(.9 .01 262);font-family:"DM Sans",sans-serif;color:var(--chk-ink)}
-.chk-shell{width:min(960px,100%);display:grid;grid-template-columns:420px 1fr;background:var(--chk-bg);border-radius:14px;overflow:hidden;padding:10px;gap:0;min-height:560px;box-shadow:0 20px 50px -20px oklch(.3 .1 300/.35);animation:verify-pop .4s ease}
+.chk-shell{width:min(960px,100%);display:grid;grid-template-columns:420px 1fr;background:var(--chk-bg);border-radius:14px;overflow:hidden;padding:10px;gap:0;min-height:560px;box-shadow:0 20px 50px -20px oklch(.3 .1 262/.35);animation:verify-pop .4s ease}
 .chk-screen.chk-embedded{padding:0;background:var(--chk-bg);place-items:stretch}
 .chk-embedded .chk-shell{width:100%;min-height:100vh;padding:0;border-radius:0;box-shadow:none;animation:none}
 .chk-left{background:var(--chk-lav);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
@@ -1072,20 +1072,20 @@ section[id]{scroll-margin-top:var(--header-height)}
 
 /* Result sheet: slides up over payment options */
 .chk-right{position:relative;overflow:hidden}
-.chk-sheet{position:absolute;left:0;right:0;bottom:0;top:62px;background:oklch(1 0 0);border-radius:18px 18px 0 0;box-shadow:0 -10px 30px -12px oklch(.3 .1 300 / .25);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:24px;text-align:center;animation:chk-up .45s cubic-bezier(.22,1,.36,1) both;z-index:5}
-.chk-sheet h2{margin:8px 0 0;font-size:20px;font-weight:700;color:oklch(.22 .02 300)}
-.chk-sheet p{margin:0;color:oklch(.5 .02 300);font-size:13px}
-.chk-ring{width:54px;height:54px;border-radius:50%;border:4px solid oklch(.92 .03 300);border-top-color:oklch(.45 .2 300);animation:chk-spin .8s linear infinite}
+.chk-sheet{position:absolute;left:0;right:0;bottom:0;top:62px;background:oklch(1 0 0);border-radius:18px 18px 0 0;box-shadow:0 -10px 30px -12px oklch(.3 .1 262 / .25);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:24px;text-align:center;animation:chk-up .45s cubic-bezier(.22,1,.36,1) both;z-index:5}
+.chk-sheet h2{margin:8px 0 0;font-size:20px;font-weight:700;color:oklch(.22 .02 262)}
+.chk-sheet p{margin:0;color:oklch(.5 .02 262);font-size:13px}
+.chk-ring{width:54px;height:54px;border-radius:50%;border:4px solid oklch(.92 .03 262);border-top-color:oklch(.45 .19 262);animation:chk-spin .8s linear infinite}
 .chk-badge{position:relative;width:84px;height:84px;border-radius:50%;display:grid;place-items:center;animation:chk-pop .5s cubic-bezier(.34,1.56,.64,1) both}
 .is-success .chk-badge{background:oklch(.68 .17 150)}
 .is-failed .chk-badge{background:oklch(.6 .22 25);animation:chk-pop .5s cubic-bezier(.34,1.56,.64,1) both,chk-shake .4s .5s ease both}
 .chk-mark{width:46px;height:46px;fill:none;stroke:oklch(1 0 0);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:chk-draw .4s .9s ease forwards}
 .is-failed .chk-mark{animation-delay:.45s}
 .chk-coin{position:absolute;top:-6px;left:50%;width:34px;height:34px;margin-left:-17px;border-radius:50%;background:radial-gradient(circle at 35% 30%,oklch(.95 .12 95),oklch(.78 .16 80) 60%,oklch(.62 .14 70));color:oklch(.45 .1 70);font-weight:800;font-size:16px;display:grid;place-items:center;box-shadow:0 2px 6px oklch(.4 .1 70 / .4);animation:chk-coin .9s .2s cubic-bezier(.5,0,.5,1) both}
-.chk-sheet-amt{font-size:24px;color:oklch(.22 .02 300)}
-.chk-sheet-order{display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid oklch(.92 .02 300);border-radius:12px;font-size:13px}
-.chk-sheet-order small{display:block;color:oklch(.5 .02 300)}
-.chk-sheet-order button{border:0;background:oklch(.95 .02 300);border-radius:8px;padding:6px;cursor:pointer;display:grid}
+.chk-sheet-amt{font-size:24px;color:oklch(.22 .02 262)}
+.chk-sheet-order{display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid oklch(.92 .02 262);border-radius:12px;font-size:13px}
+.chk-sheet-order small{display:block;color:oklch(.5 .02 262)}
+.chk-sheet-order button{border:0;background:oklch(.95 .02 262);border-radius:8px;padding:6px;cursor:pointer;display:grid}
 .chk-sheet-order svg{width:16px;height:16px}
 @keyframes chk-up{from{transform:translateY(100%)}to{transform:translateY(0)}}
 @keyframes chk-spin{to{transform:rotate(360deg)}}
@@ -1096,7 +1096,7 @@ section[id]{scroll-margin-top:var(--header-height)}
 
 /* Compact result panel covering only the Card / Net Banking box */
 .chk-options-wrap{position:relative}
-.chk-options-wrap .chk-sheet{position:absolute;inset:auto 0 0 0;top:auto;min-height:100%;border-radius:14px;flex-direction:row;justify-content:flex-start;gap:14px;padding:12px 14px;text-align:left;box-shadow:0 -6px 20px -10px oklch(.3 .1 300 / .3);overflow:hidden}
+.chk-options-wrap .chk-sheet{position:absolute;inset:auto 0 0 0;top:auto;min-height:100%;border-radius:14px;flex-direction:row;justify-content:flex-start;gap:14px;padding:12px 14px;text-align:left;box-shadow:0 -6px 20px -10px oklch(.3 .1 262 / .3);overflow:hidden}
 .chk-options-wrap .chk-sheet.is-processing{justify-content:center}
 .chk-options-wrap .chk-sheet h2{margin:0;font-size:15px}
 .chk-options-wrap .chk-sheet p{font-size:12px}
