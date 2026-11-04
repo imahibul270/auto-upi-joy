@@ -6,6 +6,7 @@ import { Check, ChevronLeft, ChevronRight, Copy, CreditCard, Landmark } from "lu
 import { brandLogoUrl } from "@/components/BrandLogo";
 import { Button } from "@/components/ui/button";
 import upiAppsReal from "@/assets/upi-apps-real.jpg.asset.json";
+import checkoutSideArt from "@/assets/checkout-side-art.png";
 
 export const Route = createFileRoute("/pay/$slug")({
   head: () => ({ meta: [
@@ -241,6 +242,7 @@ function PayPage() {
               {loading ? <span className="pay-skeleton pay-skeleton-amount" /> : link ? <>₹{link.payable_amount.toFixed(2)} <ChevronRight /></> : "—"}
             </div>
           </div>
+          <img className="chk-art" src={checkoutSideArt} alt="" width={1024} height={1024} loading="lazy" />
           <div className="chk-secured">
             <span>Secured by</span>
             <img src={brandLogoUrl} alt="" width={18} height={18} />
