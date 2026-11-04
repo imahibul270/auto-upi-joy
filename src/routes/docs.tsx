@@ -11,12 +11,12 @@ export const Route = createFileRoute("/docs")({
       {
         name: "description",
         content:
-          "Auto Upi REST API docs: create UPI orders, check payment status, verify signed webhooks and integrate with PHP, Node or any language in minutes.",
+          "Auto Upi popup checkout docs: create UPI orders, open checkout on your website and verify payments with signed webhooks or order status.",
       },
       { property: "og:title", content: "Auto Upi API Documentation" },
       {
         property: "og:description",
-        content: "Create orders, poll status and receive signed webhooks with the Auto Upi UPI gateway API.",
+        content: "Integrate Auto Upi popup checkout on your website with server-side orders and signed payment verification.",
       },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -65,7 +65,8 @@ function CodeBlock({ title, code }: { title: string; code: string }) {
 
 function CodeTabs({ samples }: { samples: { label: string; code: string }[] }) {
   const [tab, setTab] = useState(0);
-  const active = samples[tab] ?? samples[0]!;
+  const active = samples[tab] ?? samples[0];
+  if (!active) return null;
   return (
     <div>
       <div className="docs-tabs">
@@ -128,8 +129,8 @@ function DocsPage() {
           <section id="introduction" className="docs-section docs-hero">
             <h1>Auto Upi API documentation</h1>
             <p>
-              Auto Upi is a self-serve UPI collection gateway. Create an order from your server, send the customer to the
-              hosted checkout page, and the order is confirmed automatically — no commission, no reconciliation, money
+              Auto Upi is a self-serve UPI collection gateway. Create an order from your server and open the
+              hosted checkout as a popup on your own website. Orders are confirmed automatically — no commission, money
               straight into your UPI account.
             </p>
             <div className="docs-quick">
@@ -151,9 +152,11 @@ function DocsPage() {
               <li><strong>Create an account</strong> and sign in to the merchant console.</li>
               <li><strong>Connect an account</strong> — pick PhonePe or Paytm and complete the setup on the Connect Accounts page.</li>
               <li><strong>Generate an API key</strong> on the API Keys page. Copy it once; regenerating replaces the old key.</li>
-              <li><strong>Create an order</strong> from your server and redirect the customer to the returned <code>payment_url</code>.</li>
-              <li><strong>Set your URLs</strong> on the Config page — success redirect, failed redirect and the default webhook URL.</li>
-              <li><strong>Confirm</strong> the payment through the status endpoint or your webhook, then fulfil the order.</li>
+              <li><strong>Copy the webhook secret</strong> from API Keys and store both credentials securely on your server.</li>
+              <li><strong>Set your webhook URL</strong> on Config, or pass your HTTPS webhook endpoint when creating each order.</li>
+              <li><strong>Load the popup script</strong> once from <code>https://autoupi.in/checkout.js</code>.</li>
+              <li><strong>Create an order</strong> from your server, save its ID against the buyer, then call <code>AutoUpi.open({"{ url: payment_url }"})</code> on your page. See <a href="#popup">Popup checkout</a>.</li>
+              <li><strong>Confirm</strong> payment through your signed webhook or a server-side status check, then update the same page and fulfil the order once.</li>
             </ol>
           </section>
 
@@ -205,8 +208,10 @@ curl_setopt_array($ch, [
 $order = json_decode(curl_exec($ch), true);
 curl_close($ch);
 
-// save $order["order_id"] in your database, then send the customer to checkout
-header("Location: " . $order["payment_url"]);`,
+// Check API errors and save order_id against your buyer on your server.
+// Return payment_url to your page for AutoUpi.open({ url: payment_url }).
+header("Content-Type: application/json");
+echo json_encode($order);`,
                 },
                 {
                   label: "node",
@@ -216,7 +221,8 @@ header("Location: " . $order["payment_url"]);`,
   body: JSON.stringify({ amount: 1499, customer_name: "Rahul" }),
 });
 const order = await res.json();
-// order.payment_url -> redirect the customer`,
+// Check res.ok and order.ok, then save order_id against your buyer.
+// Return payment_url to your page for AutoUpi.open({ url: payment_url }).`,
                 },
               ]}
             />
@@ -242,7 +248,7 @@ const order = await res.json();
           <section id="order-status" className="docs-section">
             <h2>Order status</h2>
             <p className="docs-endpoint"><span className="m-get">GET</span> <code>/api/public/v1/order-status?order_id=ORD…</code></p>
-            <p>Poll this endpoint from your server (or after the customer returns) to confirm a payment before fulfilment.</p>
+            <p>Check this endpoint from your server during checkout or after a popup callback to confirm payment before fulfilment. Your page calls your own status endpoint; it never sends the API key to Auto Upi directly.</p>
             <CodeTabs
               samples={[
                 {
@@ -266,7 +272,7 @@ function autoupi_status(string $orderId): array {
 
 $order = autoupi_status($_GET["order_id"]);
 if (($order["status"] ?? "") === "paid") {
-  // mark the order paid in your database and show the success page
+  // fulfil this buyer's saved order once and update the same page
 }`,
                 },
               ]}
@@ -308,12 +314,6 @@ if (($order["status"] ?? "") === "paid") {
               <strong> Config</strong> page in your dashboard — it is used for every order of your account when the
               create order call does not send its own <code>webhook_url</code>.
             </p>
-            <p>
-              The same Config page holds your <strong>success</strong> and <strong>failed</strong> redirect URLs. After
-              the checkout result screen the payer is sent to your URL with <code>?order_id=…&amp;status=paid</code> or
-              <code>?order_id=…&amp;status=failed</code>. Redirects are per account, so only your own orders use them.
-              Always confirm the final state with the webhook or the order status endpoint before you fulfil.
-            </p>
             <CodeBlock
               title="payload"
               code={`POST https://yoursite.com/autoupi-webhook.php
@@ -338,7 +338,7 @@ v1 = hex(hmac_sha256(webhook_secret, signed_payload))`}
                   label: "php",
                   code: `<?php
 // autoupi-webhook.php
-$secret = "whsec_your_webhook_secret";
+$secret = getenv("AUTOUPI_WEBHOOK_SECRET");
 $raw    = file_get_contents("php://input");
 $header = $_SERVER["HTTP_X_AUTOUPI_SIGNATURE"] ?? "";
 
@@ -390,53 +390,84 @@ if (!timingSafeEqual(Buffer.from(v1), Buffer.from(expected))) {
               title="HTML / JavaScript"
               code={`<script src="https://autoupi.in/checkout.js"></script>
 <button id="pay">Pay now</button>
+<p id="payment-status" role="status"></p>
 <script>
+  const payButton = document.getElementById("pay");
+  const paymentStatus = document.getElementById("payment-status");
   document.getElementById("pay").onclick = async () => {
-    // Your server calls /api/public/v1/create-order and returns payment_url
-    const { payment_url } = await fetch("/create-order.php", { method: "POST" }).then(r => r.json());
-    AutoUpi.open({
-      url: payment_url,
-      onSuccess: (r) => { location.href = "/thank-you?order_id=" + r.order_id; },
-      onFailure: (r) => { alert("Payment failed for " + r.order_id); },
-      onClose:   () => { console.log("Customer closed the popup"); },
-    });
+    payButton.disabled = true;
+    paymentStatus.textContent = "Starting payment…";
+    try {
+      // Your server uses the saved cart price, not a browser-supplied amount.
+      // Protect this request with your app's session and CSRF controls.
+      const response = await fetch("/checkout.php", { method: "POST" });
+      const order = await response.json();
+      if (!response.ok || !order.ok || !order.payment_url) {
+        throw new Error("Could not start payment. Please try again.");
+      }
+      if (!window.AutoUpi) throw new Error("Checkout could not load. Please try again.");
+      AutoUpi.open({
+        url: order.payment_url,
+        onSuccess: (result) => {
+          paymentStatus.textContent = "Confirming payment…";
+          // Call YOUR server's buyer-scoped order-status endpoint here.
+          // Show success only after it reads paid from Auto Upi.
+          // The signed webhook can also confirm the order independently.
+          payButton.disabled = false;
+        },
+        onFailure: (result) => {
+          paymentStatus.textContent = "Payment failed or expired. Please try again.";
+          payButton.disabled = false;
+        },
+      });
+      paymentStatus.textContent = "Waiting for payment…";
+    } catch (error) {
+      paymentStatus.textContent = error.message || "Could not start payment.";
+      payButton.disabled = false;
+    }
   };
 </script>`}
             />
             <CodeBlock
-              title="create-order.php"
+              title="Server-side order creation"
               code={`<?php
 $ch = curl_init("https://autoupi.in/api/public/v1/create-order");
 curl_setopt_array($ch, [
   CURLOPT_POST => true,
   CURLOPT_RETURNTRANSFER => true,
-  CURLOPT_HTTPHEADER => ["Content-Type: application/json", "x-api-key: YOUR_API_KEY"],
-  CURLOPT_POSTFIELDS => json_encode(["amount" => 100]),
+  CURLOPT_HTTPHEADER => ["Content-Type: application/json", "X-API-Key: " . getenv("AUTOUPI_KEY")],
+  // Example price only: use your server's saved cart amount in production.
+  CURLOPT_POSTFIELDS => json_encode(["amount" => 100, "webhook_url" => "https://yoursite.com/autoupi-webhook.php"]),
 ]);
+// For complete order saving and error handling, see checkout.php below.
 header("Content-Type: application/json");
 echo curl_exec($ch);`}
             />
             <p className="docs-note">
               The popup result only updates your screen. Deliver the product only after the signed webhook (or the
-              order status API) says the order is paid. Inside the popup, your saved redirect URLs are not used.
+              order status API) says the order is paid. Update the current merchant page after confirmation; do not
+              navigate the customer away. The snippets show integration hooks, not a ready-made store: connect them
+              to your own saved orders, buyer authentication and fulfilment.
             </p>
             <h3>Popup size and setup checklist</h3>
             <ul>
               <li>Desktop: up to 860px wide and 520px high, limited to 94% of screen width and 80% of screen height.</li>
               <li>Mobile: 94% of screen width and 80% of the visible screen height. Short screens scroll inside the checkout so the result stays accessible.</li>
-              <li>The script adds the 2px border, close button and backdrop. Do not add another modal, iframe, white wrapper, padding or custom checkout styles.</li>
+              <li>The script adds the 3px border, rounded corners and backdrop. There is no top-right close icon; keep the existing left Back control. Do not add another modal, iframe, white wrapper, padding or custom checkout styles.</li>
               <li>Load the hosted script once and call <code>AutoUpi.open</code> directly with the returned <code>payment_url</code>. Do not copy or self-host an older checkout.js.</li>
               <li>Allow <code>https://autoupi.in</code> in your site's script-src and frame-src policies if you use Content Security Policy.</li>
               <li>Keep API keys and webhook secrets on your server. Keep your existing order creation and payment verification unchanged.</li>
-              <li>Check one paid order, one failed/expired order and the close button on desktop and mobile before going live. Callbacks update your page; only server verification authorizes delivery.</li>
+              <li>Use <code>onSuccess</code> and <code>onFailure</code> for result updates. The current hosted script does not emit an <code>onClose</code> callback; do not rely on it to reset your page. A buyer-scoped server status check can reconcile pending orders.</li>
+              <li>Check one paid order, one failed/expired order, duplicate webhook delivery and the left Back confirmation on desktop and mobile before going live. Callbacks update your page; only server verification authorizes delivery.</li>
             </ul>
           </section>
 
           <section id="php" className="docs-section">
             <h2>PHP integration in 3 files</h2>
             <p>
-              Copy these three files into any PHP site (WordPress, Laravel, CodeIgniter or plain PHP). Only the API key,
-              webhook secret and your database calls need changing.
+              Use these three server-side files with the HTML / JavaScript popup example above. Store the API key
+              and webhook secret securely, and connect the order-saving and fulfilment hooks to your existing site.
+              WordPress, Laravel and CodeIgniter should use their own session, CSRF and request handling conventions.
             </p>
             <CodeBlock
               title="1. autoupi.php — tiny helper class"
@@ -484,21 +515,27 @@ class AutoUpi {
 }`}
             />
             <CodeBlock
-              title="2. checkout.php — start a payment"
+              title="2. checkout.php — return the popup order"
               code={`<?php
 require "autoupi.php";
-$api = new AutoUpi("aupi_live_your_key");
+// Require POST, authenticate the buyer, and validate CSRF using your app.
+$api = new AutoUpi(getenv("AUTOUPI_KEY"));
 
 $order = $api->createOrder(1499, "Rahul Sharma", "https://yoursite.com/autoupi-webhook.php");
 
 if (empty($order["ok"])) {
-  die("Could not start payment: " . ($order["error"] ?? "unknown"));
+  http_response_code(400);
+  header("Content-Type: application/json");
+  echo json_encode(["ok" => false, "error" => "Could not start payment"]);
+  exit;
 }
 
 // store it so the webhook can find the buyer later
 save_order($order["order_id"], $_SESSION["user_id"], $order["amount"]);
 
-header("Location: " . $order["payment_url"]);
+// save_order is your application's function, not an Auto Upi SDK method.
+header("Content-Type: application/json");
+echo json_encode(["ok" => true, "order_id" => $order["order_id"], "payment_url" => $order["payment_url"]]);
 exit;`}
             />
             <CodeBlock
@@ -509,7 +546,7 @@ require "autoupi.php";
 $raw = file_get_contents("php://input");
 $sig = $_SERVER["HTTP_X_AUTOUPI_SIGNATURE"] ?? "";
 
-if (!AutoUpi::verify($raw, $sig, "whsec_your_webhook_secret")) {
+if (!AutoUpi::verify($raw, $sig, getenv("AUTOUPI_WEBHOOK_SECRET"))) {
   http_response_code(401);
   exit("bad signature");
 }
@@ -517,6 +554,8 @@ if (!AutoUpi::verify($raw, $sig, "whsec_your_webhook_secret")) {
 $event = json_decode($raw, true);
 if (($event["event"] ?? "") === "payment.paid") {
   // amount = your original order value; payable_amount = what the customer actually paid
+  // Look up the saved order and verify its amount before fulfilment.
+  // Your mark_order_paid function must handle duplicate delivery atomically.
   mark_order_paid($event["order_id"], $event["amount"]);
 }
 
@@ -524,8 +563,9 @@ http_response_code(200);
 echo "ok";`}
             />
             <p className="docs-note">
-              No webhook endpoint yet? Poll <code>order-status</code> on your thank-you page instead — the result is the
-              same, just a few seconds slower.
+              No webhook endpoint yet? Your page can call your own server to check <code>order-status</code> while
+              the popup is open and after a result. Authenticate the buyer, check order ownership and fulfil once
+              only when the server confirms <code>paid</code>. Never put the API key in that page.
             </p>
           </section>
 
