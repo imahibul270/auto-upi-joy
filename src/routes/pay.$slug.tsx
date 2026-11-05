@@ -299,7 +299,7 @@ function PayPage() {
         <main className="chk-right">
           <div className="chk-head">
             <p>Payment Options for <strong>{loading ? "…" : link?.order_id ?? "—"}</strong></p>
-            <button type="button" className="chk-change" aria-label="More options">⋮</button>
+            <button type="button" className="chk-change" aria-label="More options">⋯</button>
           </div>
 
           {!loading && !link ? (
