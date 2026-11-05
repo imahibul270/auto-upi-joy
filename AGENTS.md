@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - The hosted checkout script owns merchant popup dimensions; embedded checkout CSS owns internal fitting and scrolling so merchants do not duplicate or restyle the payment UI.
+- Keep the splash logo inline using the supplied artwork data so it needs no separate image request; preserve the checkout's existing sizing and animation styles.
