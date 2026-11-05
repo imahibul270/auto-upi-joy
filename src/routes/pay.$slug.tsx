@@ -7,7 +7,7 @@ import { brandLogoUrl } from "@/components/BrandLogo";
 import { Button } from "@/components/ui/button";
 import upiAppsReal from "@/assets/upi-apps-real.jpg.asset.json";
 import checkoutSideArt from "@/assets/checkout-side-art.png";
-import splashLogo from "@/assets/autoupi-logo-2.jpg.asset.json";
+import { splashLogoInline } from "@/assets/splash-logo-inline";
 
 export const Route = createFileRoute("/pay/$slug")({
   head: () => ({ meta: [
@@ -261,12 +261,12 @@ function PayPage() {
         <div className="chk-splash" aria-hidden="true">
           <div className="chk-splash-card">
             <div className="chk-splash-logo">
-              <img src={splashLogo.url} alt="" />
+              <img src={splashLogoInline} alt="" />
               <span className="chk-splash-flash" />
             </div>
             <div className="chk-splash-secured">
               <span>Secured by</span>
-              <img src={splashLogo.url} alt="" width={16} height={16} />
+              <img src={splashLogoInline} alt="" width={16} height={16} />
               <strong>Auto Upi</strong>
             </div>
           </div>
