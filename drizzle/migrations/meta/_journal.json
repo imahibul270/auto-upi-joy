@@ -267,6 +267,13 @@
       "when": 1793681510836,
       "tag": "0037_paise_limit_15",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1794569569894,
+      "tag": "0038_lock_platform_settings",
+      "breakpoints": true
     }
   ]
 }
