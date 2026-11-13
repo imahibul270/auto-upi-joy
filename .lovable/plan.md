@@ -1,18 +1,19 @@
-# Moving Auto Upi off Lovable (no changes to the live app)
+# Checkout UI + animation clone prompt (TXT only)
 
-## What is and isn't possible here
-- I can't build a Cloudflare hosting/deploy setup for this project from here. That isn't supported, and the current site must keep running untouched.
-- Moving the database to Cloudflare (D1) would mean rewriting every login, plan limit, quota, double-payment check and admin rule. That is a big risk of new payment bugs, so I won't do it.
-- What already works without Lovable: the code is standard. You can take it through GitHub (Project settings → Git → connect, or Download codebase), run it on your own server, and use your own database with the ready-made `database/setup.sql` (empty, with no users or data).
+## What you get
+One file in Files: `autoupi-checkout-ui-clone-prompt.txt`. Give it to any AI to rebuild the same checkout look and animations.
 
-## What I will do (documentation only, no app code changes)
-1. Update `database/GUIDE.md` with one clear "Exit Lovable" checklist in simple Hinglish:
-   - Export the code (GitHub sync or Download codebase).
-   - Create your own empty database (supabase.com or self-hosted) and run `setup.sql`. Payment detection, polling, mailbox connect, success handling and double-payment protection all come along with it.
-   - Fill in the `.env` values and the admin email.
-   - Host it on any Node host (Hostinger guide is already there). The domain autoupi.in moves to the new host only after testing.
-   - Test checklist: register, connect mailbox, ₹1 payment, check for duplicate credit, webhook, admin.
-2. List what does NOT come with the export: Lovable AI/connector keys and the payment gateway secrets, which you add again yourself.
+## What the TXT will contain
+- Layout: blue left panel (back arrow, logo, payee, amount box, shopping art, "Secured by Auto Upi"), right panel (order ID heading, ⋯ button, QR card with logo, expiry timer, UPI apps strip, Card/Net Banking rows). Mobile stacking at 760px.
+- Splash screen: white card, logo pop, shine flash, "Secured by", stays until the page is loaded (8s safety limit), fades out in 350ms.
+- Timer: mm:ss countdown from the server expiry time.
+- QR blur when the result arrives.
+- 2-second "Processing payment…" ring.
+- Success: green circle bounce, tick draw, ripple waves, text slides up, amount, order ID copy, 3-2-1 redirect line.
+- Failed: black/white card, red cross, shake.
+- Back button Yes/No exit sheet, with the same slide-up and no page jerk.
+- Exact colors, sizes, timings and keyframes, plus the full JSX and CSS copied from your current code (your own code) so the AI can paste it.
+- Rules for the AI: only the UI. Payment detection, the database and webhooks stay with the AI's own backend. No restyling.
 
 ## Not touched
-The current live site, payments, database and all logic.
+The app, the live site and all logic. I only write the TXT file and check that it's complete.
